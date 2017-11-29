@@ -1,2 +1,2 @@
 # DonerECS
-A tweaked Entity Component Systerm
+A Tweaked Entity-Component System
