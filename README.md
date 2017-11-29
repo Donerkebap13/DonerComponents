@@ -1,10 +1,6 @@
 # DonerECS - A Tweaked Entity-Component System
 DonerECS, Doner Entity-Component System, or simply DECS, is a framework that uses C++11 features to provide a **Unity-like** entity-component System.
 
-## Disclaimer
-**DonerECS doesn't pretend to be a cache friendly Entity-Component System.** It's not based on Systems either. In DonerECS each component has it's own Update method, and also others such as Init(), Activate(), Deactivate() and so on. The way of sharing information around is through messages. 
-If you are not familiar with this way of working, I recommend you to have a look to the [Example Project](#example) or the  [Tutorial](#tutorial)  and give it a try!
-
 ## Features
 - Support for **complex entity hierarchies**, with parent/children relationships, activation, deactivation etc. 
 - A **Handle System** to determine if any entity/component is still valid or has been destroyed already.
@@ -14,6 +10,10 @@ If you are not familiar with this way of working, I recommend you to have a look
 - **Prefab system** to reuse and compose more complex hierarchies.
 - A **JSON parsing system** to load your prefabs/entities/scenes from disk.
 - **178 Unit Tests (and counting) ensures that everything should work as expected.**
+
+## Disclaimer
+**DonerECS doesn't pretend to be a cache friendly Entity-Component System.** It's not based on Systems either. In DonerECS each component has it's own Update method, and also others such as Init(), Activate(), Deactivate() and so on. The way of sharing information around is through messages. 
+If you are not familiar with this way of working, I recommend you to have a look to the [Example Project](#example) or the  [Tutorial](#tutorial)  and give it a try!
 
 ## Downloading
 
