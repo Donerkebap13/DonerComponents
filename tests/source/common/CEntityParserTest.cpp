@@ -28,6 +28,7 @@
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/entity/CEntityManager.h>
 #include <donerecs/entity/CEntityParser.h>
+#include <donerecs/entity/CPrefabManager.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 #include <donerecs/tags/CTagsManager.h>
@@ -46,8 +47,8 @@ namespace DonerECS
 			CCompFoo() : m_a(-1), m_b(-1) {}
 			void ParseAtts(const Json::Value& atts) override
 			{
-				m_a = !atts["a"].isNull() ? atts["a"].asInt() : -1;
-				m_b = !atts["b"].isNull() ? atts["b"].asInt() : -1;
+				m_a = !atts["a"].isNull() ? atts["a"].asInt() : m_a;
+				m_b = !atts["b"].isNull() ? atts["b"].asInt() : m_b;
 			}
 			int m_a;
 			int m_b;
@@ -82,6 +83,16 @@ namespace DonerECS
 			"\"type\": \"entity\", \"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
 			"\"components\": [{ \"type\": \"foo\", \"a\": 1, \"b\": -3 }],"
 			"\"children\": [{ \"type\": \"entity\", \"name\": \"test11\", \"initiallyActive\":false, \"tags\": [\"tag1\", \"tag3\"], \"components\": [{ \"type\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
+
+		const char* const ENTITY_BASED_ON_PREFAB = "{ \"root\": {"
+			"\"type\": \"entity\", \"name\": \"test1\", \"prefab\": \"prefabTest\"}}";
+
+		const char* const ENTITY_BASED_ON_PREFAB_MODIFYING_COMPONENT_DATA = "{ \"root\": {"
+			"\"type\": \"entity\", \"name\": \"test1\", \"prefab\": \"prefabTest\","
+			"\"components\": [{ \"type\": \"foo\", \"b\": 1337, \"initiallyActive\":false }]}}";
+
+		const char* const ENTITY_BASED_ON_PREFAB_ADDING_EXTRA_TAGS = "{ \"root\": {"
+			"\"type\": \"entity\", \"name\": \"test1\", \"prefab\": \"prefabTest\", \"tags\": [\"tag2\", \"tag3\"]}}";
 	}
 
 	class CEntityParserTest : public ::testing::Test
@@ -90,6 +101,7 @@ namespace DonerECS
 		CEntityParserTest()
 			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
 			, m_entityManager(CEntityManager::CreateInstance())
+			, m_prefabManager(CPrefabManager::CreateInstance())
 			, m_tagManager(CTagsManager::CreateInstance())
 		{
 			ADD_COMPONENT_FACTORY("foo", EntityParserTestInternal::CCompFoo, 10);
@@ -102,12 +114,14 @@ namespace DonerECS
 		~CEntityParserTest()
 		{
 			CComponentFactoryManager::DestroyInstance();
+			CPrefabManager::DestroyInstance();
 			CEntityManager::DestroyInstance();
 			CTagsManager::DestroyInstance();
 		}
 
-		CEntityManager *m_entityManager;
 		CComponentFactoryManager *m_componentFactoryManager;
+		CEntityManager *m_entityManager;
+		CPrefabManager *m_prefabManager;
 		CTagsManager *m_tagManager;
 	};
 
@@ -240,5 +254,77 @@ namespace DonerECS
 		EXPECT_TRUE(component->IsInitialized());
 		EXPECT_FALSE(component->IsActive());
 		EXPECT_FALSE(component->IsDestroyed());
+	}
+
+	TEST_F(CEntityParserTest, parse_entity_based_on_prefab)
+	{
+		CEntityParser parser;
+		CEntity* prefabEntity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY);
+		EXPECT_NE(nullptr, prefabEntity);
+
+		bool success = m_prefabManager->RegisterPrefab("prefabTest", prefabEntity);
+		EXPECT_TRUE(success);
+
+
+		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ENTITY_BASED_ON_PREFAB);
+		EXPECT_NE(nullptr, entity);
+		EXPECT_EQ(std::string("test1"), entity->GetName());
+		EXPECT_TRUE(entity->GetIsInitiallyActive());
+		EXPECT_TRUE(entity->IsInitialized());
+		EXPECT_TRUE(entity->IsActive());
+		EXPECT_FALSE(entity->IsDestroyed());
+
+		EntityParserTestInternal::CCompFoo* component = entity->GetComponent<EntityParserTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, component);
+		EXPECT_TRUE(component->GetIsInitiallyActive());
+		EXPECT_TRUE(component->IsInitialized());
+		EXPECT_TRUE(component->IsActive());
+		EXPECT_FALSE(component->IsDestroyed());
+		EXPECT_EQ(1, component->m_a);
+		EXPECT_EQ(-3, component->m_b);
+
+		EXPECT_TRUE(entity->HasTags("tag1"));
+		EXPECT_FALSE(entity->HasTags("tag2"));
+		EXPECT_TRUE(entity->HasTags("tag3"));
+	}
+
+	TEST_F(CEntityParserTest, parse_entity_based_on_prefab_modifying_component_data)
+	{
+		CEntityParser parser;
+		CEntity* prefabEntity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY);
+		EXPECT_NE(nullptr, prefabEntity);
+
+		bool success = m_prefabManager->RegisterPrefab("prefabTest", prefabEntity);
+		EXPECT_TRUE(success);
+
+		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ENTITY_BASED_ON_PREFAB_MODIFYING_COMPONENT_DATA);
+		EXPECT_NE(nullptr, entity);
+
+		EntityParserTestInternal::CCompFoo* component = entity->GetComponent<EntityParserTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, component);
+		EXPECT_FALSE(component->GetIsInitiallyActive());
+		EXPECT_TRUE(component->IsInitialized());
+		EXPECT_FALSE(component->IsActive());
+		EXPECT_FALSE(component->IsDestroyed());
+		EXPECT_EQ(1, component->m_a);
+		EXPECT_EQ(1337, component->m_b);
+	}
+
+
+	TEST_F(CEntityParserTest, parse_entity_based_on_prefab_with_extra_tags)
+	{
+		CEntityParser parser;
+		CEntity* prefabEntity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY);
+		EXPECT_NE(nullptr, prefabEntity);
+
+		bool success = m_prefabManager->RegisterPrefab("prefabTest", prefabEntity);
+		EXPECT_TRUE(success);
+
+		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ENTITY_BASED_ON_PREFAB_ADDING_EXTRA_TAGS);
+		EXPECT_NE(nullptr, entity);
+
+		EXPECT_TRUE(entity->HasTags("tag1"));
+		EXPECT_TRUE(entity->HasTags("tag2"));
+		EXPECT_TRUE(entity->HasTags("tag3"));
 	}
 }

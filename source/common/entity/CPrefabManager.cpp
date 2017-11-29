@@ -37,9 +37,12 @@ namespace DonerECS
 
 	CPrefabManager::~CPrefabManager()
 	{
-		for (auto& pair : m_prefabs)
+		if (CEntityManager::Get())
 		{
-			m_entityManager.DestroyEntity(&pair.second);
+			for (auto& pair : m_prefabs)
+			{
+				m_entityManager.DestroyEntity(&pair.second);
+			}
 		}
 		m_prefabs.clear();
 	}
