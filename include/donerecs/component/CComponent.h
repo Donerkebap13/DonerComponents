@@ -47,9 +47,9 @@ namespace DonerECS
 	public:
 		virtual ~CComponent();
 
-		virtual void Init();
-		virtual void Update(float dt);
-		virtual void Destroy();
+		void Init();
+		void Update(float dt);
+		void Destroy();
 
 		operator CHandle();
 		const CComponent* operator=(const CHandle& rhs);
@@ -83,8 +83,8 @@ namespace DonerECS
 			}
 		}
 
-		virtual void Activate();
-		virtual void Deactivate();
+		void Activate();
+		void Deactivate();
 
 		bool IsInitialized() const { return m_initialized; }
 		bool IsActive() const { return m_numDeactivations == 0; }

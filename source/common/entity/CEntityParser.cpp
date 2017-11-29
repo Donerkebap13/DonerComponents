@@ -53,6 +53,18 @@ namespace DonerECS
 		return ParseSceneFromJson((const char*)mdp.GetBaseData());
 	}
 
+	CHandle CEntityParser::ParseSceneFromMemory(void* jsonStringBuffer, std::size_t size)
+	{
+		CMemoryDataProvider mdp((const unsigned char*)jsonStringBuffer, size);
+		if (!mdp.IsValid())
+		{
+			printf("CEntityParser::error reading from Buffer!\n");
+			return CHandle();
+		}
+
+		return ParseSceneFromJson((const char*)mdp.GetBaseData());
+	}
+
 	CHandle CEntityParser::ParseSceneFromJson(const char* const jsonStr)
 	{
 		CHandle result;
