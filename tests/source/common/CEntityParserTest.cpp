@@ -34,6 +34,7 @@
 #include <donerecs/tags/CTagsManager.h>
 #include <donerecs/handle/CHandle.h>
 #include <donerecs/json/json.h>
+#include <donerecs/utils/memory/CMemoryDataProvider.h>
 
 #include <gtest/gtest.h>
 
@@ -325,6 +326,35 @@ namespace DonerECS
 
 		EXPECT_TRUE(entity->HasTags("tag1"));
 		EXPECT_TRUE(entity->HasTags("tag2"));
+		EXPECT_TRUE(entity->HasTags("tag3"));
+	}
+
+	TEST_F(CEntityParserTest, parse_entity_from_memory_buffer)
+	{
+		std::string entityStr(EntityParserTestInternal::ONE_LEVEL_ENTITY);
+		CMemoryDataProvider mdp((unsigned char*)entityStr.c_str(), entityStr.size());
+
+		CEntityParser parser;
+		CEntity* entity = parser.ParseSceneFromMemory(mdp.GetBaseData(), mdp.GetSize());
+
+		EXPECT_NE(nullptr, entity);
+		EXPECT_EQ(std::string("test1"), entity->GetName());
+		EXPECT_TRUE(entity->GetIsInitiallyActive());
+		EXPECT_TRUE(entity->IsInitialized());
+		EXPECT_TRUE(entity->IsActive());
+		EXPECT_FALSE(entity->IsDestroyed());
+
+		EntityParserTestInternal::CCompFoo* component = entity->GetComponent<EntityParserTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, component);
+		EXPECT_TRUE(component->GetIsInitiallyActive());
+		EXPECT_TRUE(component->IsInitialized());
+		EXPECT_TRUE(component->IsActive());
+		EXPECT_FALSE(component->IsDestroyed());
+		EXPECT_EQ(1, component->m_a);
+		EXPECT_EQ(-3, component->m_b);
+
+		EXPECT_TRUE(entity->HasTags("tag1"));
+		EXPECT_FALSE(entity->HasTags("tag2"));
 		EXPECT_TRUE(entity->HasTags("tag3"));
 	}
 }
