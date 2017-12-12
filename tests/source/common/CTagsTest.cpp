@@ -31,6 +31,11 @@
 
 namespace DonerECS
 {
+	namespace TagsTestInternal
+	{
+		const char* const TAGS_JSON_FILE = "{ \"tags\": [\"test\", \"test2\"] }";
+	}
+
 	class CTagsTest : public ::testing::Test
 	{
 	public:
@@ -261,6 +266,30 @@ namespace DonerECS
 		bool success = m_tagManager->RegisterTag("test");
 		EXPECT_TRUE(success);
 		success = m_tagManager->RegisterTag("test2");
+		EXPECT_TRUE(success);
+
+		int tagId1 = m_tagManager->GetTagIdx("test");
+		EXPECT_EQ(0, tagId1);
+		int tagId2 = m_tagManager->GetTagIdx("test2");
+		EXPECT_EQ(1, tagId2);
+
+		TagsMask mask;
+		mask[tagId1] = true;
+		success = m_tagManager->HasAnyTags(mask, "test");
+		EXPECT_TRUE(success);
+		success = m_tagManager->HasAnyTags(mask, "test", "test2");
+		EXPECT_TRUE(success);
+		TagsMask mask2;
+		mask2[tagId2] = true;
+		success = m_tagManager->HasAnyTags(mask2, "test");
+		EXPECT_FALSE(success);
+		success = m_tagManager->HasAnyTags(mask2, "test", "test2");
+		EXPECT_TRUE(success);
+	}
+
+	TEST_F(CTagsTest, parse_tags_from_json)
+	{
+		bool success = m_tagManager->ParseTagsFromJson(TagsTestInternal::TAGS_JSON_FILE);
 		EXPECT_TRUE(success);
 
 		int tagId1 = m_tagManager->GetTagIdx("test");

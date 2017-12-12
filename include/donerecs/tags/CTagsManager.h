@@ -78,6 +78,10 @@ namespace DonerECS
 			return HasAnyTagsInternal(mask, CStrID(args)...);
 		}
 
+		bool ParseTagsFromFile(const char* const path);
+		bool ParseTagsFromMemory(const unsigned char* jsonStringBuffer, std::size_t size);
+		bool ParseTagsFromJson(const char* const jsonStr);
+
 	private:
 		template<typename... Args>
 		bool AddTagsInternal(TagsMask& mask, CStrID tag, Args... args)

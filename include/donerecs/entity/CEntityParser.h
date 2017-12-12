@@ -46,7 +46,7 @@ namespace DonerECS
 	public:
 		CEntityParser();
 
-		CHandle ParseScene(const char* const path);
+		CHandle ParseSceneFromFile(const char* const path);
 		CHandle ParseSceneFromMemory(const unsigned char* jsonStringBuffer, std::size_t size);
 		CHandle ParseSceneFromJson(const char* const jsonStr);
 

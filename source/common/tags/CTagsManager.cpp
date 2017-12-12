@@ -26,6 +26,9 @@
 ////////////////////////////////////////////////////////////
 
 #include <donerecs/tags/CTagsManager.h>
+#include <donerecs/utils/memory/CMemoryDataProvider.h>
+
+#include <donerecs/json/json.h>
 
 namespace DonerECS
 {
@@ -65,5 +68,55 @@ namespace DonerECS
 	{
 		int tagIdx = GetTagIdx(tag);
 		return tagIdx >= 0 ? mask.test(tagIdx) : false;
+	}
+
+	bool CTagsManager::ParseTagsFromFile(const char* const path)
+	{
+		CMemoryDataProvider mdp(path);
+		if (!mdp.IsValid())
+		{
+			printf("CTagsManager::error opening %s!\n", path);
+			return false;
+		}
+
+		return ParseTagsFromJson((const char*)mdp.GetBaseData());
+	}
+
+	bool CTagsManager::ParseTagsFromMemory(const unsigned char* jsonStringBuffer, std::size_t size)
+	{
+		CMemoryDataProvider mdp(jsonStringBuffer, size);
+		if (!mdp.IsValid())
+		{
+			printf("CTagsManager::error reading from Buffer!\n");
+			return false;
+		}
+
+		return ParseTagsFromJson((const char*)mdp.GetBaseData());
+	}
+
+	bool CTagsManager::ParseTagsFromJson(const char* const jsonStr)
+	{
+		Json::Value jsonValue;
+		Json::Reader reader;
+		bool parsingSuccessful = reader.parse(jsonStr, jsonValue);
+		if (!parsingSuccessful)
+		{
+			std::string error = reader.getFormattedErrorMessages();
+			printf("CEntityParser::Error processing Json: %s\n", error.c_str());
+			return false;
+		}
+
+		Json::Value& tags = jsonValue["tags"];
+		if (tags.type() == Json::arrayValue)
+		{
+			for (size_t i = 0; i < tags.size(); ++i)
+			{
+				Json::Value& tag = tags[i];
+				RegisterTag(CStrID(tag.asCString()));
+			}
+			return true;
+		}
+		// TODO_ERROR
+		return false;
 	}
 }

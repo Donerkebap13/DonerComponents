@@ -41,7 +41,7 @@ namespace DonerECS
 		, m_prefabManager(*CPrefabManager::Get())
 	{}
 
-	CHandle CEntityParser::ParseScene(const char* const path)
+	CHandle CEntityParser::ParseSceneFromFile(const char* const path)
 	{
 		CMemoryDataProvider mdp(path);
 		if (!mdp.IsValid())
