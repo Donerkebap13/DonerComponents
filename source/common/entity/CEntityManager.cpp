@@ -55,4 +55,14 @@ namespace DonerECS
 		}
 		return false;
 	}
+
+	void CEntityManager::SendPostMsgs()
+	{
+		for (CPostMessageBase* postMsg : m_postMsgs)
+		{
+			postMsg->SendMessage();
+			delete postMsg;
+		}
+		m_postMsgs.clear();
+	}
 }

@@ -343,4 +343,97 @@ namespace DonerECS
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE * 2, compBar->m_bar);
 	}
+
+	TEST_F(CMessagesTest, entity_with_component_receives_postMessage)
+	{
+		CEntity* entity = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity);
+		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, compFoo);
+
+		entity->Init();
+		entity->Activate();
+
+		EXPECT_EQ(0, compFoo->m_foo);
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		entity->PostMessage(message);
+		EXPECT_EQ(0, compFoo->m_foo);
+
+		m_entityManager->SendPostMsgs();
+
+		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
+	}
+
+	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_PostMessageRecursive)
+	{
+		CEntity* entity = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity);
+		CEntity* entity1 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity1);
+		entity->AddChild(entity1);
+		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, compFoo);
+
+		entity->Init();
+		entity->Activate();
+
+		EXPECT_EQ(0, compFoo->m_foo);
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		entity->PostMessageRecursive(message);
+		EXPECT_EQ(0, compFoo->m_foo);
+
+		m_entityManager->SendPostMsgs();
+
+		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
+	}
+
+	TEST_F(CMessagesTest, child_of_child_entity_with_different_components_receives_message_with_PostMessageRecursive)
+	{
+		CEntity* entity = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity);
+		CEntity* entity1 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity1);
+		entity->AddChild(entity1);
+		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, compFoo);
+		CEntity* entity11 = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity11);
+		entity1->AddChild(entity11);
+		MessagesTestInternal::CCompBar* compBar = entity11->AddComponent<MessagesTestInternal::CCompBar>();
+		EXPECT_NE(nullptr, compBar);
+
+		entity->Init();
+		entity->Activate();
+
+		EXPECT_EQ(0, compFoo->m_foo);
+		EXPECT_EQ(0, compBar->m_bar);
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		entity->PostMessageRecursive(message);
+		EXPECT_EQ(0, compFoo->m_foo);
+		EXPECT_EQ(0, compBar->m_bar);
+
+		m_entityManager->SendPostMsgs();
+
+		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
+		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compBar->m_bar);
+	}
+
+	TEST_F(CMessagesTest, send_postMessage_before_destroying_entity_doesnt_crash)
+	{
+		CEntity* entity = m_entityManager->GetNewElement();
+		EXPECT_NE(nullptr, entity);
+
+		entity->Init();
+		entity->Activate();
+
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		entity->PostMessage(message);
+
+		m_entityManager->DestroyEntity(&entity);
+		EXPECT_EQ(nullptr, entity);
+
+		m_entityManager->SendPostMsgs();
+
+		EXPECT_TRUE(true);
+	}
 }

@@ -201,6 +201,26 @@ namespace DonerECS
 			}
 		}
 
+		template<typename T>
+		void PostMessage(const T& message)
+		{
+			CEntityManager::Get()->PostMessage(this, message);
+		}
+
+		template<typename T>
+		void PostMessageRecursive(const T& message)
+		{
+			PostMessage(message);
+
+			for (CEntity* child : m_children)
+			{
+				if (child)
+				{
+					child->PostMessageRecursive(message);
+				}
+			}
+		}
+
 		void Init();
 		void Destroy();
 

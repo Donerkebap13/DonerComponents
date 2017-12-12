@@ -27,46 +27,34 @@
 
 #pragma once
 
-#include <donerecs/common/CFactory.h>
-#include <donerecs/common/CSingleton.h>
-#include <donerecs/entity/CEntity.h>
-#include <donerecs/messages/CPostMsg.h>
-
-#include <vector>
-
 namespace DonerECS
 {
-	class CEntityManager : public CSingleton<CEntityManager>, public CFactory<CEntity>
+	class CPostMessageBase
 	{
-		friend class CEntity;
 	public:
-		CEntityManager();
-		~CEntityManager() override {}
+		virtual void SendMessage() = 0;
+	};
 
-		template<typename T>
-		void BroadcastMessage(const T& message)
+	template<typename T>
+	class CPostMessage : public CPostMessageBase
+	{
+	public:
+		CPostMessage(CHandle entity, const T& messageData)
+			: m_entity(entity)
+			, m_messageData(messageData)
+		{}
+
+		void SendMessage() override
 		{
-			for (SEntry& entry : m_entries)
+			CEntity* entity = m_entity; 
+			if (entity)
 			{
-				if (entry.m_used)
-				{
-					entry.m_data->SendMessage(message);
-				}
+				entity->SendMessage(m_messageData);
 			}
 		}
 
-		template<typename T>
-		void PostMessage(CHandle entity, const T& message)
-		{
-			m_postMsgs.emplace_back(new CPostMessage<T>(entity, message));
-		}
-
-		bool DestroyEntity(CEntity** entity);
-		bool DestroyEntity(CHandle handle);
-
-		void SendPostMsgs();
-
 	private:
-		std::vector<CPostMessageBase*> m_postMsgs;
+		CHandle m_entity;
+		T m_messageData;
 	};
 }
