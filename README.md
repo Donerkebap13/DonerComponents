@@ -222,7 +222,7 @@ CEntity* entity = parser.ParseSceneFromFile("path/to/your/scene.json");
 The format of a scene.json file is something similar to this:
 ```json
 {
-	"type": "scene"
+	"type": "scene",
 	"root": {
 		"name": "test1",
 		"tags": ["tag1", "tag2", "tag3"],
@@ -255,7 +255,7 @@ The format of a scene.json file is something similar to this:
 If, instead of parsing a scene we want to parse a **prefab** to register it automatically into `DonerECS::CPrefabManager`, we just need to change the `type` to `"prefab"`:
 ```json
 {
-	"type": "prefab"
+	"type": "prefab",
 	"root": { ... }
 }
 ```
