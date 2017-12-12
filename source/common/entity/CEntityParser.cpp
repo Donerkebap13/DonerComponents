@@ -78,10 +78,11 @@ namespace DonerECS
 			return result;
 		}
 
-		Json::Value& rootEntity = jsonValue["root"];
-		if (rootEntity.type() == Json::objectValue)
+		Json::Value& type = jsonValue["type"];
+		if (type.type() == Json::stringValue)
 		{
-			if (rootEntity["type"].asString() == "entity")
+			Json::Value& rootEntity = jsonValue["root"];
+			if (type.asString() == "scene")
 			{
 				result = ParseEntity(rootEntity, nullptr);
 				CEntity* entity = result;
@@ -91,9 +92,13 @@ namespace DonerECS
 					entity->CheckFirstActivation();
 				}
 			}
-			else if (rootEntity["type"].asString() == "prefab")
+			else if (type.asString() == "prefab")
 			{
 				result = ParsePrefab(rootEntity);
+			}
+			else
+			{
+				// ERROR
 			}
 		}
 
@@ -168,7 +173,7 @@ namespace DonerECS
 			for (size_t i = 0; i < components.size(); ++i)
 			{
 				Json::Value& componentJson = components[i];
-				CStrID componentId = CStrID(componentJson["type"].asCString());
+				CStrID componentId = CStrID(componentJson["name"].asCString());
 				CComponent* component = entity->GetComponent(componentId);
 				if (!component)
 				{
