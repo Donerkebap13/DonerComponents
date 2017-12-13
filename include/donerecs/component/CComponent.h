@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include <donerecs/ErrorMessages.h>
 #include <donerecs/handle/CHandle.h>
 #include <donerecs/common/CECSElement.h>
 #include <donerecs/messages/CMsgHandler.h>
@@ -111,7 +112,15 @@ namespace DonerECS
 		template<typename C, typename T>
 		void RegisterMessage(void(C::*function)(const T& param))
 		{
-			m_messages[CTypeHasher::Hash<T>()] = new CMsgHandler<C, T>(function);
+			CTypeHasher::HashId id = CTypeHasher::Hash<T>();
+			if (m_messages.find(id) == m_messages.end())
+			{
+				m_messages[id] = new CMsgHandler<C, T>(function);
+			}
+			else
+			{
+				DECS_WARNING_MSG(EErrorCode::MessageAlreadyRegistered, "The message is already registered for this component");
+			}
 		}
 
 		CHandle m_owner;

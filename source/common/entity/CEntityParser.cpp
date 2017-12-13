@@ -24,9 +24,12 @@
 // SOFTWARE.
 //
 ////////////////////////////////////////////////////////////
+
+#include <donerecs/ErrorMessages.h>
 #include <donerecs/entity/CEntityParser.h>
 #include <donerecs/entity/CEntityManager.h>
 #include <donerecs/entity/CPrefabManager.h>
+#include <donerecs/ErrorMessages.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/utils/memory/CMemoryDataProvider.h>
 #include <donerecs/utils/hash/CStrID.h>
@@ -46,7 +49,7 @@ namespace DonerECS
 		CMemoryDataProvider mdp(path);
 		if (!mdp.IsValid())
 		{
-			printf("CEntityParser::error opening %s!\n", path);
+			DECS_ERROR_MSG(EErrorCode::FileNotFound, "error opening %s", path);
 			return CHandle();
 		}
 
@@ -58,7 +61,7 @@ namespace DonerECS
 		CMemoryDataProvider mdp(jsonStringBuffer, size);
 		if (!mdp.IsValid())
 		{
-			printf("CEntityParser::error reading from Buffer!\n");
+			DECS_ERROR_MSG(EErrorCode::ReadFromBufferFailed, "Error reading from Buffer");
 			return CHandle();
 		}
 
@@ -74,7 +77,7 @@ namespace DonerECS
 		if (!parsingSuccessful)
 		{
 			std::string error = reader.getFormattedErrorMessages();
-			printf("CEntityParser::Error processing Json: %s\n", error.c_str());
+			DECS_ERROR_MSG(EErrorCode::JSONError, "Error processing Json: %s", error.c_str());
 			return result;
 		}
 
@@ -98,7 +101,7 @@ namespace DonerECS
 			}
 			else
 			{
-				// ERROR
+				DECS_ERROR_MSG(EErrorCode::InvalidSceneParsingType, "Trying to parse scene of invalid type: %s. Valid types are 'scene' and 'prefab'", type.asCString());
 			}
 		}
 
@@ -114,12 +117,11 @@ namespace DonerECS
 		}
 		else
 		{
-			entity = m_entityManager.GetNewElement();
+			entity = m_entityManager.CreateEntity();
 		}
 
 		if (!entity)
 		{
-			// ERROR
 			return CHandle();
 		}
 
@@ -163,6 +165,10 @@ namespace DonerECS
 			}
 			return true;
 		}
+		else if (tags.type() != Json::nullValue)
+		{
+			DECS_ERROR_MSG(EErrorCode::JSONBadFormat, "Your tags info for entity '%s' is bad formatted", entity->GetName().c_str());
+		}
 		return false;
 	}
 
@@ -187,11 +193,14 @@ namespace DonerECS
 				}
 				else
 				{
-					// ERROR
 					return false;
 				}
 			}
 			return true;
+		}
+		else if (components.type() != Json::nullValue)
+		{
+			DECS_ERROR_MSG(EErrorCode::JSONBadFormat, "Your components info for entity '%s' is bad formatted", entity->GetName().c_str());
 		}
 		return false;
 	}
@@ -206,6 +215,10 @@ namespace DonerECS
 				ParseEntity(childJson, entity);
 			}
 			return true;
+		}
+		else if (children.type() != Json::nullValue)
+		{
+			DECS_ERROR_MSG(EErrorCode::JSONBadFormat, "Your children info for entity '%s' is bad formatted", entity->GetName().c_str());
 		}
 		return false;
 	}

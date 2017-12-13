@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/ErrorMessages.h>
 #include <donerecs/entity/CPrefabManager.h>
 #include <donerecs/entity/CEntityManager.h>
 #include <donerecs/handle/CHandle.h>
@@ -54,6 +55,7 @@ namespace DonerECS
 			m_prefabs[nameId] = prefab;
 			return true;
 		}
+		DECS_ERROR_MSG(EErrorCode::PrefabAlreadyRegistered, "Prefab with nameId %u already registered", nameId);
 		return false;
 	}
 
@@ -63,10 +65,11 @@ namespace DonerECS
 		if (prefabIt != m_prefabs.end())
 		{
 			CEntity* prefab = (*prefabIt).second;
-			CEntity* entity = m_entityManager.GetNewElement();
+			CEntity* entity = m_entityManager.CreateEntity();
 			entity->CloneFrom(prefab);
 			return entity;
 		}
+		DECS_ERROR_MSG(EErrorCode::PrefabNotRegistered, "Prefab with nameId %u not registered", nameId);
 		return CHandle();
 	}
 }

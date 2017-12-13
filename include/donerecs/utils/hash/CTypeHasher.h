@@ -37,7 +37,7 @@ namespace DonerECS
 		CTypeHasher() = delete;
 
 #if defined(ENV64BIT)
-		using Hash = long long;
+		using HashId = long long;
 #elif defined(ENV32BIT)
 		using HashId = long;
 #endif

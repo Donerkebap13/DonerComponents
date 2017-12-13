@@ -118,10 +118,10 @@ namespace DonerECS
 
 		~CEntityParserTest()
 		{
-			CComponentFactoryManager::DestroyInstance();
 			CPrefabManager::DestroyInstance();
 			CEntityManager::DestroyInstance();
 			CTagsManager::DestroyInstance();
+			CComponentFactoryManager::DestroyInstance();
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;

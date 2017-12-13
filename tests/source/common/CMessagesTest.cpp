@@ -108,8 +108,8 @@ namespace DonerECS
 
 		~CMessagesTest()
 		{
-			CComponentFactoryManager::DestroyInstance();
 			CEntityManager::DestroyInstance();
+			CComponentFactoryManager::DestroyInstance();
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;
@@ -146,7 +146,7 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, entity_with_component_receives_message)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
 		EXPECT_NE(nullptr, compFoo);
@@ -162,7 +162,7 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, not_initialized_entity_with_component_dont_receives_message)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
 		EXPECT_NE(nullptr, compFoo);
@@ -175,7 +175,7 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, not_active_entity_with_component_dont_receives_message)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
 		EXPECT_NE(nullptr, compFoo);
@@ -190,7 +190,7 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, two_different_components_in_same_entity_receives_same_message)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
 		EXPECT_NE(nullptr, compFoo);
@@ -210,7 +210,7 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, component_can_recive_same_message_multiple_times)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		MessagesTestInternal::CCompBar* compBar = entity->AddComponent<MessagesTestInternal::CCompBar>();
 		EXPECT_NE(nullptr, compBar);
@@ -229,9 +229,9 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_SendMessageRecursive)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		CEntity* entity1 = m_entityManager->GetNewElement();
+		CEntity* entity1 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity1);
 		entity->AddChild(entity1);
 		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
@@ -248,14 +248,14 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, child_of_child_entity_with_different_components_receives_message_with_SendMessageRecursive)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		CEntity* entity1 = m_entityManager->GetNewElement();
+		CEntity* entity1 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity1);
 		entity->AddChild(entity1);
 		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
 		EXPECT_NE(nullptr, compFoo);
-		CEntity* entity11 = m_entityManager->GetNewElement();
+		CEntity* entity11 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity11);
 		entity1->AddChild(entity11);
 		MessagesTestInternal::CCompBar* compBar = entity11->AddComponent<MessagesTestInternal::CCompBar>();
@@ -274,9 +274,9 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, inactive_child_doesnt_receives_message)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		CEntity* entity1 = m_entityManager->GetNewElement();
+		CEntity* entity1 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity1);
 		entity->AddChild(entity1);
 		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
@@ -294,9 +294,9 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, two_different_entities_receives_same_message_through_BroadcastMessage)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		CEntity* entity2 = m_entityManager->GetNewElement();
+		CEntity* entity2 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity2);
 		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
 		EXPECT_NE(nullptr, compFoo);
@@ -318,9 +318,9 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, child_entity_receives_message_through_BroadcastMessage_only_once)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		CEntity* entity1 = m_entityManager->GetNewElement();
+		CEntity* entity1 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity1);
 		entity->AddChild(entity1);
 		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
@@ -346,7 +346,7 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, entity_with_component_receives_postMessage)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
 		EXPECT_NE(nullptr, compFoo);
@@ -366,9 +366,9 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_PostMessageRecursive)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		CEntity* entity1 = m_entityManager->GetNewElement();
+		CEntity* entity1 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity1);
 		entity->AddChild(entity1);
 		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
@@ -389,14 +389,14 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, child_of_child_entity_with_different_components_receives_message_with_PostMessageRecursive)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		CEntity* entity1 = m_entityManager->GetNewElement();
+		CEntity* entity1 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity1);
 		entity->AddChild(entity1);
 		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
 		EXPECT_NE(nullptr, compFoo);
-		CEntity* entity11 = m_entityManager->GetNewElement();
+		CEntity* entity11 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity11);
 		entity1->AddChild(entity11);
 		MessagesTestInternal::CCompBar* compBar = entity11->AddComponent<MessagesTestInternal::CCompBar>();
@@ -420,7 +420,7 @@ namespace DonerECS
 
 	TEST_F(CMessagesTest, send_postMessage_before_destroying_entity_doesnt_crash)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 
 		entity->Init();

@@ -88,6 +88,7 @@ namespace DonerECS
 			m_children.emplace_back(newChild);
 			return true;
 		}
+		DECS_WARNING_MSG(EErrorCode::EntityChildAlreadyExists, "Child already added to this entity");
 		return false;
 	}
 
@@ -121,6 +122,7 @@ namespace DonerECS
 				return child;
 			}
 		}
+		DECS_WARNING_MSG(EErrorCode::EntityChildNotFound, "Child %s doesn't belong to this entity", name.c_str());
 		return CHandle();
 	}
 
@@ -130,17 +132,26 @@ namespace DonerECS
 		{
 			return m_children[index];
 		}
+		DECS_WARNING_MSG(EErrorCode::EntityChildNotFound, "Child in position %u doesn't belong to this entity", index);
 		return CHandle();
 	}
 
 	CHandle CEntity::AddComponent(CStrID nameId)
 	{
-		CComponent* component = m_componentFactoryManager.AddComponent(nameId, m_components);
-		if (component)
+		if (!HasComponent(nameId))
 		{
-			component->SetOwner(this);
+			CComponent* component = m_componentFactoryManager.AddComponent(nameId, m_components);
+			if (component)
+			{
+				component->SetOwner(this);
+			}
+			return component;
 		}
-		return component;
+		else
+		{
+			DECS_WARNING_MSG(EErrorCode::ComponentdAlreadyFoundInEntity, "Component %u already added", nameId);
+			return CHandle();
+		}
 	}
 
 	bool CEntity::RemoveComponent(CStrID nameId)
@@ -150,6 +161,7 @@ namespace DonerECS
 		{
 			return m_componentFactoryManager.DestroyComponent(&m_components[componentIdx]);
 		}
+		DECS_WARNING_MSG(EErrorCode::ComponentdNotFoundInEntity, "Component %u hasn't been added to this entity", nameId);
 		return false;
 	}
 
@@ -160,7 +172,18 @@ namespace DonerECS
 		{
 			return m_components[componentIdx];
 		}
+		DECS_WARNING_MSG(EErrorCode::ComponentdNotFoundInEntity, "Component %u hasn't been added to this entity", nameId);
 		return CHandle();
+	}
+
+	bool CEntity::HasComponent(CStrID nameId) const
+	{
+		int componentIdx = m_componentFactoryManager.GetFactoryIndexByName(nameId);
+		if (componentIdx >= 0)
+		{
+			return m_components[componentIdx] != nullptr;
+		}
+		return false;
 	}
 
 	void CEntity::Init()
@@ -356,7 +379,7 @@ namespace DonerECS
 			{
 				if (child)
 				{
-					CEntity* newChild = entityManager->GetNewElement();
+					CEntity* newChild = entityManager->CreateEntity();
 					if (newChild)
 					{
 						newChild->CloneFrom(child);

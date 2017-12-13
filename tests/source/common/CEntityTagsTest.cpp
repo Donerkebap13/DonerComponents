@@ -58,9 +58,9 @@ namespace DonerECS
 
 		~CEntityTagsTest()
 		{
-			CComponentFactoryManager::DestroyInstance();
 			CEntityManager::DestroyInstance();
 			CTagsManager::DestroyInstance();
+			CComponentFactoryManager::DestroyInstance();
 		}
 
 		CEntityManager *m_entityManager;
@@ -70,7 +70,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, add_single_tag)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->AddTags(EntityTagsTestInternal::TAG1);
 		EXPECT_TRUE(success);
@@ -81,7 +81,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, add_multiple_tags)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->AddTags(EntityTagsTestInternal::TAG1, EntityTagsTestInternal::TAG2);
 		EXPECT_TRUE(success);
@@ -94,7 +94,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, remove_single_tag)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->AddTags(EntityTagsTestInternal::TAG1);
 		EXPECT_TRUE(success);
@@ -111,7 +111,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, remove_multiple_tags)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->AddTags(EntityTagsTestInternal::TAG1, EntityTagsTestInternal::TAG2);
 		EXPECT_TRUE(success);
@@ -132,7 +132,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, remove_single_tag_dont_remove_other_tags)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->AddTags(EntityTagsTestInternal::TAG1, EntityTagsTestInternal::TAG2);
 		EXPECT_TRUE(success);
@@ -153,7 +153,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, add_nonexistent_tag_fails)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->AddTags(EntityTagsTestInternal::INVALID_TAG);
 		EXPECT_FALSE(success);
@@ -164,7 +164,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, add_nonexistent_tag_dont_prevent_to_add_valid_tags)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->AddTags(EntityTagsTestInternal::INVALID_TAG, EntityTagsTestInternal::TAG1);
 		EXPECT_FALSE(success);
@@ -177,7 +177,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, remove_nonexistent_tag_fails)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->RemoveTags(EntityTagsTestInternal::INVALID_TAG);
 		EXPECT_FALSE(success);
@@ -185,7 +185,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, remove_nonexistent_tag_dont_prevent_to_remove_valid_tags)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->AddTags(EntityTagsTestInternal::TAG1);
 		EXPECT_TRUE(success);
@@ -202,7 +202,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, entity_has_all_tags)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->AddTags(EntityTagsTestInternal::TAG1, EntityTagsTestInternal::TAG2);
 		EXPECT_TRUE(success);
@@ -217,7 +217,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, entity_has_any_tag)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->AddTags(EntityTagsTestInternal::TAG1, EntityTagsTestInternal::TAG2);
 		EXPECT_TRUE(success);
@@ -234,13 +234,13 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, get_entity_children_with_all_tags)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		CEntity* child1 = m_entityManager->GetNewElement();
+		CEntity* child1 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child1);
-		CEntity* child2 = m_entityManager->GetNewElement();
+		CEntity* child2 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child2);
-		CEntity* child11 = m_entityManager->GetNewElement();
+		CEntity* child11 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child11);
 
 		child1->AddTags(EntityTagsTestInternal::TAG1, EntityTagsTestInternal::TAG2);
@@ -277,13 +277,13 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, get_entity_children_with_any_tag)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		CEntity* child1 = m_entityManager->GetNewElement();
+		CEntity* child1 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child1);
-		CEntity* child2 = m_entityManager->GetNewElement();
+		CEntity* child2 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child2);
-		CEntity* child11 = m_entityManager->GetNewElement();
+		CEntity* child11 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child11);
 
 		child1->AddTags(EntityTagsTestInternal::TAG1, EntityTagsTestInternal::TAG2);
@@ -328,13 +328,13 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, get_entity_children_with_all_tags_recursive)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		CEntity* child1 = m_entityManager->GetNewElement();
+		CEntity* child1 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child1);
-		CEntity* child2 = m_entityManager->GetNewElement();
+		CEntity* child2 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child2);
-		CEntity* child11 = m_entityManager->GetNewElement();
+		CEntity* child11 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child11);
 
 		child1->AddTags(EntityTagsTestInternal::TAG1, EntityTagsTestInternal::TAG2);
@@ -371,13 +371,13 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, get_entity_children_with_any_tag_recursive)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		CEntity* child1 = m_entityManager->GetNewElement();
+		CEntity* child1 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child1);
-		CEntity* child2 = m_entityManager->GetNewElement();
+		CEntity* child2 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child2);
-		CEntity* child11 = m_entityManager->GetNewElement();
+		CEntity* child11 = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child11);
 
 		child1->AddTags(EntityTagsTestInternal::TAG1, EntityTagsTestInternal::TAG2);
@@ -414,7 +414,7 @@ namespace DonerECS
 
 	TEST_F(CEntityTagsTest, entity_clone_tags)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = entity->AddTags(EntityTagsTestInternal::TAG1, EntityTagsTestInternal::TAG2);
 		EXPECT_TRUE(success);
@@ -424,7 +424,7 @@ namespace DonerECS
 		success = entity->HasTags(EntityTagsTestInternal::TAG2);
 		EXPECT_TRUE(success);
 
-		CEntity* clone = m_entityManager->GetNewElement();
+		CEntity* clone = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, clone);
 		success = clone->HasTags(EntityTagsTestInternal::TAG1);
 		EXPECT_FALSE(success);

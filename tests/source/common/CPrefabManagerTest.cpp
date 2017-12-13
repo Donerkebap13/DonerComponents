@@ -60,7 +60,7 @@ namespace DonerECS
 
 	TEST_F(CPrefabManagerTest, register_prefab)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = m_prefabManager->RegisterPrefab("test", entity);
 		EXPECT_TRUE(success);
@@ -68,7 +68,7 @@ namespace DonerECS
 
 	TEST_F(CPrefabManagerTest, register_existing_prefab_fails)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		bool success = m_prefabManager->RegisterPrefab("test", entity);
 		EXPECT_TRUE(success);
@@ -78,7 +78,7 @@ namespace DonerECS
 
 	TEST_F(CPrefabManagerTest, clone_prefab)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		entity->SetName("test1");
 

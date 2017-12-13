@@ -61,6 +61,8 @@ namespace DonerECS
 			m_postMsgs.emplace_back(new CPostMessage<T>(entity, message));
 		}
 
+		CEntity* CreateEntity();
+
 		bool DestroyEntity(CEntity** entity);
 		bool DestroyEntity(CHandle handle);
 

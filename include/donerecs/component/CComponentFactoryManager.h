@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include <donerecs/ErrorMessages.h>
 #include <donerecs/common/CSingleton.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactory.h>
@@ -58,6 +59,11 @@ namespace DonerECS
 			{
 				m_factories.emplace_back(CTypeHasher::Hash<T>(), factoryName, factory);
 			}
+			else
+			{
+				DECS_ERROR_MSG(EErrorCode::ComponentFactoryAlreadyRegistered, "You're trying to register an already registered component factory with name %s", factoryName);
+				delete factory;
+			}
 		}
 
 		template<typename T>
@@ -68,7 +74,11 @@ namespace DonerECS
 			{
 				return factory->CreateComponent();
 			}
-			return nullptr;
+			else
+			{
+				DECS_ERROR_MSG(EErrorCode::ComponentFactoryNotRegistered, "There's no factory registered to create this component");
+				return nullptr;
+			}
 		}
 
 		template<typename T>
@@ -84,6 +94,7 @@ namespace DonerECS
 					return components[factoryIdx];
 				}
 			}
+			DECS_ERROR_MSG(EErrorCode::ComponentFactoryNotRegistered, "There's no factory registered to create this component");
 			return nullptr;
 		}
 
@@ -95,7 +106,11 @@ namespace DonerECS
 			{
 				return factory->GetByIdxAndVersion(index, version);
 			}
-			return nullptr;
+			else
+			{
+				DECS_WARNING_MSG(EErrorCode::ComponentFactoryNotRegistered, "There's no factory registered to create this component");
+				return nullptr;
+			}
 		}
 
 		template<typename T>
@@ -109,7 +124,8 @@ namespace DonerECS
 					return i;
 				}
 			}
-			return 1;
+			DECS_ERROR_MSG(EErrorCode::ComponentFactoryNotRegistered, "There's no factory registered to create this component");
+			return -1;
 		}
 
 		CComponent* CreateComponent(CStrID componentNameId);
@@ -154,6 +170,7 @@ namespace DonerECS
 					return data.m_address;
 				}
 			}
+			DECS_WARNING_MSG(EErrorCode::ComponentFactoryNotRegistered, "There's no factory registered to create this component");
 			return nullptr;
 		}
 

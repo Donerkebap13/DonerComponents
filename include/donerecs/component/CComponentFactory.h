@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include <donerecs/ErrorMessages.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/common/CFactory.h>
 
@@ -58,7 +59,12 @@ namespace DonerECS
 
 		CComponent* CreateComponent() override
 		{
-			return GetNewElement();
+			CComponent* component = GetNewElement();
+			if (!component)
+			{
+				DECS_ERROR_MSG(EErrorCode::NoMoreComponentsAvailable, "No more components of this kind available");
+			}
+			return component;
 		}
 
 		CComponent* CloneComponent(CComponent* component) override
@@ -67,9 +73,8 @@ namespace DonerECS
 			if (newComponent)
 			{
 				*newComponent = *(static_cast<T*>(component));
-				return newComponent;
 			}
-			return nullptr;
+			return newComponent;
 		}
 
 		CComponent* GetByIdxAndVersion(int index, int version) override

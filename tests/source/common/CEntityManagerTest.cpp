@@ -46,8 +46,8 @@ namespace DonerECS
 
 		~CEntityManagerTest()
 		{
-			CComponentFactoryManager::DestroyInstance();
 			CEntityManager::DestroyInstance();
+			CComponentFactoryManager::DestroyInstance();
 		}
 
 		CEntityManager *m_entityManager;
@@ -56,7 +56,7 @@ namespace DonerECS
 
 	TEST_F(CEntityManagerTest, destroy_entity_with_entity)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		m_entityManager->DestroyEntity(&entity);
 		EXPECT_EQ(nullptr, entity);
@@ -64,7 +64,7 @@ namespace DonerECS
 
 	TEST_F(CEntityManagerTest, destroy_entity_with_handle)
 	{
-		CHandle entity = m_entityManager->GetNewElement();
+		CHandle entity = m_entityManager->CreateEntity();
 		EXPECT_TRUE(static_cast<bool>(entity));
 		m_entityManager->DestroyEntity(entity);
 		EXPECT_FALSE(static_cast<bool>(entity));

@@ -40,7 +40,11 @@ namespace DonerECS
 		{
 			return factory->CreateComponent();
 		}
-		return nullptr;
+		else
+		{
+			DECS_ERROR_MSG(EErrorCode::ComponentFactoryNotRegistered, "There's no factory registered to create component %u", componentNameId);
+			return nullptr;
+		}
 	}
 
 	CComponent* CComponentFactoryManager::CloneComponent(CComponent* component, int componentIdx)
@@ -50,7 +54,11 @@ namespace DonerECS
 		{
 			return factory->CloneComponent(component);
 		}
-		return nullptr;
+		else
+		{
+			DECS_ERROR_MSG(EErrorCode::InvalidComponentFactoryIndex, "There's no factory registered with index %d", componentIdx);
+			return nullptr;
+		}
 	}
 
 	void CComponentFactoryManager::CloneComponents(std::vector<CComponent*>& src, std::vector<CComponent*>& dst)
@@ -74,6 +82,7 @@ namespace DonerECS
 				return components[factoryIdx];
 			}
 		}
+		DECS_ERROR_MSG(EErrorCode::ComponentFactoryNotRegistered, "There's no factory registered to create component %u", componentNameId);
 		return nullptr;
 	}
 
@@ -87,6 +96,7 @@ namespace DonerECS
 				return factory->GetByIdxAndVersion(index, version);
 			}
 		}
+		DECS_ERROR_MSG(EErrorCode::InvalidComponentFactoryIndex, "There's no factory registered with index %d", index);
 		return nullptr;
 	}
 
@@ -113,6 +123,7 @@ namespace DonerECS
 				return pos;
 			}
 		}
+		DECS_ERROR_MSG(EErrorCode::ComponentNotRegisteredInFactory, "Trying to get position for component created outside a factory");
 		return -1;
 	}
 
@@ -120,13 +131,17 @@ namespace DonerECS
 	{
 		for (std::size_t i = 0; i < m_factories.size(); ++i)
 		{
-			(*component)->Destroy();
-			if (m_factories[i].m_address->DestroyComponent(*component))
+			if (m_factories[i].m_address->GetComponentPosition(*component) != -1)
 			{
-				*component = nullptr;
-				return true;
+				(*component)->Destroy();
+				if (m_factories[i].m_address->DestroyComponent(*component))
+				{
+					*component = nullptr;
+					return true;
+				}
 			}
 		}
+		DECS_ERROR_MSG(EErrorCode::ComponentNotRegisteredInFactory, "Trying to destroy component created outside a factory");
 		return false;
 	}
 
@@ -139,6 +154,7 @@ namespace DonerECS
 				return data.m_address;
 			}
 		}
+		DECS_ERROR_MSG(EErrorCode::ComponentFactoryNotRegistered, "There's no factory registered with id %u", nameId);
 		return nullptr;
 	}
 
@@ -148,6 +164,7 @@ namespace DonerECS
 		{
 			return m_factories[idx].m_address;
 		}
+		DECS_ERROR_MSG(EErrorCode::InvalidComponentFactoryIndex, "There's no factory registered with index %u", idx);
 		return nullptr;
 	}
 
@@ -160,6 +177,7 @@ namespace DonerECS
 				return i;
 			}
 		}
+		DECS_ERROR_MSG(EErrorCode::ComponentFactoryNotRegistered, "There's no factory registered with id %u", nameId);
 		return -1;
 	}
 

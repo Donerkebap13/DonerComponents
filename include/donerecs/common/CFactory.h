@@ -83,7 +83,6 @@ namespace DonerECS
 				m_current = m_current->m_next;
 				return data;
 			}
-			printf("No room for more!\n");
 			return nullptr;
 		}
 

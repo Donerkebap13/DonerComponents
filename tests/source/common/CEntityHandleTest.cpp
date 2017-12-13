@@ -51,8 +51,8 @@ namespace DonerECS
 
 		~CEntityHandleTest()
 		{
-			CComponentFactoryManager::DestroyInstance();
 			CEntityManager::DestroyInstance();
+			CComponentFactoryManager::DestroyInstance();
 		}
 
 		CEntityManager *m_entityManager;
@@ -61,20 +61,20 @@ namespace DonerECS
 
 	TEST_F(CEntityHandleTest, get_new_entity_pointer)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 	}
 
 	TEST_F(CEntityHandleTest, get_new_entity_as_handle)
 	{
-		CHandle entityHandle = m_entityManager->GetNewElement();
+		CHandle entityHandle = m_entityManager->CreateEntity();
 		EXPECT_EQ(CHandle::EElementType::Entity, entityHandle.m_elementType);
 		EXPECT_EQ(0, entityHandle.m_componentIdx);
 		EXPECT_EQ(0, entityHandle.m_elementPosition);
 		EXPECT_EQ(0, entityHandle.m_version);
 		EXPECT_TRUE(static_cast<bool>(entityHandle));
 
-		CHandle entityHandle2 = m_entityManager->GetNewElement();
+		CHandle entityHandle2 = m_entityManager->CreateEntity();
 		EXPECT_EQ(CHandle::EElementType::Entity, entityHandle2.m_elementType);
 		EXPECT_EQ(0, entityHandle2.m_componentIdx);
 		EXPECT_EQ(1, entityHandle2.m_elementPosition);
@@ -84,7 +84,7 @@ namespace DonerECS
 
 	TEST_F(CEntityHandleTest, cast_handle_to_entity)
 	{
-		CHandle entityHandle = m_entityManager->GetNewElement();
+		CHandle entityHandle = m_entityManager->CreateEntity();
 
 		CEntity* entity = entityHandle;
 		EXPECT_NE(nullptr, entity);
@@ -98,7 +98,7 @@ namespace DonerECS
 
 	TEST_F(CEntityHandleTest, cast_entity_to_handle)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 
 		CHandle entityHandle = entity;
@@ -111,7 +111,7 @@ namespace DonerECS
 
 	TEST_F(CEntityHandleTest, invalidate_handle)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 
 		CHandle entityHandle = entity;
@@ -137,7 +137,7 @@ namespace DonerECS
 
 	TEST_F(CEntityHandleTest, invalid_cast_to_handle_after_destroy)
 	{
-		CEntity* entity = m_entityManager->GetNewElement();
+		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
 		CHandle handle = entity;
 		EXPECT_TRUE(static_cast<bool>(handle));

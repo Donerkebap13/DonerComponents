@@ -27,6 +27,7 @@
 
 #include <donerecs/tags/CTagsManager.h>
 #include <donerecs/utils/memory/CMemoryDataProvider.h>
+#include <donerecs/ErrorMessages.h>
 
 #include <donerecs/json/json.h>
 
@@ -39,7 +40,11 @@ namespace DonerECS
 			m_registeredTags[tag] = m_registeredTags.size();
 			return true;
 		}
-		return false;
+		else
+		{
+			DECS_WARNING_MSG(EErrorCode::TagAlreadyExists, "Tag %u already registered", tag);
+			return false;
+		}
 	}
 
 	int CTagsManager::GetTagIdx(CStrID tag) const
@@ -49,7 +54,11 @@ namespace DonerECS
 		{
 			return tagItr->second;
 		}
-		return -1;
+		else
+		{
+			DECS_WARNING_MSG(EErrorCode::TagNotFound, "Tag %u not found", tag);
+			return -1;
+		}
 	}
 
 	bool CTagsManager::SetTag(TagsMask& mask, CStrID tag, bool add)
@@ -60,9 +69,12 @@ namespace DonerECS
 			mask[tagIdx] = add;
 			return true;
 		}
-		return false;
+		else
+		{
+			DECS_WARNING_MSG(EErrorCode::TagNotFound, "Tag %u not found", tag);
+			return false;
+		}
 	}
-
 
 	bool CTagsManager::HasTag(const TagsMask& mask, CStrID tag) const
 	{
@@ -75,7 +87,7 @@ namespace DonerECS
 		CMemoryDataProvider mdp(path);
 		if (!mdp.IsValid())
 		{
-			printf("CTagsManager::error opening %s!\n", path);
+			DECS_ERROR_MSG(EErrorCode::FileNotFound, "error opening %s", path);
 			return false;
 		}
 
@@ -87,7 +99,7 @@ namespace DonerECS
 		CMemoryDataProvider mdp(jsonStringBuffer, size);
 		if (!mdp.IsValid())
 		{
-			printf("CTagsManager::error reading from Buffer!\n");
+			DECS_ERROR_MSG(EErrorCode::ReadFromBufferFailed, "Error reading from Buffer");
 			return false;
 		}
 
@@ -102,10 +114,9 @@ namespace DonerECS
 		if (!parsingSuccessful)
 		{
 			std::string error = reader.getFormattedErrorMessages();
-			printf("CEntityParser::Error processing Json: %s\n", error.c_str());
+			DECS_ERROR_MSG(EErrorCode::JSONError, "Error processing Json: %s", error.c_str());
 			return false;
 		}
-
 		Json::Value& tags = jsonValue["tags"];
 		if (tags.type() == Json::arrayValue)
 		{
@@ -116,7 +127,10 @@ namespace DonerECS
 			}
 			return true;
 		}
-		// TODO_ERROR
-		return false;
+		else
+		{
+			DECS_ERROR_MSG(EErrorCode::JSONBadFormat, "Your tags.json file is bad formatted");
+			return false;
+		}
 	}
 }

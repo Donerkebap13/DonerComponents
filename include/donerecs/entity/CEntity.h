@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include <donerecs/ErrorMessages.h>
 #include <donerecs/handle/CHandle.h>
 #include <donerecs/common/CECSElement.h>
 #include <donerecs/utils/hash/CStrID.h>
@@ -50,12 +51,21 @@ namespace DonerECS
 		template<typename T>
 		CHandle AddComponent()
 		{
-			CComponent* component = m_componentFactoryManager.AddComponent<T>(m_components);
-			if (component)
+			if (!HasComponent<T>())
 			{
-				component->SetOwner(this);
+				CComponent* component = m_componentFactoryManager.AddComponent<T>(m_components);
+				if (component)
+				{
+					component->SetOwner(this);
+				}
+				return component;
 			}
-			return component;
+			else
+			{
+				DECS_WARNING_MSG(EErrorCode::ComponentdAlreadyFoundInEntity, "Component already added");
+				return CHandle();
+			}
+			
 		}
 		template<typename T>
 		bool RemoveComponent()
@@ -81,6 +91,17 @@ namespace DonerECS
 			return CHandle();
 		}
 
+		template<typename T>
+		bool HasComponent() const
+		{
+			int componentIdx = m_componentFactoryManager.GetFactoryindex<T>();
+			if (componentIdx >= 0)
+			{
+				return m_components[componentIdx] != nullptr;
+			}
+			return false;
+		}
+
 		void SetParent(CEntity* newParent);
 		CHandle GetParent() const { return m_parent; }
 		bool AddChild(CHandle newChild);
@@ -93,6 +114,7 @@ namespace DonerECS
 		CHandle AddComponent(CStrID nameId);
 		bool RemoveComponent(CStrID nameId);
 		CHandle GetComponent(CStrID nameId);
+		bool HasComponent(CStrID nameId) const;
 
 		template<typename... Args>
 		bool AddTags(Args... args)
