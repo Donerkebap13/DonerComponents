@@ -103,16 +103,16 @@ cd %root%
 """
 
 
-def generate_scripts_for_platform(platform, generate_tests, gtest_libs_folder, gtest_include_folder, max_entities, max_tags):
+def generate_scripts_for_platform(platform, generate_tests, max_entities, max_tags):
     script_folder = path_to_os("{}/generate_solution_scripts/{}".format(app_folder, platform))
 
     file_extension = "sh"
     generate_template = generate_file_template_SHELL
-    update_template = generate_file_template_SHELL
+    update_template = update_file_template_SHELL
     if platform == "win32":
         file_extension = "bat"
         generate_template = generate_file_template_BATCH
-        update_template = generate_file_template_BATCH
+        update_template = update_file_template_BATCH
 
     generate_script_file_debug = path_to_os("{}/debug-01-generate.{}".format(script_folder, file_extension))
     generate_script_file_release = path_to_os("{}/release-01-generate.{}".format(script_folder, file_extension))
@@ -123,8 +123,8 @@ def generate_scripts_for_platform(platform, generate_tests, gtest_libs_folder, g
 
     create_folder_if_not_exists(script_folder)
 
-    cmake_call_debug = generate_cmake_call("Debug", platform, generate_tests, gtest_libs_folder, gtest_include_folder, max_entities, max_tags)
-    cmake_call_release = generate_cmake_call("Release", platform, generate_tests, gtest_libs_folder, gtest_include_folder, max_entities, max_tags)
+    cmake_call_debug = generate_cmake_call("Debug", platform, generate_tests, max_entities, max_tags)
+    cmake_call_release = generate_cmake_call("Release", platform, generate_tests, max_entities, max_tags)
 
     generate_templated_file(generate_script_file_debug, generate_template, project_folder_path_debug, cmake_call_debug)
     generate_templated_file(generate_script_file_release, generate_template, project_folder_path_release, cmake_call_release)
@@ -133,14 +133,10 @@ def generate_scripts_for_platform(platform, generate_tests, gtest_libs_folder, g
     generate_templated_file(update_script_file_release, update_template, project_folder_path_release, cmake_call_release)
 
 
-def generate_cmake_call(configuration, platform, generate_tests, gtest_libs_folder, gtest_include_folder, max_entities, max_tags):
+def generate_cmake_call(configuration, platform, generate_tests, max_entities, max_tags):
     tests_flags = ""
-    if(generate_tests and configuration == "Debug"):
+    if(generate_tests):
         tests_flags = "-DDECS_ENABLE_TESTS=1"
-        if(gtest_libs_folder != None):
-            tests_flags += ' -DGTEST_ROOT="{}"'.format(path_to_os(gtest_libs_folder))
-        if (gtest_include_folder != None):
-            tests_flags += ' -DGTEST_INCLUDE_DIR="{}"'.format(path_to_os(gtest_include_folder))
 
     common_cmake_flags = ""
     platform_flags = ""
@@ -163,27 +159,25 @@ def generate_templated_file(script_file_path, template, project_folder_path, cma
 def read_parameters():
     parser = argparse.ArgumentParser()
     parser.add_argument('--generate-tests', action='store_true', help="Generate Tests project in Debug mode", dest='generate_tests')
-    parser.add_argument('--gtest-libs-folder', help='If FindGtest.cmake can\'t find GTest\'s libs by it\'s own, specify here the path to gtest libs folder', dest='gtest_libs_folder')
-    parser.add_argument('--gtest-include-folder', help='If FindGtest.cmake can\'t find GTest\'s include folder by it\'s own, specify here the path to gtest include folder', dest='gtest_include_folder')
     parser.add_argument('--max-entities', help="Max number of entities. Maximum allowed is 8192. Default is 4096", default="4096", dest='max_entities')
     parser.add_argument('--max-tags', help="Max number of registrable tags. Rounded to highest power of two. Default is 64", default="64", dest='max_tags')
     parser.add_argument('--all-platforms', action='store_true', help="Generate scripts for all supported platforms", dest='all_platforms')
 
     args = parser.parse_args()
 
-    return args.generate_tests, args.gtest_libs_folder, args.gtest_include_folder, args.max_entities, args.max_tags, args.all_platforms
+    return args.generate_tests, args.max_entities, args.max_tags, args.all_platforms
 
 
-def generate_scripts(generate_tests, gtest_libs_folder, gtest_include_folder, max_entities, max_tags, all_platforms):
+def generate_scripts(generate_tests, max_entities, max_tags, all_platforms):
     if all_platforms:
         for platform in VALID_PLATFORMS:
-            generate_scripts_for_platform(platform, generate_tests, gtest_libs_folder, gtest_include_folder, max_entities, max_tags)
+            generate_scripts_for_platform(platform, generate_tests, max_entities, max_tags)
     elif sys.platform in VALID_PLATFORMS:
-        generate_scripts_for_platform(sys.platform, generate_tests, gtest_libs_folder, gtest_include_folder, max_entities, max_tags)
+        generate_scripts_for_platform(sys.platform, generate_tests, max_entities, max_tags)
     else:
         message_and_die("You're working under an unsupported OS! Valid OS are {}".format(VALID_PLATFORMS))
 
 
 if __name__ == '__main__':
-    generate_tests, gtest_libs_folder, gtest_include_folder, max_entities, max_tags, all_platforms = read_parameters()
-    generate_scripts(generate_tests, gtest_libs_folder, gtest_include_folder, max_entities, max_tags, all_platforms)
+    generate_tests, max_entities, max_tags, all_platforms = read_parameters()
+    generate_scripts(generate_tests, max_entities, max_tags, all_platforms)

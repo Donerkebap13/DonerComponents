@@ -38,6 +38,10 @@ warnings_as_errors("${project_name}")
 if(DECS_ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 	set(CMAKE_FIND_LIBRARY_PREFIXES "" "lib")
 	set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".a" ".dll")
+	
+	set(GTEST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/googletest/lib/${CMAKE_CONFIGURATION_TYPES}")
+	set(GTEST_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/googletest/include")
+	
 	find_package(GTest)
 	
 	if(GTEST_FOUND)
@@ -61,6 +65,6 @@ if(DECS_ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 		
 		warnings_as_errors("${tests_project_name}")
 	else()
-		MESSAGE( STATUS "GTest is not installed in your system! Can't generate tests")
+		MESSAGE( STATUS "GTest is not found in your system! Can't generate tests")
 	endif()
 endif()
