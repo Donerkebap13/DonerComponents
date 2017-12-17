@@ -7,7 +7,7 @@ set(DECS_VERSION "${DECS_MAJOR_VERSION}.${DECS_MINOR_VERSION}.${DECS_PATCH_VERSI
 enable_language(CXX)
 
 include(ExternalProject)
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/utils.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/utils.cmake)
 
 set(project_name "DonerECS")
 set(ide_group "${project_name}")

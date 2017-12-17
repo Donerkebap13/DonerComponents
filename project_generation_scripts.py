@@ -147,7 +147,7 @@ def generate_cmake_call(configuration, platform, generate_tests, max_entities, m
     if platform == "darwin":
         platform_flags = "-G Xcode"
 
-    root_cmake_path = path_to_os(app_folder)
+    root_cmake_path = path_to_os("{}/DonerECS".format(app_folder))
 
     return 'cmake "{}" -DCMAKE_CONFIGURATION_TYPES="{}" {} {} {} -DMAX_ENTITIES={} -DMAX_TAGS={}'.format(root_cmake_path, configuration, common_cmake_flags, platform_flags, tests_flags, max_entities, max_tags).replace("  ", " ").replace("  ", " ")
 
