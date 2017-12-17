@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-cd ".."
+cd ..
 
 python project_generation_scripts.py --generate-tests
 
