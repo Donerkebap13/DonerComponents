@@ -1,12 +1,12 @@
 #!/bin/bash -e
 
-cd ..
+PROJECT_PATH="../project_travis"
 
-python project_generation_scripts.py --generate-tests
+mkdir -p ${PROJECT_PATH}
 
-cd generate_solution_scripts/linux
+cd ${PROJECT_PATH}
 
-sh debug-01-generate.sh
+cmake "${PROJECT_PATH}/../DonerECS" -DCMAKE_CONFIGURATION_TYPES="Debug" -DDECS_ENABLE_TESTS=1 -DMAX_ENTITIES=4096 -DMAX_TAGS=64
 
 make VERBOSE=1
 make test
