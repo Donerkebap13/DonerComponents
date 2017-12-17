@@ -1,6 +1,8 @@
 #!/bin/bash -e
 
-PROJECT_PATH="../project_travis"
+PROJECT_PATH="${PWD}/../project_travis"
+
+echo ${PROJECT_PATH}
 
 mkdir -p ${PROJECT_PATH}
 
