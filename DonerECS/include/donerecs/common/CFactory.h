@@ -70,7 +70,7 @@ namespace DonerECS
 					entry.m_data->~T();
 				}
 			}
-			delete m_buffer;
+			free(m_buffer);
 		}
 
 		T* GetNewElement()

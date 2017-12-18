@@ -41,10 +41,11 @@ namespace DonerECS
 		virtual CComponent* CreateComponent() = 0;
 		virtual CComponent* CloneComponent(CComponent* component) = 0;
 		virtual CComponent* GetByIdxAndVersion(int index, int version) = 0;
-		virtual bool SetHandleInfoFromComponent(CComponent* component, CHandle& handle) = 0;
 		virtual int GetComponentPosition(CComponent* component) = 0;
 		virtual bool DestroyComponent(CComponent* component) = 0;
 		virtual void Update(float dt) = 0;
+
+		bool SetHandleInfoFromComponent(CComponent* component, CHandle& handle);
 	};
 
 	template <typename T>
@@ -82,19 +83,6 @@ namespace DonerECS
 		CComponent* GetByIdxAndVersion(int index, int version) override
 		{
 			return CFactory<T>::GetElementByIdxAndVersion(index, version);
-		}
-
-		bool SetHandleInfoFromComponent(CComponent* component, CHandle& handle) override
-		{
-			int pos = GetComponentPosition(component);
-			if (pos != -1)
-			{
-				handle.m_elementType = CHandle::EElementType::Component;
-				handle.m_elementPosition = pos;
-				handle.m_version = component->GetVersion();
-				return true;
-			}
-			return false;
 		}
 
 		int GetComponentPosition(CComponent* component) override

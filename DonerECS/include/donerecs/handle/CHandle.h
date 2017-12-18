@@ -75,6 +75,15 @@ namespace DonerECS
 			return nullptr;
 		}
 
+		template<typename T>
+		void SendMessage(const T& message);
+		template<typename T>
+		void SendMessageRecursive(const T& message);
+		template<typename T>
+		void PostMessage(const T& message);
+		template<typename T>
+		void PostMessageRecursive(const T& message);
+
 		bool Destroy();
 
 		unsigned m_elementType : 2; //  4

@@ -25,37 +25,22 @@
 //
 ////////////////////////////////////////////////////////////
 
-#pragma once
-
+#include <donerecs/component/CComponent.h>
+#include <donerecs/component/CComponentFactory.h>
 #include <donerecs/handle/CHandle.h>
 
 namespace DonerECS
 {
-	class CPostMessageBase
+	bool IComponentFactory::SetHandleInfoFromComponent(CComponent* component, CHandle& handle)
 	{
-	public:
-		virtual void SendMessage() = 0;
-	};
-
-	template<typename T>
-	class CPostMessage : public CPostMessageBase
-	{
-	public:
-		CPostMessage(CHandle entity, const T& messageData)
-			: m_entity(entity)
-			, m_messageData(messageData)
-		{}
-
-		void SendMessage() override
+		int pos = GetComponentPosition(component);
+		if (pos != -1)
 		{
-			if (m_entity)
-			{
-				m_entity.SendMessage(m_messageData);
-			}
+			handle.m_elementType = CHandle::EElementType::Component;
+			handle.m_elementPosition = pos;
+			handle.m_version = component->GetVersion();
+			return true;
 		}
-
-	private:
-		CHandle m_entity;
-		T m_messageData;
-	};
+		return false;
+	}
 }

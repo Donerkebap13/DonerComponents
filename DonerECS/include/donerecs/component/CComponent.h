@@ -76,7 +76,7 @@ namespace DonerECS
 			if (m_initialized && IsActive() && !m_destroyed)
 			{
 				static const CTypeHasher::HashId hash = CTypeHasher::Hash<T>();
-				auto& registeredMsg = m_messages.find(hash);
+				auto registeredMsg = m_messages.find(hash);
 				if (registeredMsg != m_messages.end())
 				{
 					(*registeredMsg).second->Execute(this, message);

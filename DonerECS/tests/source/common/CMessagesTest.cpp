@@ -144,6 +144,21 @@ namespace DonerECS
 		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
+	TEST_F(CMessagesTest, component_receives_registered_sendMessage_through_handle)
+	{
+		MessagesTestInternal::CCompFoo* compFoo = static_cast<MessagesTestInternal::CCompFoo*>(
+			m_componentFactoryManager->CreateComponent<MessagesTestInternal::CCompFoo>());
+		EXPECT_NE(nullptr, compFoo);
+
+		compFoo->Init();
+		compFoo->Activate();
+		EXPECT_EQ(0, compFoo->m_foo);
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		CHandle compFooHandle = compFoo;
+		compFooHandle.SendMessage(message);
+		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
+	}
+
 	TEST_F(CMessagesTest, entity_with_component_receives_message)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
@@ -157,6 +172,23 @@ namespace DonerECS
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
 		entity->SendMessage(message);
+		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
+	}
+
+	TEST_F(CMessagesTest, entity_with_component_receives_message_through_handle)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		EXPECT_NE(nullptr, entity);
+		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, compFoo);
+
+		entity->Init();
+		entity->Activate();
+
+		EXPECT_EQ(0, compFoo->m_foo);
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		CHandle entityHandle = entity;
+		entityHandle.SendMessage(message);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
@@ -272,6 +304,26 @@ namespace DonerECS
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compBar->m_bar);
 	}
 
+	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_SendMessageRecursive_through_handle)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		EXPECT_NE(nullptr, entity);
+		CEntity* entity1 = m_entityManager->CreateEntity();
+		EXPECT_NE(nullptr, entity1);
+		entity->AddChild(entity1);
+		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, compFoo);
+
+		entity->Init();
+		entity->Activate();
+
+		EXPECT_EQ(0, compFoo->m_foo);
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		CHandle entityHandle = entity;
+		entityHandle.SendMessageRecursive(message);
+		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
+	}
+
 	TEST_F(CMessagesTest, inactive_child_doesnt_receives_message)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
@@ -364,6 +416,27 @@ namespace DonerECS
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
+	TEST_F(CMessagesTest, entity_with_component_receives_postMessage_through_handle)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		EXPECT_NE(nullptr, entity);
+		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, compFoo);
+
+		entity->Init();
+		entity->Activate();
+
+		EXPECT_EQ(0, compFoo->m_foo);
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		CHandle entityHandle = entity;
+		entityHandle.PostMessage(message);
+		EXPECT_EQ(0, compFoo->m_foo);
+
+		m_entityManager->SendPostMsgs();
+
+		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
+	}
+
 	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_PostMessageRecursive)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
@@ -380,6 +453,30 @@ namespace DonerECS
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
 		entity->PostMessageRecursive(message);
+		EXPECT_EQ(0, compFoo->m_foo);
+
+		m_entityManager->SendPostMsgs();
+
+		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
+	}
+
+	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_PostMessageRecursive_through_handle)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		EXPECT_NE(nullptr, entity);
+		CEntity* entity1 = m_entityManager->CreateEntity();
+		EXPECT_NE(nullptr, entity1);
+		entity->AddChild(entity1);
+		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, compFoo);
+
+		entity->Init();
+		entity->Activate();
+
+		EXPECT_EQ(0, compFoo->m_foo);
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		CHandle entityHandle = entity;
+		entityHandle.PostMessageRecursive(message);
 		EXPECT_EQ(0, compFoo->m_foo);
 
 		m_entityManager->SendPostMsgs();

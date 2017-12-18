@@ -363,4 +363,68 @@ namespace DonerECS
 	{
 		CEntityManager::Get()->PostMessage(this, message);
 	}
+
+	// -------------------------
+	// -- CHandle
+	// -------------------------
+
+	template<typename T>
+	void CHandle::SendMessage(const T& message)
+	{
+		if (m_elementType == CHandle::EElementType::Entity)
+		{
+			CEntity* entity = *this;
+			if (entity)
+			{
+				entity->SendMessage(message);
+			}
+		}
+		else if (m_elementType == CHandle::EElementType::Component)
+		{
+			CComponent* component = *this;
+			if (component)
+			{
+				component->SendMessage(message);
+			}
+		}
+	}
+
+	template<typename T>
+	void CHandle::SendMessageRecursive(const T& message)
+	{
+		if (m_elementType == CHandle::EElementType::Entity)
+		{
+			CEntity* entity = *this;
+			if (entity)
+			{
+				entity->SendMessageRecursive(message);
+			}
+		}
+	}
+
+	template<typename T>
+	void CHandle::PostMessage(const T& message)
+	{
+		if (m_elementType == CHandle::EElementType::Entity)
+		{
+			CEntity* entity = *this;
+			if (entity)
+			{
+				entity->PostMessage(message);
+			}
+		}
+	}
+
+	template<typename T>
+	void CHandle::PostMessageRecursive(const T& message)
+	{
+		if (m_elementType == CHandle::EElementType::Entity)
+		{
+			CEntity* entity = *this;
+			if (entity)
+			{
+				entity->PostMessageRecursive(message);
+			}
+		}
+	}
 }
