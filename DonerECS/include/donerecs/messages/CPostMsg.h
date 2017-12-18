@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include <donerecs/handle/CHandle.h>
+
 namespace DonerECS
 {
 	class CPostMessageBase

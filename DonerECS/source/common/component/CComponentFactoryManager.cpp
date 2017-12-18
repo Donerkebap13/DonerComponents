@@ -27,7 +27,9 @@
 
 #pragma once
 
+#include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
+#include <donerecs/handle/CHandle.h>
 
 #include <cassert>
 

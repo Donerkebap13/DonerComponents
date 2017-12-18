@@ -33,11 +33,7 @@ namespace DonerECS
 	{
 	public:
 		template<typename C, typename T>
-		void Execute(C* caller, const T& param)
-		{
-			CMsgHandler<C, T>* myself = static_cast<CMsgHandler<C, T>*>(this);
-			myself->ExecuteFunction(caller, param);
-		}
+		void Execute(C* caller, const T& param);
 	};
 
 	template<typename C, typename T>
@@ -56,4 +52,11 @@ namespace DonerECS
 	private:
 		void (C::*m_function)(const T&);
 	};
+
+	template<typename C, typename T>
+	void CMsgHandlerBase::Execute(C* caller, const T& param)
+	{
+		CMsgHandler<C, T>* myself = static_cast<CMsgHandler<C, T>*>(this);
+		myself->ExecuteFunction(caller, param);
+	}
 }

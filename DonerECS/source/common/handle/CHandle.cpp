@@ -27,7 +27,6 @@
 
 #include <donerecs/handle/CHandle.h>
 #include <donerecs/entity/CEntity.h>
-#include <donerecs/entity/CEntityManager.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 

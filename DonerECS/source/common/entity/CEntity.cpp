@@ -26,7 +26,7 @@
 ////////////////////////////////////////////////////////////
 
 #include <donerecs/entity/CEntity.h>
-#include <donerecs/entity/CEntityManager.h>
+#include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 
 #include <cassert>
@@ -392,5 +392,60 @@ namespace DonerECS
 				}
 			}
 		}
+	}
+
+	// -------------------------
+	// -- CEntityManager
+	// -------------------------
+
+	CEntityManager::CEntityManager()
+		: CFactory(MAX_ENTITIES)
+	{}
+
+
+	CEntity* CEntityManager::CreateEntity()
+	{
+		CEntity* entity = GetNewElement();
+		if (!entity)
+		{
+			DECS_ERROR_MSG(EErrorCode::NoMoreEntitiesAvailable, "No more entities available for creation at this point");
+		}
+		return entity;
+	}
+
+	bool CEntityManager::DestroyEntity(CEntity** entity)
+	{
+		if (*entity)
+		{
+			if (FindElement(*entity))
+			{
+				(*entity)->Destroy();
+				return DestroyElement(entity);
+			}
+			DECS_WARNING_MSG(EErrorCode::EntityNotRegisteredInFactory, "Trying to destroy an entity which hasn't been created using CEntityManager");
+		}
+		return false;
+	}
+
+	bool CEntityManager::DestroyEntity(CHandle handle)
+	{
+		CEntity* entity = handle;
+		if (entity)
+		{
+			entity->SetParent(nullptr);
+			entity->Destroy();
+			return DestroyElement(&entity);
+		}
+		return false;
+	}
+
+	void CEntityManager::SendPostMsgs()
+	{
+		for (CPostMessageBase* postMsg : m_postMsgs)
+		{
+			postMsg->SendMessage();
+			delete postMsg;
+		}
+		m_postMsgs.clear();
 	}
 }

@@ -26,7 +26,6 @@
 ////////////////////////////////////////////////////////////
 
 #include <donerecs/entity/CEntity.h>
-#include <donerecs/entity/CEntityManager.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 #include <donerecs/tags/CTagsManager.h>
 #include <donerecs/handle/CHandle.h>

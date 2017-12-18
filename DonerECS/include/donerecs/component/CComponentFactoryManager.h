@@ -29,7 +29,6 @@
 
 #include <donerecs/ErrorMessages.h>
 #include <donerecs/common/CSingleton.h>
-#include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactory.h>
 #include <donerecs/utils/hash/CTypeHasher.h>
 #include <donerecs/utils/hash/CStrID.h>
@@ -40,6 +39,8 @@
 
 namespace DonerECS
 {
+	class CComponent;
+
 	class CComponentFactoryManager : public CSingleton<CComponentFactoryManager>
 	{
 		struct SFactoryData

@@ -28,8 +28,9 @@
 #pragma once
 
 #include <donerecs/ErrorMessages.h>
-#include <donerecs/handle/CHandle.h>
 #include <donerecs/common/CECSElement.h>
+#include <donerecs/handle/CHandle.h>
+#include <donerecs/messages/CPostMsg.h>
 #include <donerecs/utils/hash/CStrID.h>
 #include <donerecs/tags/CTagsManager.h>
 
@@ -224,10 +225,7 @@ namespace DonerECS
 		}
 
 		template<typename T>
-		void PostMessage(const T& message)
-		{
-			CEntityManager::Get()->PostMessage(this, message);
-		}
+		void PostMessage(const T& message);
 
 		template<typename T>
 		void PostMessageRecursive(const T& message)
@@ -319,4 +317,50 @@ namespace DonerECS
 		bool m_destroyed;
 		bool m_initiallyActive;
 	};
+
+	// -------------------------
+	// -- CEntityManager
+	// -------------------------
+
+	class CEntityManager : public CSingleton<CEntityManager>, public CFactory<CEntity>
+	{
+		friend class CEntity;
+	public:
+		CEntityManager();
+		~CEntityManager() override {}
+
+		template<typename T>
+		void BroadcastMessage(const T& message)
+		{
+			for (SEntry& entry : m_entries)
+			{
+				if (entry.m_used)
+				{
+					entry.m_data->SendMessage(message);
+				}
+			}
+		}
+
+		template<typename T>
+		void PostMessage(CHandle entity, const T& message)
+		{
+			m_postMsgs.emplace_back(new CPostMessage<T>(entity, message));
+		}
+
+		CEntity* CreateEntity();
+
+		bool DestroyEntity(CEntity** entity);
+		bool DestroyEntity(CHandle handle);
+
+		void SendPostMsgs();
+
+	private:
+		std::vector<CPostMessageBase*> m_postMsgs;
+	};
+
+	template<typename T>
+	void CEntity::PostMessage(const T& message)
+	{
+		CEntityManager::Get()->PostMessage(this, message);
+	}
 }

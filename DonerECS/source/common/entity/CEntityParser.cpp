@@ -26,8 +26,8 @@
 ////////////////////////////////////////////////////////////
 
 #include <donerecs/ErrorMessages.h>
+#include <donerecs/entity/CEntity.h>
 #include <donerecs/entity/CEntityParser.h>
-#include <donerecs/entity/CEntityManager.h>
 #include <donerecs/entity/CPrefabManager.h>
 #include <donerecs/ErrorMessages.h>
 #include <donerecs/component/CComponent.h>

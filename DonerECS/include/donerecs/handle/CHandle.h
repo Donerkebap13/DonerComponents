@@ -27,6 +27,8 @@
 
 #pragma once
 
+#include <donerecs/component/CComponentFactoryManager.h>
+
 namespace DonerECS
 {
 	class CEntity;

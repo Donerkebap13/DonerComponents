@@ -28,11 +28,13 @@
 #pragma once
 
 #include <donerecs/ErrorMessages.h>
-#include <donerecs/component/CComponent.h>
 #include <donerecs/common/CFactory.h>
 
 namespace DonerECS
 {
+	class CComponent;
+	class CHandle;
+
 	class IComponentFactory
 	{
 	public:
@@ -54,12 +56,12 @@ namespace DonerECS
 			);
 	public:
 		CComponentFactory(int nElements)
-			: CFactory(nElements)
+			: CFactory<T>(nElements)
 		{}
 
 		CComponent* CreateComponent() override
 		{
-			CComponent* component = GetNewElement();
+			CComponent* component = CFactory<T>::GetNewElement();
 			if (!component)
 			{
 				DECS_ERROR_MSG(EErrorCode::NoMoreComponentsAvailable, "No more components of this kind available");
@@ -79,12 +81,12 @@ namespace DonerECS
 
 		CComponent* GetByIdxAndVersion(int index, int version) override
 		{
-			return GetElementByIdxAndVersion(index, version);
+			return CFactory<T>::GetElementByIdxAndVersion(index, version);
 		}
 
 		bool SetHandleInfoFromComponent(CComponent* component, CHandle& handle) override
 		{
-			int pos = GetPositionForElement(static_cast<T*>(component));
+			int pos = GetComponentPosition(component);
 			if (pos != -1)
 			{
 				handle.m_elementType = CHandle::EElementType::Component;
@@ -97,18 +99,18 @@ namespace DonerECS
 
 		int GetComponentPosition(CComponent* component) override
 		{
-			return GetPositionForElement(static_cast<T*>(component));
+			return CFactory<T>::GetPositionForElement(static_cast<T*>(component));
 		}
 
 		bool DestroyComponent(CComponent* component) override
 		{
 			T* tmp = static_cast<T*>(component);
-			return DestroyElement(&tmp);
+			return CFactory<T>::DestroyElement(&tmp);
 		}
 
 		void Update(float dt) override
 		{
-			for (SEntry& entry : m_entries)
+			for (CFactory<T>::SEntry& entry : m_entries)
 			{
 				if (entry.m_used)
 				{
