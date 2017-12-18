@@ -98,7 +98,7 @@ namespace DonerECS
 
 		void Update(float dt) override
 		{
-			for (CFactory<T>::SEntry& entry : m_entries)
+			for (auto& entry : CFactory<T>::m_entries)
 			{
 				if (entry.m_used)
 				{
