@@ -17,13 +17,10 @@ project("${project_name}")
 
 message(STATUS "${project_name} version ${DECS_VERSION}")
 
-if ((MAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-endif()
-
 # Default compiler args
 if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|.*Clang)")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Werror -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=sign-compare")
+	message(STATUS "-- ${CMAKE_CXX_COMPILER_ID} detected. Setting flags: $ {CMAKE_CXX_FLAGS}")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -pedantic -Werror -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=sign-compare")
 	set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 	set(CMAKE_CXX_FLAGS_RELEASE "-g -O2 -DNDEBUG")
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL 'MSVC')
@@ -34,6 +31,7 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL 'MSVC')
 	set(CMAKE_CXX_FLAGS_DEBUG "/Zi /FS /DEBUG /Od /MDd")
 	# /Ox - Full optimization
 	set(CMAKE_CXX_FLAGS_RELEASE "/Ox -DNDEBUG")
+	message(STATUS "-- ${CMAKE_CXX_COMPILER_ID} detected. Setting flags: $ {CMAKE_CXX_FLAGS}")
 endif()
 
 file(GLOB_RECURSE header_files "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
