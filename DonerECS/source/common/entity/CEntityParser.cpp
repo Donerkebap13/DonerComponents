@@ -158,7 +158,7 @@ namespace DonerECS
 	{
 		if (tags.type() == Json::arrayValue)
 		{
-			for (size_t i = 0; i < tags.size(); ++i)
+			for (Json::ArrayIndex i = 0; i < tags.size(); ++i)
 			{
 				Json::Value& tag = tags[i];
 				entity->AddTags(tag.asCString());
@@ -176,7 +176,7 @@ namespace DonerECS
 	{
 		if (components.type() == Json::arrayValue)
 		{
-			for (size_t i = 0; i < components.size(); ++i)
+			for (Json::ArrayIndex i = 0; i < components.size(); ++i)
 			{
 				Json::Value& componentJson = components[i];
 				CStrID componentId = CStrID(componentJson["name"].asCString());
@@ -209,7 +209,7 @@ namespace DonerECS
 	{
 		if (children.type() == Json::arrayValue)
 		{
-			for (size_t i = 0; i < children.size(); ++i)
+			for (Json::ArrayIndex i = 0; i < children.size(); ++i)
 			{
 				Json::Value& childJson = children[i];
 				ParseEntity(childJson, entity);

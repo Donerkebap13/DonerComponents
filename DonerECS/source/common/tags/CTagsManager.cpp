@@ -120,7 +120,7 @@ namespace DonerECS
 		Json::Value& tags = jsonValue["tags"];
 		if (tags.type() == Json::arrayValue)
 		{
-			for (size_t i = 0; i < tags.size(); ++i)
+			for (Json::ArrayIndex i = 0; i < tags.size(); ++i)
 			{
 				Json::Value& tag = tags[i];
 				RegisterTag(CStrID(tag.asCString()));
