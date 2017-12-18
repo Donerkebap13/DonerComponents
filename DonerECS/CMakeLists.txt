@@ -5,10 +5,8 @@ set(DECS_PATCH_VERSION 0)
 set(DECS_VERSION "${DECS_MAJOR_VERSION}.${DECS_MINOR_VERSION}.${DECS_PATCH_VERSION}")
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-enable_language(CXX)
-
-include(ExternalProject)
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/utils.cmake)
+include(CheckCXXSourceCompiles)
 
 set(project_name "DonerECS")
 set(ide_group "${project_name}")
@@ -101,7 +99,20 @@ if(NOT DEFINED MAX_TAGS)
 	set(MAX_TAGS 64)
 endif()
 target_compile_definitions("${project_name}" PUBLIC -DMAX_TAGS=${MAX_TAGS})
-		
+
+# Make sure C++11 features are available
+target_compile_features("${project_name}" PUBLIC cxx_auto_type)
+target_compile_features("${project_name}" PUBLIC cxx_nullptr)
+target_compile_features("${project_name}" PUBLIC cxx_static_assert)
+target_compile_features("${project_name}" PUBLIC cxx_decltype)
+target_compile_features("${project_name}" PUBLIC cxx_constexpr)
+target_compile_features("${project_name}" PUBLIC cxx_sizeof_member)
+target_compile_features("${project_name}" PUBLIC cxx_variadic_templates)
+target_compile_features("${project_name}" PUBLIC cxx_rvalue_references)
+target_compile_features("${project_name}" PUBLIC cxx_long_long_type)
+target_compile_features("${project_name}" PUBLIC cxx_lambdas)
+target_compile_features("${project_name}" PUBLIC cxx_func_identifier)
+
 warnings_as_errors("${project_name}")
 
 if(DECS_ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
