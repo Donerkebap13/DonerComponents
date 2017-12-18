@@ -29,6 +29,7 @@
 
 #include <donerecs/ErrorMessages.h>
 #include <donerecs/common/CECSElement.h>
+#include <donerecs/component/CComponent.h>
 #include <donerecs/handle/CHandle.h>
 #include <donerecs/messages/CPostMsg.h>
 #include <donerecs/utils/hash/CStrID.h>
@@ -39,7 +40,6 @@
 
 namespace DonerECS
 {
-	class CComponent;
 	class CComponentFactoryManager;
 
 	class CEntity : public CECSElement

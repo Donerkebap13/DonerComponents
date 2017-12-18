@@ -34,6 +34,7 @@ namespace DonerECS
 	class CPostMessageBase
 	{
 	public:
+		virtual ~CPostMessageBase() {}
 		virtual void SendMessage() = 0;
 	};
 

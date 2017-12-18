@@ -26,7 +26,6 @@
 ////////////////////////////////////////////////////////////
 
 #include <donerecs/entity/CEntity.h>
-#include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 
 #include <cassert>
@@ -128,7 +127,7 @@ namespace DonerECS
 
 	CHandle CEntity::GetChildByIndex(std::size_t index)
 	{
-		if (index >= 0 && index < m_children.size())
+		if (index < m_children.size())
 		{
 			return m_children[index];
 		}
