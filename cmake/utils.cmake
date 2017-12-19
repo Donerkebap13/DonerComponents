@@ -30,3 +30,39 @@ function(warnings_as_errors TARGET)
         endif()
     endif()
 endfunction(warnings_as_errors)
+
+function(set_compile_flags TARGET)
+    get_target_property(CURRENT_COMPILE_FLAGS ${TARGET} COMPILE_FLAGS)
+    if("${CURRENT_COMPILE_FLAGS}" STREQUAL "CURRENT_COMPILE_FLAGS-NOTFOUND")
+        set (CURRENT_COMPILE_FLAGS "")
+    endif()
+	get_target_property(CURRENT_COMPILE_FLAGS_DEBUG ${TARGET} COMPILE_FLAGS_DEBUG)
+    if("${CURRENT_COMPILE_FLAGS_DEBUG}" STREQUAL "CURRENT_COMPILE_FLAGS-NOTFOUND")
+        set (CURRENT_COMPILE_FLAGS_DEBUG "")
+    endif()
+	get_target_property(CURRENT_COMPILE_FLAGS_RELEASE ${TARGET} COMPILE_FLAGS_RELEASE)
+    if("${CURRENT_COMPILE_FLAGS_RELEASE}" STREQUAL "CURRENT_COMPILE_FLAGS-NOTFOUND")
+        set (CURRENT_COMPILE_FLAGS_RELEASE "")
+    endif()
+	
+	if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|.*Clang)")
+		set(CURRENT_COMPILE_FLAGS "${CURRENT_COMPILE_FLAGS} -pedantic -Werror -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=sign-compare -stdlib=libc++")
+		set(CURRENT_COMPILE_FLAGS_DEBUG "${CURRENT_COMPILE_FLAGS_DEBUG} -O0 -g")
+		set(CURRENT_COMPILE_FLAGS_RELEASE "${CURRENT_COMPILE_FLAGS_RELEASE} -g -O2 -DNDEBUG")
+		
+	elseif(CMAKE_CXX_COMPILER_ID STREQUAL 'MSVC')
+		# /Zi - Produces a program database (PDB) that contains type information and symbolic debugging information for use with the debugger.
+		# /FS - Allows multiple cl.exe processes to write to the same .pdb file
+		# /DEBUG - Enable debug during linking
+		# /Od - Disables optimization
+		# /WX - Warnings as errors
+		set(CURRENT_COMPILE_FLAGS "${CURRENT_COMPILE_FLAGS} /WX")
+		set(CURRENT_COMPILE_FLAGS_DEBUG "${CURRENT_COMPILE_FLAGS_DEBUG} /Zi /FS /DEBUG /Od /MDd")
+		# /Ox - Full optimization
+		set(CURRENT_COMPILE_FLAGS_RELEASE "${CURRENT_COMPILE_FLAGS_RELEASE} /Ox -DNDEBUG")
+	endif()
+	
+	set_target_properties (${TARGET} PROPERTIES COMPILE_FLAGS "${CURRENT_COMPILE_FLAGS}")
+	set_target_properties (${TARGET} PROPERTIES COMPILE_FLAGS_DEBUG "${CURRENT_COMPILE_FLAGS_DEBUG}")
+	set_target_properties (${TARGET} PROPERTIES COMPILE_FLAGS_RELEASE "${CURRENT_COMPILE_FLAGS_RELEASE}")
+endfunction(set_compile_flags)

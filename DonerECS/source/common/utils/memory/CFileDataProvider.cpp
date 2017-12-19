@@ -127,7 +127,7 @@ namespace DonerECS
 		assert(IsValid());
 		int rc = fseek(m_file, static_cast<long>(offset), static_cast<int>(from));
 		assert(rc == 0);
-		int newPosition = ftell(m_file);
+		std::size_t newPosition = static_cast<std::size_t>(ftell(m_file));
 		assert(from != ESeekType::FromStart || newPosition == offset);
 		return newPosition;
 	}

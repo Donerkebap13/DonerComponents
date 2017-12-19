@@ -109,8 +109,8 @@ namespace DonerECS
 			return std::make_tuple(entity, entity1, entity11, component, component1, component11);
 		}
 
-		CEntityManager *m_entityManager;
 		CComponentFactoryManager *m_componentFactoryManager;
+		CEntityManager *m_entityManager;
 	};
 
 	TEST_F(CEntityComponentTest, add_component_by_class)

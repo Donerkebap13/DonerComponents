@@ -83,7 +83,6 @@ namespace DonerECS
 	TEST_F(CComponentHandleTest, get_new_component_as_handle)
 	{
 		CHandle fooHandle = m_componentFactoryManager->CreateComponent<ComponentHandleTestInternal::CCompFoo>();
-		int p = (int)fooHandle.m_elementType;
 		EXPECT_EQ(CHandle::EElementType::Component, fooHandle.m_elementType);
 		EXPECT_EQ(0, fooHandle.m_componentIdx);
 		EXPECT_EQ(0, fooHandle.m_elementPosition);
