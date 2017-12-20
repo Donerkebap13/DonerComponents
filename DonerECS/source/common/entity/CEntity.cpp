@@ -28,6 +28,7 @@
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 
+#include <algorithm>
 #include <cassert>
 
 namespace DonerECS

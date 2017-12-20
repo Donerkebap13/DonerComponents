@@ -58,7 +58,7 @@ namespace DonerECS
 		operator CEntity*();
 		operator bool();
 
-		friend bool operator== (const CHandle &h1, const CHandle &h2);
+		bool operator==(const CHandle& rhs) const;
 
 		template<typename T>
 		operator T*()

@@ -73,6 +73,14 @@ namespace DonerECS
 		return false;
 	}
 
+	bool CHandle::operator==(const CHandle& rhs) const
+	{
+		return m_elementType == rhs.m_elementType &&
+			m_componentIdx == rhs.m_componentIdx &&
+			m_elementPosition == rhs.m_elementPosition &&
+			m_version == rhs.m_version;
+	}
+
 	bool CHandle::Destroy()
 	{
 		bool success = false;
@@ -94,13 +102,5 @@ namespace DonerECS
 			*this = CHandle();
 		}
 		return success;
-	}
-
-	bool operator== (const CHandle &h1, const CHandle &h2)
-	{
-		return h1.m_elementType == h2.m_elementType &&
-			h1.m_componentIdx == h2.m_componentIdx &&
-			h1.m_elementPosition == h2.m_elementPosition &&
-			h1.m_version == h2.m_version;
 	}
 }

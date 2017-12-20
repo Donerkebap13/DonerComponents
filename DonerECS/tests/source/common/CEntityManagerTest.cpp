@@ -49,8 +49,8 @@ namespace DonerECS
 			CComponentFactoryManager::DestroyInstance();
 		}
 
-		CEntityManager *m_entityManager;
 		CComponentFactoryManager *m_componentFactoryManager;
+		CEntityManager *m_entityManager;
 	};
 
 	TEST_F(CEntityManagerTest, destroy_entity_with_entity)
