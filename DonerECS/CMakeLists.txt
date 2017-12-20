@@ -30,26 +30,26 @@ message(STATUS "${project_name} version ${DECS_VERSION}")
 #	set(CMAKE_CXX_FLAGS_RELEASE "/Ox -DNDEBUG")
 #endif()
 
-set(OLD_CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-if ((MAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-endif()
-check_cxx_source_compiles(
-"
-#include <memory>
-int main() {
-    std::shared_ptr<int>();
-}
-"
-DONERECS_HAVE_CXX11_STDLIB
-)
-
-if (NOT DONERECS_HAVE_CXX11_STDLIB)
-    message(STATUS "-- Not using -stdlib=libc++ (test failed to build)")
-    set(CMAKE_CXX_FLAGS "${OLD_CMAKE_CXX_FLAGS}")
-else ()
-    message(STATUS "-- Using -stdlib=libc++")
-endif ()
+#set(OLD_CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+#if ((MAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+#endif()
+#check_cxx_source_compiles(
+#"
+##include <memory>
+#int main() {
+#    std::shared_ptr<int>();
+#}
+#"
+#DONERECS_HAVE_CXX11_STDLIB
+#)
+#
+#if (NOT DONERECS_HAVE_CXX11_STDLIB)
+#    message(STATUS "-- Not using -stdlib=libc++ (test failed to build)")
+#    set(CMAKE_CXX_FLAGS "${OLD_CMAKE_CXX_FLAGS}")
+#else ()
+#    message(STATUS "-- Using -stdlib=libc++")
+#endif ()
 
 file(GLOB_RECURSE header_files "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB_RECURSE source_files "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
