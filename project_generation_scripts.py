@@ -145,7 +145,7 @@ def generate_cmake_call(configuration, platform, generate_tests, max_entities, m
 
 
 def generate_templated_file(script_file_path, template, project_folder_path, cmake_call):
-    with open(script_file_path, "w", newline='') as file:
+    with open(script_file_path, "w") as file:
         file.write(template.format(
             project_folder_path=project_folder_path,
             cmake_call=cmake_call
