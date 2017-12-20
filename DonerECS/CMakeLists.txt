@@ -118,37 +118,33 @@ target_compile_features("${project_name}" PUBLIC cxx_func_identifier)
 warnings_as_errors("${project_name}")
 
 if(DECS_ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
-	set(CMAKE_FIND_LIBRARY_PREFIXES "" "lib")
-	set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".a" ".dll")
-	
-	set(GTEST_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/googletest/lib/${CMAKE_CONFIGURATION_TYPES}")
-	set(GTEST_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/googletest/include")
-	
-	find_package(GTest)
-	
-	if(GTEST_FOUND)
-		set(tests_project_name "${project_name}_tests")
-		project("${tests_project_name}")
-		
-		file(GLOB_RECURSE test_header_files "${CMAKE_CURRENT_SOURCE_DIR}/tests/include/*.h")
-		file(GLOB_RECURSE test_source_files "${CMAKE_CURRENT_SOURCE_DIR}/tests/source/*.cpp")
 
-		add_source_groups("${test_header_files}")
-		add_source_groups("${test_source_files}")
-		
-		include_directories("${CMAKE_CURRENT_SOURCE_DIR}/tests/include")		
-		include_directories("${GTEST_INCLUDE_DIRS}")
-		add_executable ("${tests_project_name}" "${test_header_files}" "${test_source_files}")
-		
-		set_target_properties("${tests_project_name}" PROPERTIES LINKER_LANGUAGE CXX)
-		set_target_properties ("${tests_project_name}" PROPERTIES FOLDER "${ide_group}/tests")
-		
-		target_link_libraries("${tests_project_name}" "${project_name}" "${GTEST_BOTH_LIBRARIES}")
-		
-		warnings_as_errors("${tests_project_name}")
-	else()
-		MESSAGE( STATUS "GTest is not found in your system! Can't generate tests")
-	endif()
+	set(gtest_root "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gtest/1.7.0")
+	add_subdirectory("${gtest_root}" "${CMAKE_BINARY_DIR}/gtest")
+	
+	set(gtest_ide_group "GoogleTest")
+	set_target_properties ("gtest" PROPERTIES FOLDER "${gtest_ide_group}")
+
+	set(tests_project_name "${project_name}_tests")
+	project("${tests_project_name}")
+	
+	file(GLOB_RECURSE test_header_files "${CMAKE_CURRENT_SOURCE_DIR}/tests/include/*.h")
+	file(GLOB_RECURSE test_source_files "${CMAKE_CURRENT_SOURCE_DIR}/tests/source/*.cpp")
+
+	add_source_groups("${test_header_files}")
+	add_source_groups("${test_source_files}")
+	
+	include_directories("${CMAKE_CURRENT_SOURCE_DIR}/tests/include")		
+	include_directories("${gtest_root}/include")
+	
+	add_executable ("${tests_project_name}" "${test_header_files}" "${test_source_files}")
+	
+	set_target_properties("${tests_project_name}" PROPERTIES LINKER_LANGUAGE CXX)
+	set_target_properties ("${tests_project_name}" PROPERTIES FOLDER "${ide_group}/tests")
+	
+	target_link_libraries("${tests_project_name}" "${project_name}" "gtest")
+	
+	warnings_as_errors("${tests_project_name}")
 endif()
 
 if (NOT WINDOWS OR CYGWIN)
