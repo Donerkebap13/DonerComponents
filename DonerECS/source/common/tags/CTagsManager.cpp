@@ -37,7 +37,8 @@ namespace DonerECS
 	{
 		if (m_registeredTags.find(tag) == m_registeredTags.end())
 		{
-			m_registeredTags[tag] = m_registeredTags.size();
+			int idx = m_registeredTags.size();
+			m_registeredTags[tag] = idx;
 			return true;
 		}
 		else
