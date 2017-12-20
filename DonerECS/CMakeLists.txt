@@ -147,7 +147,7 @@ if(DECS_ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 	
 	add_test("${tests_project_name}" "${tests_project_name}")
 	
-	warnings_as_errors("${tests_project_name}")
+	set_compile_flags("${tests_project_name}")
 endif()
 
 if (NOT WINDOWS OR CYGWIN)
