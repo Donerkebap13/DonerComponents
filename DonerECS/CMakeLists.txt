@@ -118,7 +118,8 @@ target_compile_features("${project_name}" PUBLIC cxx_func_identifier)
 warnings_as_errors("${project_name}")
 
 if(DECS_ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
-
+	enable_testing()
+	
 	set(gtest_root "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/gtest/1.7.0")
 	add_subdirectory("${gtest_root}" "${CMAKE_BINARY_DIR}/gtest")
 	
@@ -143,6 +144,8 @@ if(DECS_ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 	set_target_properties ("${tests_project_name}" PROPERTIES FOLDER "${ide_group}/tests")
 	
 	target_link_libraries("${tests_project_name}" "${project_name}" "gtest")
+	
+	add_test("${tests_project_name}" "${tests_project_name}")
 	
 	warnings_as_errors("${tests_project_name}")
 endif()
