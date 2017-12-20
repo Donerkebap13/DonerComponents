@@ -29,6 +29,7 @@
 #include <donerecs/utils/memory/CFileDataProvider.h>
 
 #include <cassert>
+#include <cstring>
 
 namespace DonerECS
 {
