@@ -40,8 +40,6 @@ mkdir -p ${{PROJECT_PATH}}
 cd ${{PROJECT_PATH}}
 
 {cmake_call} ${{EXTRA_CMAKE_PARAMETERS}}
-
-read -p "Press any key to continue..."
 """
 
 
@@ -62,8 +60,6 @@ cd %project_folder%
 
 {cmake_call} %extra_cmake_parameters%
 
-pause
-
 cd %root%
 """
 
@@ -81,8 +77,6 @@ fi
 cd ${{PROJECT_PATH}}
 
 {cmake_call} ${{EXTRA_CMAKE_PARAMETERS}}
-
-read -p "Press any key to continue..."
 """
 
 
@@ -100,8 +94,6 @@ IF NOT EXIST %project_folder% (
 cd %project_folder%
 
 {cmake_call} %extra_cmake_parameters%
-
-pause
 
 cd %root%
 """
