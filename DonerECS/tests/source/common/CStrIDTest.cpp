@@ -33,8 +33,8 @@ namespace DonerECS
 {
 	namespace StrIdTestInternal
 	{
-		constexpr char* const TEST_1_STR = "Test1";
-		constexpr int TEST_1_ID = 1875181088;
+		const char* const TEST_1_STR = "Test1";
+		const int TEST_1_ID = 1875181088;
 	}
 
 	class CStrIDTest : public ::testing::Test
