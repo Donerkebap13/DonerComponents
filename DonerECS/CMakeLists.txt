@@ -16,19 +16,19 @@ project("${project_name}")
 message(STATUS "${project_name} version ${DECS_VERSION}")
 
 # Default compiler args
-if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|.*Clang)")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Werror -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=sign-compare")
-	set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
-	set(CMAKE_CXX_FLAGS_RELEASE "-g -O2 -DNDEBUG")
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL 'MSVC')
-	# /Zi - Produces a program database (PDB) that contains type information and symbolic debugging information for use with the debugger.
-	# /FS - Allows multiple cl.exe processes to write to the same .pdb file
-	# /DEBUG - Enable debug during linking
-	# /Od - Disables optimization
-	set(CMAKE_CXX_FLAGS_DEBUG "/Zi /FS /DEBUG /Od /MDd")
-	# /Ox - Full optimization
-	set(CMAKE_CXX_FLAGS_RELEASE "/Ox -DNDEBUG")
-endif()
+#if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|.*Clang)")
+#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Werror -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=sign-compare")
+#	set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
+#	set(CMAKE_CXX_FLAGS_RELEASE "-g -O2 -DNDEBUG")
+#elseif(CMAKE_CXX_COMPILER_ID STREQUAL 'MSVC')
+#	# /Zi - Produces a program database (PDB) that contains type information and symbolic debugging information for use with the debugger.
+#	# /FS - Allows multiple cl.exe processes to write to the same .pdb file
+#	# /DEBUG - Enable debug during linking
+#	# /Od - Disables optimization
+#	set(CMAKE_CXX_FLAGS_DEBUG "/Zi /FS /DEBUG /Od /MDd")
+#	# /Ox - Full optimization
+#	set(CMAKE_CXX_FLAGS_RELEASE "/Ox -DNDEBUG")
+#endif()
 
 set(OLD_CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 if ((MAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
@@ -81,7 +81,7 @@ else()
 	set_target_properties("${project_name}" PROPERTIES DEBUG_POSTFIX -d FOLDER "${project_name}")
 endif()
 
-#set_compile_flags("${project_name}")
+set_compile_flags("${project_name}")
 
 set(install_libs "${project_name}")
 set_property(TARGET "${project_name}" APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES
