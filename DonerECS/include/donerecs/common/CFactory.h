@@ -122,7 +122,7 @@ namespace DonerECS
 
 		T* GetElementByIdxAndVersion(std::size_t index, int version)
 		{
-			if (index >= 0 && index < m_numElements && m_entries[index].m_version == version)
+			if (index < m_numElements && m_entries[index].m_version == version)
 			{
 				return m_entries[index].m_data;
 			}

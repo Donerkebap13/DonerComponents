@@ -93,7 +93,7 @@ namespace DonerECS
 
 	bool CEntity::RemoveChild(CHandle child)
 	{
-		auto it = std::find(m_children.begin(), m_children.end(), child);
+		std::vector<CHandle>::iterator it = std::find(m_children.begin(), m_children.end(), child);
 		if (it != m_children.end())
 		{
 			CEntity* entity = (*it);
