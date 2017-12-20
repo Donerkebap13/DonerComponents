@@ -46,7 +46,7 @@ function(set_compile_flags TARGET)
     endif()
 	
 	if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|.*Clang)")
-		set(CURRENT_COMPILE_FLAGS "${CURRENT_COMPILE_FLAGS} -pedantic -Werror -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=sign-compare -stdlib=libc++")
+		set(CURRENT_COMPILE_FLAGS "${CURRENT_COMPILE_FLAGS} -pedantic -Werror -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=sign-compare")
 		set(CURRENT_COMPILE_FLAGS_DEBUG "${CURRENT_COMPILE_FLAGS_DEBUG} -O0 -g")
 		set(CURRENT_COMPILE_FLAGS_RELEASE "${CURRENT_COMPILE_FLAGS_RELEASE} -g -O2 -DNDEBUG")
 		
