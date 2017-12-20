@@ -32,6 +32,8 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
+
 namespace DonerECS
 {
 	namespace EntityTagsTestInternal
