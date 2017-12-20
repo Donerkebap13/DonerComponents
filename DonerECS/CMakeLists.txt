@@ -15,42 +15,6 @@ project("${project_name}")
 
 message(STATUS "${project_name} version ${DECS_VERSION}")
 
-# Default compiler args
-#if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|.*Clang)")
-#	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Werror -Wall -Wextra -Wno-unused-parameter -Wno-error=unused-variable -Wno-error=sign-compare")
-#	set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
-#	set(CMAKE_CXX_FLAGS_RELEASE "-g -O2 -DNDEBUG")
-#elseif(CMAKE_CXX_COMPILER_ID STREQUAL 'MSVC')
-#	# /Zi - Produces a program database (PDB) that contains type information and symbolic debugging information for use with the debugger.
-#	# /FS - Allows multiple cl.exe processes to write to the same .pdb file
-#	# /DEBUG - Enable debug during linking
-#	# /Od - Disables optimization
-#	set(CMAKE_CXX_FLAGS_DEBUG "/Zi /FS /DEBUG /Od /MDd")
-#	# /Ox - Full optimization
-#	set(CMAKE_CXX_FLAGS_RELEASE "/Ox -DNDEBUG")
-#endif()
-
-#set(OLD_CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-#if ((MAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-#endif()
-#check_cxx_source_compiles(
-#"
-##include <memory>
-#int main() {
-#    std::shared_ptr<int>();
-#}
-#"
-#DONERECS_HAVE_CXX11_STDLIB
-#)
-#
-#if (NOT DONERECS_HAVE_CXX11_STDLIB)
-#    message(STATUS "-- Not using -stdlib=libc++ (test failed to build)")
-#    set(CMAKE_CXX_FLAGS "${OLD_CMAKE_CXX_FLAGS}")
-#else ()
-#    message(STATUS "-- Using -stdlib=libc++")
-#endif ()
-
 file(GLOB_RECURSE header_files "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB_RECURSE source_files "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 
@@ -115,8 +79,6 @@ target_compile_features("${project_name}" PUBLIC cxx_long_long_type)
 target_compile_features("${project_name}" PUBLIC cxx_lambdas)
 target_compile_features("${project_name}" PUBLIC cxx_func_identifier)
 
-warnings_as_errors("${project_name}")
-
 if(DECS_ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 	enable_testing()
 	
@@ -158,7 +120,6 @@ if (NOT WINDOWS OR CYGWIN)
         DESTINATION "${libdir}/pkgconfig"
         )
 endif()
-
 
 install(
 	DIRECTORY "${project_name}"
