@@ -2,6 +2,9 @@ language: cpp
 compiler:
   - clang
   - gcc
+os:
+  - linux
+  - osx
 before_install:
   - sudo apt-get update -qq
   - if test $CC = gcc; then sudo apt-get install --yes --force-yes gcc-4.7 g++-4.7; fi
