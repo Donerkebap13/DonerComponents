@@ -10,5 +10,6 @@ elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
 	cd "projects/darwin-debug"
 fi
 
+./configure --enable-gcov
 make VERBOSE=1 -j8
 make CTEST_OUTPUT_ON_FAILURE=1 test -j8

@@ -6,6 +6,9 @@ os:
   - linux
   - osx
 
+before_install:
+  - pip install --user cpp-coveralls
+  
 script: ./scripts/travis.sh
 
 addons:
