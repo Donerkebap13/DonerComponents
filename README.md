@@ -1,5 +1,5 @@
 # DonerECS - A Tweaked Entity-Component System
-[![Build Status](https://travis-ci.org/Donerkebap13/DonerECS.svg?branch=master)](https://travis-ci.org/Donerkebap13/DonerECS) [![Build status](https://ci.appveyor.com/api/projects/status/3l2174mt6qm7627w/branch/master?svg=true)](https://ci.appveyor.com/project/Donerkebap13/donerecs/branch/master)
+[![Build Status](https://travis-ci.org/Donerkebap13/DonerECS.svg?branch=master)](https://travis-ci.org/Donerkebap13/DonerECS) [![Build status](https://ci.appveyor.com/api/projects/status/3l2174mt6qm7627w/branch/master?svg=true)](https://ci.appveyor.com/project/Donerkebap13/donerecs/branch/master) [![Coverage Status](https://coveralls.io/repos/github/Donerkebap13/DonerECS/badge.svg?branch=master)](https://coveralls.io/github/Donerkebap13/DonerECS?branch=master) [![Code Health](https://landscape.io/github/Donerkebap13/DonerECS/master/landscape.svg?style=flat)](https://landscape.io/github/Donerkebap13/DonerECS/master)
 
 DonerECS, Doner Entity-Component System, or simply DECS, is a framework that uses C++11 features to provide a **Unity-like** entity-component System.
 
