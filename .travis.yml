@@ -25,4 +25,4 @@ addons:
     - clang-3.7
 
 after_success:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" ]]; then coveralls --root . -E ".*gtest.*" -E ".*CMakeFiles.*" -E ".*DonerECS_tests.*"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" ]]; then coveralls --root . -E ".*test.*" -E ".*CMakeFiles.*"; fi
