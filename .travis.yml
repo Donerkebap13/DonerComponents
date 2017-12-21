@@ -7,7 +7,7 @@ os:
   - osx
 
 before_install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then pip install --user cpp-coveralls; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" ]]; then pip install --user cpp-coveralls; fi
 
 script: ./scripts/travis.sh
 
@@ -25,4 +25,4 @@ addons:
     - clang-3.7
 
 after_success:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then coveralls --root . -E ".*gtest.*" -E ".*CMakeFiles.*"; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" ]]; then coveralls --root . -E ".*gtest.*" -E ".*CMakeFiles.*"; fi
