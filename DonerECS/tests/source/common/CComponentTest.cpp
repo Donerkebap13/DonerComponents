@@ -68,7 +68,7 @@ namespace DonerECS
 		CComponentTest()
 			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
 		{
-			ADD_COMPONENT_FACTORY("foo", ComponentTestInternal::CCompFoo, 1);
+			ADD_COMPONENT_FACTORY("foo", ComponentTestInternal::CCompFoo, 2);
 		}
 
 		~CComponentTest()
@@ -316,5 +316,22 @@ namespace DonerECS
 			component->Update(0.f);
 			EXPECT_EQ(0, component->m_updateCount);
 		}
+	}
+
+	TEST_F(CComponentTest, component_copy)
+	{
+		ComponentTestInternal::CCompFoo* component1 = static_cast<ComponentTestInternal::CCompFoo*>(
+			m_componentFactoryManager->CreateComponent<ComponentTestInternal::CCompFoo>());
+		EXPECT_NE(nullptr, component1);
+		component1->DoInit();
+		EXPECT_EQ(1, component1->m_initCount);
+
+		ComponentTestInternal::CCompFoo* component2 = static_cast<ComponentTestInternal::CCompFoo*>(
+			m_componentFactoryManager->CreateComponent<ComponentTestInternal::CCompFoo>());
+		EXPECT_NE(nullptr, component2);
+		EXPECT_EQ(0, component2->m_initCount);
+
+		*component2 = *component1;
+		EXPECT_EQ(1, component2->m_initCount);
 	}
 }

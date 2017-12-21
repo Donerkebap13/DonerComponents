@@ -58,6 +58,21 @@ namespace DonerECS
 		CComponentFactoryManager *m_componentFactoryManager;
 	};
 
+	TEST_F(CEntityHandleTest, new_handle_is_invalid)
+	{
+		CHandle handle;
+		EXPECT_FALSE(handle);
+		EXPECT_EQ(0, handle.m_componentIdx);
+		EXPECT_EQ(0, handle.m_elementPosition);
+		EXPECT_EQ(0, handle.m_elementType);
+		EXPECT_EQ(0, handle.m_version);
+
+		CEntity* entity = handle;
+		EXPECT_EQ(nullptr, entity);
+		CComponent* component = handle;
+		EXPECT_EQ(nullptr, component);
+	}
+
 	TEST_F(CEntityHandleTest, get_new_entity_pointer)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();

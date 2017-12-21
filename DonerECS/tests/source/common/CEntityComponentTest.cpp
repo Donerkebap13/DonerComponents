@@ -720,4 +720,33 @@ namespace DonerECS
 		EXPECT_NE(nullptr, componentClone);
 		EXPECT_EQ(VALUE, componentClone->m_x);
 	}
+
+	TEST_F(CEntityComponentTest, component_copy)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		EXPECT_NE(nullptr, entity);
+		EntityComponentTestInternal::CCompFoo* component1 = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
+		EXPECT_NE(nullptr, component1);
+
+		EntityComponentTestInternal::CCompFoo* component2 = static_cast<EntityComponentTestInternal::CCompFoo*>(
+			m_componentFactoryManager->CreateComponent<EntityComponentTestInternal::CCompFoo>());
+		EXPECT_NE(nullptr, component2);
+
+		CHandle parent1 = component1->GetOwner();
+		EXPECT_TRUE(parent1);
+
+		*component2 = *component1;
+		EXPECT_TRUE(parent1);
+
+		CHandle parent2 = component2->GetOwner();
+		EXPECT_FALSE(parent2);
+
+		CHandle entity2 = m_entityManager->CreateEntity();
+		EXPECT_TRUE(entity2);
+		component2->SetOwner(entity2);
+
+		parent2 = component2->GetOwner();
+		EXPECT_TRUE(parent2);
+		EXPECT_EQ(entity2, parent2);
+	}
 }
