@@ -30,7 +30,7 @@ endif()
 set(libdir ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
 
 if (DECS_BUILD_SHARED)
-	message(STATUS "-- Building shared libraries (-DDECS_BUILD_SHARED=0 to only build static libraries)")
+	message(STATUS "Building shared libraries (-DDECS_BUILD_SHARED=0 to only build static libraries)")
 	add_library("${project_name}" SHARED ${header_files} ${source_files})
 	
 	set_target_properties("${project_name}" PROPERTIES
@@ -107,6 +107,16 @@ if(DECS_ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 	
 	target_link_libraries("${tests_project_name}" "${project_name}" "gtest")
 	
+	if (COVERAGE)
+		if((CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+			message(STATUS "Building ${tests_project_name} with coverage")
+			target_compile_options("${tests_project_name}" PRIVATE --coverage)
+			target_link_libraries("${tests_project_name}" "--coverage")
+		else()
+			message(STATUS "Coverage not active for ${CMAKE_CXX_COMPILER_ID}")
+		endif()
+	endif()
+		
 	add_test("${tests_project_name}" "${tests_project_name}")
 	
 	set_compile_flags("${tests_project_name}")

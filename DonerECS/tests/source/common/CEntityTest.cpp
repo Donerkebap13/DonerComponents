@@ -302,7 +302,6 @@ namespace DonerECS
 
 	TEST_F(CEntityTest, get_children_by_index_with_no_children)
 	{
-		static const char* const CHILD_NAME("Test");
 		CEntity* parent = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, parent);
 
