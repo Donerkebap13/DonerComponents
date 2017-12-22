@@ -60,6 +60,8 @@ namespace DonerECS
 			int m_activateCount;
 			int m_deactivateCount;
 		};
+        
+        class CCompBar: public CComponent {};
 	}
 
 	class CComponentTest : public ::testing::Test
@@ -334,4 +336,47 @@ namespace DonerECS
 		*component2 = *component1;
 		EXPECT_EQ(1, component2->m_initCount);
 	}
+    
+    TEST_F(CComponentTest, register_factory_twice_fails)
+    {
+        bool success = ADD_COMPONENT_FACTORY("foo", ComponentTestInternal::CCompFoo, 2);
+        EXPECT_FALSE(success);
+    }
+    
+    TEST_F(CComponentTest, create_unregistered_componet_fails)
+    {
+        ComponentTestInternal::CCompBar* component = static_cast<ComponentTestInternal::CCompBar*>(
+            m_componentFactoryManager->CreateComponent<ComponentTestInternal::CCompBar>());
+        EXPECT_EQ(nullptr, component);
+    }
+    
+    TEST_F(CComponentTest, factoryManager_updates_components)
+    {
+        ComponentTestInternal::CCompFoo* component = static_cast<ComponentTestInternal::CCompFoo*>(
+            m_componentFactoryManager->CreateComponent<ComponentTestInternal::CCompFoo>());
+        EXPECT_NE(nullptr, component);
+        
+        EXPECT_FALSE(component->IsInitialized());
+        
+        component->Init();
+        component->Activate();
+        
+        EXPECT_EQ(0, component->m_updateCount);
+        m_componentFactoryManager->Update(0.f);
+        EXPECT_EQ(1, component->m_updateCount);
+    }
+    
+    TEST_F(CComponentTest, destroy_unregistered_component_fails)
+    {
+        CComponent* component = new ComponentTestInternal::CCompFoo();
+        EXPECT_NE(nullptr, component);
+        
+        component->Init();
+        component->Activate();
+        EXPECT_FALSE(component->IsDestroyed());
+        m_componentFactoryManager->DestroyComponent(&component);
+        EXPECT_FALSE(component->IsDestroyed());
+        
+        delete component;
+    }
 }

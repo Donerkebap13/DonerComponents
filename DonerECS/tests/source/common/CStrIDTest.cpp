@@ -64,4 +64,10 @@ namespace DonerECS
 
 		EXPECT_EQ(static_cast<int>(test1), static_cast<int>(test2));
 	}
+    
+    TEST_F(CStrIDTest, init_CStrId_with_null_gives_value_zero)
+    {
+        CStrID test1(nullptr);
+        EXPECT_EQ(static_cast<int>(test1), 0);
+    }
 }

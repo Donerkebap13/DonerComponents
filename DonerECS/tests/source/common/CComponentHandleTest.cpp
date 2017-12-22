@@ -40,6 +40,9 @@ namespace DonerECS
 
 		class CCompBar : public CComponent
 		{};
+        
+        class CCompUnregistered : public CComponent
+        {};
 	}
 
 	class CComponentHandleTest : public ::testing::Test
@@ -127,6 +130,29 @@ namespace DonerECS
 					pos, component->GetVersion()));
 		EXPECT_EQ(component2, component);
 	}
+    
+    TEST_F(CComponentHandleTest, cast_invalid_handle_to_component_fails)
+    {
+        static constexpr int invalidPos = 123;
+        static constexpr int invalidVersion = 321;
+
+        CComponent* component = m_componentFactoryManager->GetByIdxAndVersion<ComponentHandleTestInternal::CCompFoo>(invalidPos, invalidVersion);
+        EXPECT_EQ(nullptr, component);
+    }
+    
+    TEST_F(CComponentHandleTest, cast_handle_to_invalid_component_fails)
+    {
+        CHandle fooHandle = m_componentFactoryManager->CreateComponent<ComponentHandleTestInternal::CCompFoo>();
+        
+        CComponent* component = fooHandle;
+        EXPECT_NE(nullptr, component);
+        
+        int pos = m_componentFactoryManager->GetPositionForElement(component);
+        EXPECT_EQ(pos, fooHandle.m_elementPosition);
+        EXPECT_EQ(component->GetVersion(), fooHandle.m_version);
+        CComponent* component2 = m_componentFactoryManager->GetByIdxAndVersion<ComponentHandleTestInternal::CCompUnregistered>(pos, component->GetVersion());
+        EXPECT_EQ(nullptr, component2);
+    }
 
 	TEST_F(CComponentHandleTest, cast_component_to_handle)
 	{

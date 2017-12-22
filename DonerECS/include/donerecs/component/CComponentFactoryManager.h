@@ -53,17 +53,20 @@ namespace DonerECS
 		};
 	public:
 		template<typename T>
-		typename std::enable_if<std::is_base_of<CComponent, T>::value>::type
-			AddFactory(const char* const factoryName, CComponentFactory<T>* factory)
+		bool AddFactory(const char* const factoryName, CComponentFactory<T>* factory)
 		{
+            static_assert(std::is_base_of<CComponent, T>::value, "T must inherits from CComponent");
+            
 			if (!FactoryExists<T>())
 			{
 				m_factories.emplace_back(CTypeHasher::Hash<T>(), factoryName, factory);
+                return true;
 			}
 			else
 			{
 				DECS_ERROR_MSG(EErrorCode::ComponentFactoryAlreadyRegistered, "You're trying to register an already registered component factory with name %s", factoryName);
 				delete factory;
+                return false;
 			}
 		}
 

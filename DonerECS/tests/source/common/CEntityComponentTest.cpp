@@ -53,6 +53,9 @@ namespace DonerECS
 
 		class CCompBar : public CComponent
 		{};
+        
+        class CCompUnregistered : public CComponent
+        {};
 	}
 
 	class CEntityComponentTest : public ::testing::Test
@@ -165,6 +168,14 @@ namespace DonerECS
 		EntityComponentTestInternal::CCompBar* bar = dynamic_cast<EntityComponentTestInternal::CCompBar*>(component);
 		EXPECT_EQ(nullptr, bar);
 	}
+    
+    TEST_F(CEntityComponentTest, get_invalid_component_by_class_fails)
+    {
+        CEntity* entity = m_entityManager->CreateEntity();
+        EXPECT_NE(nullptr, entity);
+        CComponent* omponent = entity->GetComponent<EntityComponentTestInternal::CCompFoo>();
+        EXPECT_EQ(nullptr, omponent);
+    }
 
 	TEST_F(CEntityComponentTest, has_component_by_class)
 	{
@@ -174,6 +185,14 @@ namespace DonerECS
 		bool hasComponent = entity->HasComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_TRUE(hasComponent);
 	}
+    
+    TEST_F(CEntityComponentTest, has_invalid_component_by_class_fails)
+    {
+        CEntity* entity = m_entityManager->CreateEntity();
+        EXPECT_NE(nullptr, entity);
+        bool hasComponent = entity->HasComponent<EntityComponentTestInternal::CCompFoo>();
+        EXPECT_FALSE(hasComponent);
+    }
 
 	TEST_F(CEntityComponentTest, get_component_by_name)
 	{
@@ -187,6 +206,14 @@ namespace DonerECS
 		EntityComponentTestInternal::CCompBar* bar = dynamic_cast<EntityComponentTestInternal::CCompBar*>(component);
 		EXPECT_EQ(nullptr, bar);
 	}
+    
+    TEST_F(CEntityComponentTest, get_invalid_component_by_name_fails)
+    {
+        CEntity* entity = m_entityManager->CreateEntity();
+        EXPECT_NE(nullptr, entity);
+        CComponent* omponent = entity->GetComponent("foo");
+        EXPECT_EQ(nullptr, omponent);
+    }
 
 	TEST_F(CEntityComponentTest, has_component_by_name)
 	{
@@ -196,6 +223,14 @@ namespace DonerECS
 		bool hasComponent = entity->HasComponent("foo");
 		EXPECT_TRUE(hasComponent);
 	}
+    
+    TEST_F(CEntityComponentTest, has_invalid_component_by_name_fails)
+    {
+        CEntity* entity = m_entityManager->CreateEntity();
+        EXPECT_NE(nullptr, entity);
+        bool hasComponent = entity->HasComponent("foo");
+        EXPECT_FALSE(hasComponent);
+    }
 
 	TEST_F(CEntityComponentTest, remove_component_by_class)
 	{
@@ -749,4 +784,20 @@ namespace DonerECS
 		EXPECT_TRUE(parent2);
 		EXPECT_EQ(entity2, parent2);
 	}
+    
+    TEST_F(CEntityComponentTest, get_unregistered_component_by_class_fails)
+    {
+        CEntity* entity = m_entityManager->CreateEntity();
+        EXPECT_NE(nullptr, entity);
+        CComponent* component = entity->GetComponent<EntityComponentTestInternal::CCompUnregistered>();
+        EXPECT_EQ(nullptr, component);
+    }
+    
+    TEST_F(CEntityComponentTest, get_unregistered_component_by_name_fails)
+    {
+        CEntity* entity = m_entityManager->CreateEntity();
+        EXPECT_NE(nullptr, entity);
+        CComponent* component = entity->GetComponent("CompUnregistered");
+        EXPECT_EQ(nullptr, component);
+    }
 }
