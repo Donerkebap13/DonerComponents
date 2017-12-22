@@ -251,7 +251,7 @@ namespace DonerECS
 		EXPECT_NE(nullptr, parent);
 		CEntity* child = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, child);
-		child->SetName("Test");
+		child->SetName(CHILD_NAME);
 
 		bool success = parent->AddChild(child);
 		EXPECT_TRUE(success);

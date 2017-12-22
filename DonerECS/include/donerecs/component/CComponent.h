@@ -54,19 +54,10 @@ namespace DonerECS
 
 		operator CHandle();
 		const CComponent* operator=(const CHandle& rhs);
+        const CComponent& operator=(const CComponent& rhs);
 
-		const CComponent& operator=(const CComponent& rhs)
-		{
-			m_owner = CHandle();
-			m_numDeactivations = 1;
-			m_initialized = false;
-			m_destroyed = false;
-			m_initiallyActive = true;
-			return *this;
-		}
-
-		void SetOwner(CHandle parent) { m_owner = parent; }
-		CHandle GetOwner() const { return m_owner; }
+        void SetOwner(CHandle parent);
+        CHandle GetOwner() const;
 
 		virtual void RegisterMessages() {}
 
@@ -103,11 +94,11 @@ namespace DonerECS
 
 		void CheckFirstActivationInternal();
 
-		virtual void DoInit() {}
-		virtual void DoUpdate(float dt) {}
-		virtual void DoDestroy() {}
-		virtual void DoActivate() {}
-		virtual void DoDeactivate() {}
+        virtual void DoInit();
+        virtual void DoUpdate(float dt);
+        virtual void DoDestroy();
+        virtual void DoActivate();
+        virtual void DoDeactivate();
 
 		template<typename C, typename T>
 		void RegisterMessage(void(C::*function)(const T& param))

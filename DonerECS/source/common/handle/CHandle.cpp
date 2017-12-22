@@ -32,6 +32,14 @@
 
 namespace DonerECS
 {
+    
+    CHandle::CHandle()
+        : m_elementType(EElementType::None)
+        , m_componentIdx(0)
+        , m_elementPosition(0)
+        , m_version(0)
+        {}
+    
 	CHandle::CHandle(CEntity* rhs)
 	{
 		*this = rhs ? *rhs : CHandle();

@@ -44,12 +44,7 @@ namespace DonerECS
 
 		enum EElementType : unsigned { None = 0, Entity, Component };
 
-		CHandle()
-			: m_elementType(EElementType::None)
-			, m_componentIdx(0)
-			, m_elementPosition(0)
-			, m_version(0)
-		{}
+        CHandle();
 		CHandle(CEntity* rhs);
 		CHandle(CComponent* rhs);
 
@@ -72,7 +67,10 @@ namespace DonerECS
 			{
 				return static_cast<T*>(CComponentFactoryManager::Get()->GetComponent(m_componentIdx, m_elementPosition, m_version));
 			}
-			return nullptr;
+            else
+            {
+                return nullptr;
+            }
 		}
 
 		template<typename T>
