@@ -71,9 +71,6 @@ namespace DonerECS
         m_initiallyActive = true;
         return *this;
     }
-    
-    void CComponent::SetOwner(CHandle parent) { m_owner = parent; }
-    CHandle CComponent::GetOwner() const { return m_owner; }
 
 	void CComponent::Init()
 	{
@@ -169,14 +166,4 @@ namespace DonerECS
 			--m_numDeactivations;
 		}
 	}
-    
-    void CComponent::DoInit() {}
-    
-    void CComponent::DoUpdate(float dt) {}
-    
-    void CComponent::DoDestroy() {}
-    
-    void CComponent::DoActivate() {}
-    
-    void CComponent::DoDeactivate() {}
 }

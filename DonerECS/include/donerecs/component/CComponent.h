@@ -56,8 +56,8 @@ namespace DonerECS
 		const CComponent* operator=(const CHandle& rhs);
         const CComponent& operator=(const CComponent& rhs);
 
-        void SetOwner(CHandle parent);
-        CHandle GetOwner() const;
+		void SetOwner(CHandle parent) { m_owner = parent; }
+		CHandle GetOwner() const { return m_owner; }
 
 		virtual void RegisterMessages() {}
 
@@ -82,7 +82,7 @@ namespace DonerECS
 		bool IsActive() const { return m_numDeactivations == 0; }
 		bool IsDestroyed() const { return m_destroyed; }
 
-		virtual void ParseAtts(const Json::Value& atts) {}
+		virtual void ParseAtts(const Json::Value& /*atts*/) {}
 
 		bool GetIsInitiallyActive() const { return m_initiallyActive; }
 		void SetIsInitiallyActive(bool initiallyActive) { m_initiallyActive = initiallyActive; }
@@ -94,11 +94,11 @@ namespace DonerECS
 
 		void CheckFirstActivationInternal();
 
-        virtual void DoInit();
-        virtual void DoUpdate(float dt);
-        virtual void DoDestroy();
-        virtual void DoActivate();
-        virtual void DoDeactivate();
+		virtual void DoInit() {}
+		virtual void DoUpdate(float /*dt*/) {}
+		virtual void DoDestroy() {}
+		virtual void DoActivate() {}
+		virtual void DoDeactivate() {}
 
 		template<typename C, typename T>
 		void RegisterMessage(void(C::*function)(const T& param))
