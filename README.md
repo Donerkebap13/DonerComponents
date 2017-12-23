@@ -11,7 +11,7 @@ DonerECS, Doner Entity-Component System, or simply DECS, is a framework that use
 - **Tags system** to add specific attributes to your entities.
 - **Prefab system** to reuse and compose more complex hierarchies.
 - A **JSON parsing system** to load your prefabs/entities/scenes from disk.
-- **178 Unit Tests (and counting) ensures that everything should work as expected.**
+- **200+ Unit Tests ensures that everything works as expected.**
 
 ## Disclaimer
 **DonerECS doesn't pretend to be a cache friendly Entity-Component System.** It's not based on Systems either. In DonerECS each component has it's own `Update()` method, and also others such as `Init()`, `Activate()`, `Deactivate()` and so on. The way of sharing information around is through messages. 
