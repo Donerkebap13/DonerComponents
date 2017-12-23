@@ -50,7 +50,7 @@ Here I'll try to illustrate the basic usage of the main systems of DonerECS. Aft
 
 Creating a new entity is as simple as:
 ```c++
-#include <donerecs/entity/CEntityManager.h>
+#include <donerecs/entity/CEntity.h>
 
 DonerECS::CEntityManager::CreateInstance();
 
@@ -262,5 +262,3 @@ If, instead of parsing a scene we want to parse a **prefab** to register it auto
 }
 ```
 After doing this the prefab is available for any new parsed scene to use.
-
-## TO BE CONTINUED
