@@ -27,29 +27,26 @@
 
 #pragma once
 
-// Check windows
-#if _WIN32 || _WIN64
-	#if _WIN64
-		#define ENV64BIT
-	#else
-		#define ENV32BIT
-	#endif
-#endif
+#include <donerecs/entity/CEntity.h>
+#include <donerecs/entity/CPrefabManager.h>
+#include <donerecs/component/CComponentFactoryManager.h>
+#include <donerecs/tags/CTagsManager.h>
 
-// Check GCC
-#if __GNUC__
-	#if __x86_64__ || __ppc64__
-		#define ENV64BIT
-	#else
-		#define ENV32BIT
-	#endif
-#endif
+namespace DonerECS
+{
+	static void InitializeDonerECSSystems()
+	{
+		DonerECS::CComponentFactoryManager::CreateInstance();
+		DonerECS::CEntityManager::CreateInstance();
+		DonerECS::CTagsManager::CreateInstance();
+		DonerECS::CPrefabManager::CreateInstance();
+	}
 
-
-#if defined(ENV64BIT)
-static_assert(sizeof(void*) == 8, "ENV64BIT: Error: pointer should be 8 bytes.");
-#elif defined (ENV32BIT)
-static_assert(sizeof(void*) == 4, "ENV32BIT: Error: pointer should be 4 bytes.");
-#else
-#error "Must define either ENV32BIT or ENV64BIT".
-#endif
+	static void DestroyDonerECSSystems()
+	{
+		DonerECS::CPrefabManager::DestroyInstance();
+		DonerECS::CTagsManager::DestroyInstance();
+		DonerECS::CEntityManager::DestroyInstance();
+		DonerECS::CComponentFactoryManager::DestroyInstance();
+	}
+}
