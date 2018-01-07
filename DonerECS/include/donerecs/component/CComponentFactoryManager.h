@@ -35,7 +35,7 @@
 
 #include <vector>
 
-#define ADD_COMPONENT_FACTORY(name, T, N) DonerECS::CComponentFactoryManager::Get()->AddFactory(name, new CComponentFactory<T>(N))
+#define ADD_COMPONENT_FACTORY(name, T, N) DonerECS::CComponentFactoryManager::Get()->AddFactory(name, new DonerECS::CComponentFactory<T>(N))
 
 namespace DonerECS
 {
