@@ -32,6 +32,7 @@
 #include <donerecs/common/CECSElement.h>
 #include <donerecs/messages/CMsgHandler.h>
 #include <donerecs/utils/hash/CTypeHasher.h>
+#include <donerecs/reflection/Reflection.h>
 
 #include <unordered_map>
 
@@ -112,6 +113,15 @@ namespace DonerECS
 			{
 				DECS_WARNING_MSG(EErrorCode::MessageAlreadyRegistered, "The message is already registered for this component");
 			}
+		}
+
+		template<typename ReflectionData, typename BaseClass>
+		void ParseAttsInternal(BaseClass* caller, const Json::Value& data)
+		{
+			Reflection::SetReflectionData<ReflectionData, BaseClass>(caller,
+				data,
+				std::make_index_sequence<std::tuple_size<decltype(ReflectionData::s_properties)>::value> {}
+			);
 		}
 
 		CHandle m_owner;

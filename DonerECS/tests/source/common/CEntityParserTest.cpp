@@ -43,16 +43,20 @@ namespace DonerECS
 	{
 		class CCompFoo : public CComponent
 		{
+			DECS_DECLARE_COMPONENT_AS_REFLECTABLE(CCompFoo);
 		public:
 			CCompFoo() : m_a(-1), m_b(-1) {}
-			void ParseAtts(const Json::Value& atts) override
-			{
-				m_a = !atts["a"].isNull() ? atts["a"].asInt() : m_a;
-				m_b = !atts["b"].isNull() ? atts["b"].asInt() : m_b;
-			}
+
 			int m_a;
 			int m_b;
 		};
+
+		DECS_REFLECT_CLASS_DATA(CCompFoo,
+			DECS_REFLECT_VAR(CCompFoo, int, m_a, "a"),
+			DECS_REFLECT_VAR(CCompFoo, int, m_b, "b")
+		);
+
+		DECS_COMPONENT_REFLECTION_IMPL(CCompFoo);
 
 		const char* const ONE_LEVEL_ENTITY = "{ \"type\": \"scene\", \"root\": {"
 			"\"type\": \"entity\", \"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
