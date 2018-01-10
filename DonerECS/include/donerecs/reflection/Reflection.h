@@ -32,6 +32,7 @@
 #include <donerecs/akrzemi1_optional.h>
 
 #include <tuple>
+#include <type_traits>
 
 #define DECS_REFLECT_CLASS_DATA(base_class, ...) class base_class##_reflection_data { public: constexpr static auto s_properties = std::make_tuple(__VA_ARGS__); }
 #define DECS_REFLECT_VAR(class, type, var, var_name) DonerECS::Reflection::SProperty<class, type>{ &class::var, var_name }
