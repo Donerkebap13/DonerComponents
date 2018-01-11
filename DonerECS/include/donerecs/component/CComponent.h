@@ -120,7 +120,7 @@ namespace DonerECS
 		{
 			Reflection::SetReflectionData<ReflectionData, BaseClass>(caller,
 				data,
-				std::make_index_sequence<std::tuple_size<decltype(ReflectionData::s_properties)>::value> {}
+				std::make_integer_sequence<std::size_t, std::tuple_size<decltype(ReflectionData::s_properties)>::value> {}
 			);
 		}
 
