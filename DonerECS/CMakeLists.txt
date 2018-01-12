@@ -46,8 +46,8 @@ else()
 endif()
 
 set_compile_flags("${project_name}")
-
-if ((MAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+message(STATUS "CMAKE_CXX_COMPILER_ID ${CMAKE_CXX_COMPILER_ID}")
+if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|.*Clang)")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++ -std=c++14")
 	message(STATUS "CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 endif()
