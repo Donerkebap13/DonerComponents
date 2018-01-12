@@ -33,6 +33,7 @@
 
 #include <tuple>
 #include <type_traits>
+#include <utility>
 
 #define DECS_REFLECT_CLASS_DATA(base_class, ...) class base_class##_reflection_data { public: constexpr static auto s_properties = std::make_tuple(__VA_ARGS__); }
 #define DECS_REFLECT_VAR(class, type, var, var_name) DonerECS::Reflection::SProperty<class, type>{ &class::var, var_name }
@@ -88,7 +89,7 @@ namespace DonerECS
 		void DoSetReflectionData(T* object, const DonerECS::Json::Value& data)
 		{
 			// get the property
-			constexpr auto property = std::get<index>(std::decay_t<ReflectionData>::s_properties);
+			constexpr auto property = std::get<index>(std::decay<ReflectionData>::type::s_properties);
 
 			// get the type of the property
 			using Type = typename decltype(property)::Type;
