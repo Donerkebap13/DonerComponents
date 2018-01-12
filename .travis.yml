@@ -22,7 +22,7 @@ addons:
     - llvm-toolchain-precise-3.7
     packages:
     - g++-5
-    - clang-4.0
+    - clang-3.9
 
 after_success:
   - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CC" == "gcc" ]]; then coveralls --root . -E ".*test.*" -E ".*CMakeFiles.*" --gcov-options '\-lp'; fi
