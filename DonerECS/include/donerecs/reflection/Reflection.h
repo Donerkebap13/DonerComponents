@@ -83,43 +83,34 @@ namespace DonerECS
 		Optional<float> ReflectData<float>(const DonerECS::Json::Value& att);
 		template<>
 		Optional<double> ReflectData<double>(const DonerECS::Json::Value& att);
-		
 
-		template<typename ReflectionData, typename T, std::size_t index>
-		void DoSetReflectionData(T* object, const DonerECS::Json::Value& data)
-		{
+		template<typename ReflectionData, std::size_t iteration, typename T>
+		void DoSetReflectionData(T* object, const DonerECS::Json::Value& data) {
 			// get the property
-			constexpr auto property = std::get<index>(std::decay<ReflectionData>::type::s_properties);
+			constexpr auto property = std::get<iteration>(std::decay<ReflectionData>::type::s_properties);
 
 			// get the type of the property
 			using Type = typename decltype(property)::Type;
 
-			printf("Tries %s property (%u)\n", property.m_name, index);
+			printf("Tries %s property (%u)\n", property.m_name, iteration);
 
 			// set the value to the member
 			Optional<Type> op = DonerECS::Reflection::ReflectData<Type>(data[property.m_name]);
-			if(op)
+			if (op)
 			{
 				object->*(property.m_member) = op.value();
 			}
 		}
 
-		template<typename ReflectionData, typename T>
-		void SetReflectionDataInternal(T* /*object*/, const DonerECS::Json::Value& /*data*/)
-		{
+		template<typename ReflectionData, std::size_t iteration, typename T>
+		typename std::enable_if<(iteration > 0)>::type SetReflectionData(T* object, const DonerECS::Json::Value& data) {
+			DonerECS::Reflection::DoSetReflectionData<ReflectionData, iteration>(object, data);
+			DonerECS::Reflection::SetReflectionData<ReflectionData, iteration - 1>(object, data);
 		}
 
-		template<typename ReflectionData, typename T, std::size_t index, std::size_t... Args>
-		void SetReflectionDataInternal(T* object, const DonerECS::Json::Value& data)
-		{
-			DonerECS::Reflection::DoSetReflectionData<ReflectionData, T, index>(object, data);
-			DonerECS::Reflection::SetReflectionDataInternal<ReflectionData, T, Args...>(object, data);
-		}
-
-		template<typename ReflectionData, typename T, std::size_t... I>
-		void SetReflectionData(T* object, const DonerECS::Json::Value& data, std::index_sequence<I...>)
-		{
-			DonerECS::Reflection::SetReflectionDataInternal<ReflectionData, T, I...>(object, data);
+		template<typename ReflectionData, std::size_t iteration, typename T>
+		typename std::enable_if<(iteration == 0)>::type SetReflectionData(T* object, const DonerECS::Json::Value& data) {
+			DonerECS::Reflection::DoSetReflectionData<ReflectionData, iteration>(object, data);
 		}
 	}
 }

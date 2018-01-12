@@ -118,10 +118,7 @@ namespace DonerECS
 		template<typename ReflectionData, typename BaseClass>
 		void ParseAttsInternal(BaseClass* caller, const Json::Value& data)
 		{
-			Reflection::SetReflectionData<ReflectionData, BaseClass>(caller,
-				data,
-				std::make_index_sequence<std::tuple_size<decltype(ReflectionData::s_properties)>::value> {}
-			);
+			Reflection::SetReflectionData<ReflectionData, std::tuple_size<decltype(ReflectionData::s_properties)>::value - 1>(caller, data);
 		}
 
 		CHandle m_owner;
