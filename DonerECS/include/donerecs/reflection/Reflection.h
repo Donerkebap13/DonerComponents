@@ -92,8 +92,6 @@ namespace DonerECS
 			// get the type of the property
 			using Type = typename decltype(property)::Type;
 
-			printf("Tries %s property (%u)\n", property.m_name, iteration);
-
 			// set the value to the member
 			Optional<Type> op = DonerECS::Reflection::ReflectData<Type>(data[property.m_name]);
 			if (op)
@@ -103,14 +101,14 @@ namespace DonerECS
 		}
 
 		template<typename ReflectionData, std::size_t iteration, typename T>
-		typename std::enable_if<(iteration > 0)>::type SetReflectionData(T* object, const DonerECS::Json::Value& data) {
+		typename std::enable_if<(iteration == 0)>::type SetReflectionData(T* object, const DonerECS::Json::Value& data) {
 			DonerECS::Reflection::DoSetReflectionData<ReflectionData, iteration>(object, data);
-			DonerECS::Reflection::SetReflectionData<ReflectionData, iteration - 1>(object, data);
 		}
 
 		template<typename ReflectionData, std::size_t iteration, typename T>
-		typename std::enable_if<(iteration == 0)>::type SetReflectionData(T* object, const DonerECS::Json::Value& data) {
+		typename std::enable_if<(iteration > 0)>::type SetReflectionData(T* object, const DonerECS::Json::Value& data) {
 			DonerECS::Reflection::DoSetReflectionData<ReflectionData, iteration>(object, data);
+			DonerECS::Reflection::SetReflectionData<ReflectionData, iteration - 1>(object, data);
 		}
 	}
 }

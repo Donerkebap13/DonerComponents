@@ -56,7 +56,7 @@ namespace DonerECS
 			DECS_REFLECT_VAR(CCompFoo, int, m_b, "b")
 		);
 
-		DECS_COMPONENT_REFLECTION_IMPL(CCompFoo);
+		DECS_COMPONENT_REFLECTION_IMPL(CCompFoo)
 
 		const char* const ONE_LEVEL_ENTITY = "{ \"type\": \"scene\", \"root\": {"
 			"\"type\": \"entity\", \"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
