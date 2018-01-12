@@ -88,7 +88,7 @@ namespace DonerECS
 		void DoSetReflectionData(T* object, const DonerECS::Json::Value& data)
 		{
 			// get the property
-			constexpr auto property = std::get<index>(std::decay<ReflectionData>::type::s_properties);
+			constexpr auto property = std::get<index>(std::decay_t<ReflectionData>::s_properties);
 
 			// get the type of the property
 			using Type = typename decltype(property)::Type;
@@ -116,7 +116,7 @@ namespace DonerECS
 		}
 
 		template<typename ReflectionData, typename T, std::size_t... I>
-		void SetReflectionData(T* object, const DonerECS::Json::Value& data, std::integer_sequence<std::size_t, I...>)
+		void SetReflectionData(T* object, const DonerECS::Json::Value& data, std::index_sequence<I...>)
 		{
 			DonerECS::Reflection::SetReflectionDataInternal<ReflectionData, T, I...>(object, data);
 		}
