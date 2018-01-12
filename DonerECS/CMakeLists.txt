@@ -47,6 +47,10 @@ endif()
 
 set_compile_flags("${project_name}")
 
+if ((MAKE_CXX_COMPILER_ID STREQUAL "GNU") OR (CMAKE_CXX_COMPILER_ID STREQUAL "Clang"))
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+endif()
+
 set(install_libs "${project_name}")
 set_property(TARGET "${project_name}" APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
