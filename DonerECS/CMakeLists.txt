@@ -46,10 +46,8 @@ else()
 endif()
 
 set_compile_flags("${project_name}")
-message(STATUS "CMAKE_CXX_COMPILER_ID ${CMAKE_CXX_COMPILER_ID}")
 if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|.*Clang)")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
-	message(STATUS "CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS}")
 endif()
 
 set(install_libs "${project_name}")
@@ -101,6 +99,8 @@ if(DECS_ENABLE_TESTS AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
 
 	add_source_groups("${test_header_files}")
 	add_source_groups("${test_source_files}")
+	
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING")
 	
 	include_directories("${CMAKE_CURRENT_SOURCE_DIR}/tests/include")		
 	include_directories("${gtest_root}/include")
