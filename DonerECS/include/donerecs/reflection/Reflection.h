@@ -38,7 +38,7 @@
 #define DECS_REFLECT_CLASS_DATA(base_class, ...) class base_class##_reflection_data { public: constexpr static auto s_properties = std::make_tuple(__VA_ARGS__); }
 #define DECS_REFLECT_VAR(class, type, var, var_name) DonerECS::Reflection::SProperty<class, type>{ &class::var, var_name }
 
-#define DECS_DECLARE_COMPONENT_AS_REFLECTABLE(base_class) friend class base_class##_reflection_data; public: void ParseAtts(const DonerECS::Json::Value& atts) override
+#define DECS_DECLARE_COMPONENT_AS_REFLECTABLE(base_class) friend class base_class##_reflection_data; public: void ParseAtts(const DonerECS::Json::Value& atts) override;
 #define DECS_COMPONENT_REFLECTION_IMPL(class) void class::ParseAtts(const DonerECS::Json::Value& atts) { ParseAttsInternal<class##_reflection_data, class>(this, atts); }
 
 namespace DonerECS

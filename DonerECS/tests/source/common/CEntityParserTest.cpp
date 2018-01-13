@@ -43,7 +43,7 @@ namespace DonerECS
 	{
 		class CCompFoo : public CComponent
 		{
-			DECS_DECLARE_COMPONENT_AS_REFLECTABLE(CCompFoo);
+			DECS_DECLARE_COMPONENT_AS_REFLECTABLE(CCompFoo)
 		public:
 			CCompFoo() : m_a(-1), m_b(-1) {}
 
