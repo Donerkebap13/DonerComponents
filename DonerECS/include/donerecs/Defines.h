@@ -53,3 +53,8 @@ static_assert(sizeof(void*) == 4, "ENV32BIT: Error: pointer should be 4 bytes.")
 #else
 #error "Must define either ENV32BIT or ENV64BIT".
 #endif
+
+namespace DonerECS
+{
+	enum class ESendMessageType { NonRecursive, Recursive };
+}

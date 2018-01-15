@@ -65,7 +65,7 @@ namespace DonerECS
 		template<typename T>
 		void SendMessage(const T& message)
 		{
-			if (m_initialized && IsActive() && !m_destroyed)
+			if (m_initialized && !m_destroyed)
 			{
 				static const CTypeHasher::HashId hash = CTypeHasher::Hash<T>();
 				auto registeredMsg = m_messages.find(hash);
@@ -102,12 +102,26 @@ namespace DonerECS
 		virtual void DoDeactivate() {}
 
 		template<typename C, typename T>
-		void RegisterMessage(void(C::*function)(const T& param))
+		void RegisterMessage(void(C::*function)(T& param))
 		{
 			CTypeHasher::HashId id = CTypeHasher::Hash<T>();
 			if (m_messages.find(id) == m_messages.end())
 			{
 				m_messages[id] = new CMsgHandler<C, T>(function);
+			}
+			else
+			{
+				DECS_WARNING_MSG(EErrorCode::MessageAlreadyRegistered, "The message is already registered for this component");
+			}
+		}
+
+		template<typename C, typename T>
+		void RegisterMessage(void(C::*function)(const T& param))
+		{
+			CTypeHasher::HashId id = CTypeHasher::Hash<T>();
+			if (m_messages.find(id) == m_messages.end())
+			{
+				m_messages[id] = new CConstMsgHandler<C, T>(function);
 			}
 			else
 			{

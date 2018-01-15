@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include <donerecs/Defines.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 
 namespace DonerECS
@@ -74,13 +75,13 @@ namespace DonerECS
 		}
 
 		template<typename T>
-		void SendMessage(const T& message);
+		void SendMessage(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 		template<typename T>
-		void SendMessageRecursive(const T& message);
+		void SendMessageToChildren(const T& message,ESendMessageType type = ESendMessageType::NonRecursive);
 		template<typename T>
-		void PostMessage(const T& message);
+		void PostMessage(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 		template<typename T>
-		void PostMessageRecursive(const T& message);
+		void PostMessageToChildren(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 
 		bool Destroy();
 
