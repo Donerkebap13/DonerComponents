@@ -3,7 +3,6 @@ set(DECS_MAJOR_VERSION 1)
 set(DECS_MINOR_VERSION 0)
 set(DECS_PATCH_VERSION 0)
 set(DECS_VERSION "${DECS_MAJOR_VERSION}.${DECS_MINOR_VERSION}.${DECS_PATCH_VERSION}")
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/utils.cmake)
 include(CheckCXXSourceCompiles)
@@ -46,8 +45,11 @@ else()
 endif()
 
 set_compile_flags("${project_name}")
+
 if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|.*Clang)")
-	string(REPLACE "-std=c++11" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+	if (CMAKE_CXX_FLAGS)
+		string(REPLACE "-std=c++11" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+	endif()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 endif ()
 
