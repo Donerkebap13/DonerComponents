@@ -46,16 +46,7 @@ endif()
 
 set_compile_flags("${project_name}")
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|.*Clang)")
-	if (CMAKE_CXX_FLAGS)
-		string(REPLACE "-std=c++11" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
-	endif()
-	if(CMAKE_COMPILER_IS_GNUCXX)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
-	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-	endif()
-endif ()
+enable_cxx_14()
 
 set(install_libs "${project_name}")
 set_property(TARGET "${project_name}" APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES
