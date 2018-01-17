@@ -52,8 +52,8 @@ namespace DonerECS
 		};
 
 		DECS_REFLECT_CLASS_DATA(CCompFoo,
-			DECS_REFLECT_VAR(CCompFoo, int, m_a, "a"),
-			DECS_REFLECT_VAR(CCompFoo, int, m_b, "b")
+			DECS_REFLECT_VAR(m_a, "a"),
+			DECS_REFLECT_VAR(m_b, "b")
 		);
 
 		DECS_COMPONENT_REFLECTION_IMPL(CCompFoo)

@@ -34,9 +34,10 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+#include <string>
 
-#define DECS_REFLECT_CLASS_DATA(base_class, ...) class base_class##_reflection_data { public: constexpr static auto s_properties = std::make_tuple(__VA_ARGS__); }
-#define DECS_REFLECT_VAR(class, type, var, var_name) DonerECS::Reflection::SProperty<class, type>{ &class::var, var_name }
+#define DECS_REFLECT_CLASS_DATA(base_class, ...) class base_class##_reflection_data { using T = base_class; public: constexpr static auto s_properties = std::make_tuple(__VA_ARGS__); }
+#define DECS_REFLECT_VAR(var, var_name) DonerECS::Reflection::SProperty<T, typename decltype(T::var)>{ &T::var, var_name }
 
 #define DECS_DECLARE_COMPONENT_AS_REFLECTABLE(base_class) friend class base_class##_reflection_data; public: void ParseAtts(const DonerECS::Json::Value& atts) override;
 #define DECS_COMPONENT_REFLECTION_IMPL(class) void class::ParseAtts(const DonerECS::Json::Value& atts) { ParseAttsInternal<class##_reflection_data, class>(this, atts); }
@@ -62,27 +63,88 @@ namespace DonerECS
 			const char* m_name;
 		};
 
-		template<typename T>
-		Optional<T> ReflectData(const DonerECS::Json::Value& att)
+		template<class T>
+		struct SDataReflector
 		{
-			assert(false);
-			return Optional<T>();
-		}
+			static Optional<T> ReflectData(const DonerECS::Json::Value& att)
+			{
+				assert(false);
+				return Optional<T>();
+			}
+		};
 
 		template<>
-		Optional<std::string> ReflectData<std::string>(const DonerECS::Json::Value& att);
+		struct SDataReflector<std::string>
+		{
+			static Optional<std::string> ReflectData(const DonerECS::Json::Value& att);
+		};
+
 		template<>
-		Optional<const char*> ReflectData<const char*>(const DonerECS::Json::Value& att);
+		struct SDataReflector<bool>
+		{
+			static Optional<bool> ReflectData(const DonerECS::Json::Value& att);
+		};
+
 		template<>
-		Optional<bool> ReflectData<bool>(const DonerECS::Json::Value& att);
+		struct SDataReflector<int>
+		{
+			static Optional<int> ReflectData(const DonerECS::Json::Value& att);
+		};
+
 		template<>
-		Optional<int> ReflectData<int>(const DonerECS::Json::Value& att);
+		struct SDataReflector<long long>
+		{
+			static Optional<long long> ReflectData(const DonerECS::Json::Value& att);
+		};
+
 		template<>
-		Optional<long long> ReflectData<long long>(const DonerECS::Json::Value& att);
+		struct SDataReflector<float>
+		{
+			static Optional<float> ReflectData(const DonerECS::Json::Value& att);
+		};
+
 		template<>
-		Optional<float> ReflectData<float>(const DonerECS::Json::Value& att);
-		template<>
-		Optional<double> ReflectData<double>(const DonerECS::Json::Value& att);
+		struct SDataReflector<double>
+		{
+			static Optional<double> ReflectData(const DonerECS::Json::Value& att);
+		};
+
+		// std::vector
+		template<template<typename, typename> class TT, typename T1, typename T2>
+		struct SDataReflector<TT<T1, T2>>
+		{
+			using Vector = TT<T1, T2>;
+			static Optional<Vector> ReflectData(const DonerECS::Json::Value& atts)
+			{
+				if (atts.isArray())
+				{
+					Vector v;
+					for (DonerECS::Json::ArrayIndex i = 0; i < atts.size(); ++i)
+					{
+						const DonerECS::Json::Value& att = atts[i];
+						auto op = SDataReflector<T1>::ReflectData(att);
+						if (op)
+						{
+							v.emplace_back(op.value());
+						}
+					}
+					return Optional<Vector>(v);
+				}
+				return Optional<Vector>();
+			}
+		};
+
+		//std::map
+		template<template<typename, typename...> class TT, typename T1, typename... Rest>
+		struct SDataReflector<TT<T1, Rest...>>
+		{
+			using Map = TT<T1, Rest...>;
+			static Optional<Map> ReflectData(const DonerECS::Json::Value& att)
+			{
+				assert(false);
+				return Optional<Map>();
+			}
+		};
 
 		template<typename ReflectionData, std::size_t iteration, typename T>
 		void DoSetReflectionData(T* object, const DonerECS::Json::Value& data) {
@@ -93,7 +155,7 @@ namespace DonerECS
 			using Type = typename decltype(property)::Type;
 
 			// set the value to the member
-			Optional<Type> op = DonerECS::Reflection::ReflectData<Type>(data[property.m_name]);
+			auto op = DonerECS::Reflection::SDataReflector<Type>::ReflectData(data[property.m_name]);
 			if (op)
 			{
 				object->*(property.m_member) = op.value();

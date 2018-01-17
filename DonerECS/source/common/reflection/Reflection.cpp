@@ -31,8 +31,7 @@ namespace DonerECS
 {
 	namespace Reflection
 	{
-		template<>
-		Optional<std::string> ReflectData<std::string>(const DonerECS::Json::Value& att)
+		Optional<std::string> SDataReflector<std::string>::ReflectData(const DonerECS::Json::Value& att)
 		{
 			if (att.isString())
 			{
@@ -41,18 +40,7 @@ namespace DonerECS
 			return Optional<std::string>();
 		}
 
-		template<>
-		Optional<const char*> ReflectData<const char*>(const DonerECS::Json::Value& att)
-		{
-			if (att.isString())
-			{
-				return Optional<const char*>(att.asCString());
-			}
-			return Optional<const char*>();
-		}
-
-		template<>
-		Optional<bool> ReflectData<bool>(const DonerECS::Json::Value& att)
+		Optional<bool> SDataReflector<bool>::ReflectData(const DonerECS::Json::Value& att)
 		{
 			if (att.isBool())
 			{
@@ -61,8 +49,7 @@ namespace DonerECS
 			return Optional<bool>();
 		}
 
-		template<>
-		Optional<int> ReflectData<int>(const DonerECS::Json::Value& att)
+		Optional<int> SDataReflector<int>::ReflectData(const DonerECS::Json::Value& att)
 		{
 			if (att.isInt())
 			{
@@ -71,8 +58,7 @@ namespace DonerECS
 			return Optional<int>();
 		}
 
-		template<>
-		Optional<long long> ReflectData<long long>(const DonerECS::Json::Value& att)
+		Optional<long long> SDataReflector<long long>::ReflectData(const DonerECS::Json::Value& att)
 		{
 			if (att.isInt64())
 			{
@@ -81,8 +67,7 @@ namespace DonerECS
 			return Optional<long long>();
 		}
 
-		template<>
-		Optional<float> ReflectData<float>(const DonerECS::Json::Value& att)
+		Optional<float> SDataReflector<float>::ReflectData(const DonerECS::Json::Value& att)
 		{
 			if (att.isDouble())
 			{
@@ -91,8 +76,7 @@ namespace DonerECS
 			return Optional<float>();
 		}
 
-		template<>
-		Optional<double> ReflectData<double>(const DonerECS::Json::Value& att)
+		Optional<double> SDataReflector<double>::ReflectData(const DonerECS::Json::Value& att)
 		{
 			if (att.isDouble())
 			{
