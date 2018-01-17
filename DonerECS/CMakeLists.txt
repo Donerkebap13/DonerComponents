@@ -3,7 +3,6 @@ set(DECS_MAJOR_VERSION 1)
 set(DECS_MINOR_VERSION 0)
 set(DECS_PATCH_VERSION 0)
 set(DECS_VERSION "${DECS_MAJOR_VERSION}.${DECS_MINOR_VERSION}.${DECS_PATCH_VERSION}")
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/utils.cmake)
 include(CheckCXXSourceCompiles)
@@ -47,8 +46,9 @@ endif()
 
 set_compile_flags("${project_name}")
 if (CMAKE_CXX_COMPILER_ID MATCHES "(GNU|.*Clang)")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
-endif()
+	string(REPLACE "-std=c++11" "" CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS})
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+endif ()
 
 set(install_libs "${project_name}")
 set_property(TARGET "${project_name}" APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES
