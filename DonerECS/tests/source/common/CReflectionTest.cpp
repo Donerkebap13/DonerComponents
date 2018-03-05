@@ -75,17 +75,6 @@ namespace DonerECS
 			std::vector<std::string> m_stringVector;
 		};
 
-		DECS_DEFINE_REFLECTION_DATA(CCompFoo,
-			DECS_ADD_VAR_INFO(m_int, "int"),
-			DECS_ADD_VAR_INFO(m_float, "float"),
-			DECS_ADD_VAR_INFO(m_bool, "bool"),
-			DECS_ADD_VAR_INFO(m_longLong, "long_long"),
-			DECS_ADD_VAR_INFO(m_double, "double"),
-			DECS_ADD_VAR_INFO(m_string, "string"),
-			DECS_ADD_VAR_INFO(m_intVector, "int_vector"),
-			DECS_ADD_VAR_INFO(m_stringVector, "string_vector")
-		);
-
 		DECS_COMPONENT_REFLECTION_IMPL(CCompFoo)
 
 			const char* const FULL_DATA_ENTITY = "{ \"type\": \"scene\", \"root\": {"
@@ -102,6 +91,17 @@ namespace DonerECS
 			"\"type\": \"entity\", \"name\": \"test1\","
 			"\"components\": [{ \"name\": \"foo\"}]}}";
 	}
+
+	DECS_DEFINE_REFLECTION_DATA(DonerECS::ReflectionTestInternal::CCompFoo,
+								DECS_ADD_VAR_INFO(m_int, "int"),
+								DECS_ADD_VAR_INFO(m_float, "float"),
+								DECS_ADD_VAR_INFO(m_bool, "bool"),
+								DECS_ADD_VAR_INFO(m_longLong, "long_long"),
+								DECS_ADD_VAR_INFO(m_double, "double"),
+								DECS_ADD_VAR_INFO(m_string, "string"),
+								DECS_ADD_VAR_INFO(m_intVector, "int_vector"),
+								DECS_ADD_VAR_INFO(m_stringVector, "string_vector")
+	);
 
 	class CReflectionTest : public ::testing::Test
 	{

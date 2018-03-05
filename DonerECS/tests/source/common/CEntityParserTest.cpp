@@ -51,11 +51,6 @@ namespace DonerECS
 			int m_b;
 		};
 
-		DECS_DEFINE_REFLECTION_DATA(CCompFoo,
-									DECS_ADD_VAR_INFO(m_a, "a"),
-									DECS_ADD_VAR_INFO(m_b, "b")
-		);
-
 		DECS_COMPONENT_REFLECTION_IMPL(CCompFoo)
 
 		const char* const ONE_LEVEL_ENTITY = "{ \"type\": \"scene\", \"root\": {"
@@ -102,6 +97,11 @@ namespace DonerECS
 			"\"name\": \"prefabTest\", \"tags\": [\"tag1\", \"tag3\"],"
 			"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
 	}
+
+	DECS_DEFINE_REFLECTION_DATA(DonerECS::EntityParserTestInternal::CCompFoo,
+								DECS_ADD_VAR_INFO(m_a, "a"),
+								DECS_ADD_VAR_INFO(m_b, "b")
+	);
 
 	class CEntityParserTest : public ::testing::Test
 	{
