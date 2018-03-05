@@ -75,15 +75,15 @@ namespace DonerECS
 			std::vector<std::string> m_stringVector;
 		};
 
-		DECS_REFLECT_CLASS_DATA(CCompFoo,
-			DECS_REFLECT_VAR(m_int, "int"),
-			DECS_REFLECT_VAR(m_float, "float"),
-			DECS_REFLECT_VAR(m_bool, "bool"),
-			DECS_REFLECT_VAR(m_longLong, "long_long"),
-			DECS_REFLECT_VAR(m_double, "double"),
-			DECS_REFLECT_VAR(m_string, "string"),
-			DECS_REFLECT_VAR(m_intVector, "int_vector"),
-			DECS_REFLECT_VAR(m_stringVector, "string_vector")
+		DECS_DEFINE_REFLECTION_DATA(CCompFoo,
+			DECS_ADD_VAR_INFO(m_int, "int"),
+			DECS_ADD_VAR_INFO(m_float, "float"),
+			DECS_ADD_VAR_INFO(m_bool, "bool"),
+			DECS_ADD_VAR_INFO(m_longLong, "long_long"),
+			DECS_ADD_VAR_INFO(m_double, "double"),
+			DECS_ADD_VAR_INFO(m_string, "string"),
+			DECS_ADD_VAR_INFO(m_intVector, "int_vector"),
+			DECS_ADD_VAR_INFO(m_stringVector, "string_vector")
 		);
 
 		DECS_COMPONENT_REFLECTION_IMPL(CCompFoo)

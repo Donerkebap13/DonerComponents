@@ -129,10 +129,10 @@ namespace DonerECS
 			}
 		}
 
-		template<typename ReflectionData, typename BaseClass>
+		template<typename BaseClass>
 		void ParseAttsInternal(BaseClass* caller, const Json::Value& data)
 		{
-			Reflection::SetReflectionData<ReflectionData, std::tuple_size<decltype(ReflectionData::s_properties)>::value - 1>(caller, data);
+			Reflection::CReflectionHelper<BaseClass>::DeserializeFromJson(data, caller);
 		}
 
 		CHandle m_owner;

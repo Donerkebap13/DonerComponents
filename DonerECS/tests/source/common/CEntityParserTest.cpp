@@ -51,9 +51,9 @@ namespace DonerECS
 			int m_b;
 		};
 
-		DECS_REFLECT_CLASS_DATA(CCompFoo,
-			DECS_REFLECT_VAR(m_a, "a"),
-			DECS_REFLECT_VAR(m_b, "b")
+		DECS_DEFINE_REFLECTION_DATA(CCompFoo,
+									DECS_ADD_VAR_INFO(m_a, "a"),
+									DECS_ADD_VAR_INFO(m_b, "b")
 		);
 
 		DECS_COMPONENT_REFLECTION_IMPL(CCompFoo)

@@ -46,7 +46,7 @@ endif()
 
 set_compile_flags("${project_name}")
 
-enable_cxx_14()
+target_compile_features("${project_name}" PUBLIC cxx_std_14)
 
 set(install_libs "${project_name}")
 set_property(TARGET "${project_name}" APPEND PROPERTY INTERFACE_INCLUDE_DIRECTORIES

@@ -31,58 +31,60 @@ namespace DonerECS
 {
 	namespace Reflection
 	{
-		Optional<std::string> SDataReflector<std::string>::ReflectData(const DonerECS::Json::Value& att)
-		{
-			if (att.isString())
-			{
-				return Optional<std::string>(att.asString());
-			}
-			return Optional<std::string>();
-		}
-
-		Optional<bool> SDataReflector<bool>::ReflectData(const DonerECS::Json::Value& att)
-		{
-			if (att.isBool())
-			{
-				return Optional<bool>(att.asBool());
-			}
-			return Optional<bool>();
-		}
-
-		Optional<int> SDataReflector<int>::ReflectData(const DonerECS::Json::Value& att)
+		std::experimental::optional<int> STypeReflector<int>::DeserializeFromJson(const DonerECS::Json::Value& att)
 		{
 			if (att.isInt())
 			{
-				return Optional<int>(att.asInt());
+				return std::experimental::make_optional<int>(att.asInt());
 			}
-			return Optional<int>();
+			return std::experimental::nullopt;
 		}
 
-		Optional<long long> SDataReflector<long long>::ReflectData(const DonerECS::Json::Value& att)
+		std::experimental::optional<std::string> STypeReflector<std::string>::DeserializeFromJson(const DonerECS::Json::Value& att)
+		{
+			if (att.isString())
+			{
+				return std::experimental::optional<std::string>(att.asString());
+			}
+			return std::experimental::nullopt;
+		}
+
+		std::experimental::optional<bool> STypeReflector<bool>::DeserializeFromJson(const DonerECS::Json::Value& att)
+		{
+			if (att.isBool())
+			{
+				return std::experimental::optional<bool>(att.asBool());
+			}
+			return std::experimental::optional<bool>();
+		}
+
+		
+
+		std::experimental::optional<long long> STypeReflector<long long>::DeserializeFromJson(const DonerECS::Json::Value& att)
 		{
 			if (att.isInt64())
 			{
-				return Optional<long long>(att.asInt64());
+				return std::experimental::optional<long long>(att.asInt64());
 			}
-			return Optional<long long>();
+			return std::experimental::nullopt;
 		}
 
-		Optional<float> SDataReflector<float>::ReflectData(const DonerECS::Json::Value& att)
+		std::experimental::optional<float> STypeReflector<float>::DeserializeFromJson(const DonerECS::Json::Value& att)
 		{
 			if (att.isDouble())
 			{
-				return Optional<float>(att.asFloat());
+				return std::experimental::optional<float>(att.asFloat());
 			}
-			return Optional<float>();
+			return std::experimental::nullopt;
 		}
 
-		Optional<double> SDataReflector<double>::ReflectData(const DonerECS::Json::Value& att)
+		std::experimental::optional<double> STypeReflector<double>::DeserializeFromJson(const DonerECS::Json::Value& att)
 		{
 			if (att.isDouble())
 			{
-				return Optional<double>(att.asDouble());
+				return std::experimental::optional<double>(att.asDouble());
 			}
-			return Optional<double>();
+			return std::experimental::nullopt;
 		}
 	}
 }
