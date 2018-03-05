@@ -99,7 +99,7 @@ namespace EntityParserTestInternal
 DECS_DEFINE_REFLECTION_DATA(EntityParserTestInternal::CCompFoo,
 							DECS_ADD_VAR_INFO(m_a, "a"),
 							DECS_ADD_VAR_INFO(m_b, "b")
-);
+)
 
 namespace DonerECS
 {

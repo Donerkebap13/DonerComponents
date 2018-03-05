@@ -99,7 +99,7 @@ DECS_DEFINE_REFLECTION_DATA(::ReflectionTestInternal::CCompFoo,
 							DECS_ADD_VAR_INFO(m_string, "string"),
 							DECS_ADD_VAR_INFO(m_intVector, "int_vector"),
 							DECS_ADD_VAR_INFO(m_stringVector, "string_vector")
-);
+)
 
 namespace DonerECS
 {
