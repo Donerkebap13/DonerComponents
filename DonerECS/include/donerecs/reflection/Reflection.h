@@ -41,7 +41,7 @@
 	struct SDonerECSReflectedClassProperties<base_class>                                                 \
 	{                                                                                                    \
 		using T = base_class;                                                                            \
-		constexpr static auto s_properties = std::make_tuple(##__VA_ARGS__);                             \
+		constexpr static auto s_properties = std::make_tuple(__VA_ARGS__);                             \
 		constexpr static std::size_t s_propertiesCount = std::tuple_size<decltype(s_properties)>::value; \
 	};
 
