@@ -35,6 +35,18 @@
 
 namespace DonerECS
 {
+	namespace PrefabManagerTestInternal
+	{
+		class CCompFoo : public DonerECS::CComponent
+		{
+		public:
+			CCompFoo() : m_a(-1), m_b(-1) {}
+
+			int m_a;
+			int m_b;
+		};
+	}
+
 	class CPrefabManagerTest : public ::testing::Test
 	{
 	public:
@@ -43,6 +55,7 @@ namespace DonerECS
 			, m_entityManager(CEntityManager::CreateInstance())
 			, m_prefabManager(CPrefabManager::CreateInstance())
 		{
+			ADD_COMPONENT_FACTORY("foo", PrefabManagerTestInternal::CCompFoo, 10);
 		}
 
 		~CPrefabManagerTest()
@@ -87,6 +100,27 @@ namespace DonerECS
 		CEntity* cloned = m_prefabManager->ClonePrefab("test");
 		EXPECT_NE(nullptr, cloned);
 		EXPECT_EQ(cloned->GetName(), entity->GetName());
+	}
+
+	TEST_F(CPrefabManagerTest, cloned_prefab_components_have_correct_owner)
+	{
+		CEntity* prefabEntity = m_entityManager->CreateEntity();
+		EXPECT_NE(nullptr, prefabEntity);
+		prefabEntity->SetName("test1");
+		CComponent* prefabComponent = prefabEntity->AddComponent("foo");
+		CHandle prefabEntityHandle = prefabEntity;
+		EXPECT_EQ(prefabComponent->GetOwner(), prefabEntityHandle);
+
+		bool success = m_prefabManager->RegisterPrefab("test", prefabEntity);
+		EXPECT_TRUE(success);
+
+		CEntity* cloned = m_prefabManager->ClonePrefab("test");
+		EXPECT_NE(nullptr, cloned);
+
+		CComponent* clonedComponent = cloned->GetComponent("foo");
+		EXPECT_NE(nullptr, prefabComponent);
+		CHandle clonedHandle = cloned;
+		EXPECT_EQ(clonedComponent->GetOwner(), clonedHandle);
 	}
 
 	TEST_F(CPrefabManagerTest, clone_invalid_prefab_return_invalid_entity)

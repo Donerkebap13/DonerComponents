@@ -373,6 +373,13 @@ namespace DonerECS
 			m_initiallyActive = true;
 
 			m_componentFactoryManager.CloneComponents(entity->m_components, m_components);
+			for (CComponent* component : m_components)
+			{
+				if (component)
+				{
+					component->SetOwner(this);
+				}
+			}
 
 			CEntityManager* entityManager = CEntityManager::Get();
 			for (CEntity *child : entity->m_children)

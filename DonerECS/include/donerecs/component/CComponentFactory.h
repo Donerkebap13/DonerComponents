@@ -72,12 +72,16 @@ namespace DonerECS
 
 		CComponent* CloneComponent(CComponent* component) override
 		{
-			T* newComponent = static_cast<T*>(CreateComponent());
-			if (newComponent)
+			if (component)
 			{
-				*newComponent = *(static_cast<T*>(component));
+				T* newComponent = static_cast<T*>(CreateComponent());
+				if (newComponent)
+				{
+					*newComponent = *(static_cast<T*>(component));
+				}
+				return newComponent;
 			}
-			return newComponent;
+			return nullptr;
 		}
 
 		CComponent* GetByIdxAndVersion(int index, int version) override
