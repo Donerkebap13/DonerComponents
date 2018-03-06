@@ -48,7 +48,6 @@ namespace DonerECS
 		template<class CComponent> friend class CFactory;
 	public:
 		virtual ~CComponent();
-		CComponent(CComponent&&) = default;
 
 		void Init();
 		void Update(float dt);

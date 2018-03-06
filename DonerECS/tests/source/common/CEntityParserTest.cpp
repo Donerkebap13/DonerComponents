@@ -44,7 +44,6 @@ namespace EntityParserTestInternal
 		DECS_DECLARE_COMPONENT_AS_REFLECTABLE(CCompFoo)
 	public:
 		CCompFoo() : m_a(-1), m_b(-1) {}
-		CCompFoo(CCompFoo& rhs) : m_a(rhs.m_a), m_b(rhs.m_b) {}
 
 		int m_a;
 		int m_b;
