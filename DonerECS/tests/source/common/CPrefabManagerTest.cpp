@@ -33,6 +33,9 @@
 
 #include <gtest/gtest.h>
 
+// gmock
+// using ::testing::Return;
+
 namespace DonerECS
 {
 	namespace PrefabManagerTestInternal
@@ -73,7 +76,6 @@ namespace DonerECS
 	TEST_F(CPrefabManagerTest, register_prefab)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		bool success = m_prefabManager->RegisterPrefab("test", entity);
 		EXPECT_TRUE(success);
 	}
@@ -81,44 +83,60 @@ namespace DonerECS
 	TEST_F(CPrefabManagerTest, register_existing_prefab_fails)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
+		m_prefabManager->RegisterPrefab("test", entity);
+
 		bool success = m_prefabManager->RegisterPrefab("test", entity);
-		EXPECT_TRUE(success);
-		success = m_prefabManager->RegisterPrefab("test", entity);
 		EXPECT_FALSE(success);
+
+		// gmock (TEST THIS)
+		/*EXPECT_CALL(m_prefabManager, RegisterPrefab("test", entity))
+		.WillOnce(Return(true))
+		.WillRepeatedly(Return(false));*/
 	}
 
 	TEST_F(CPrefabManagerTest, clone_prefab)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->SetName("test1");
 
-		bool success = m_prefabManager->RegisterPrefab("test", entity);
-		EXPECT_TRUE(success);
+		m_prefabManager->RegisterPrefab("test", entity);
 
 		CEntity* cloned = m_prefabManager->ClonePrefab("test");
-		EXPECT_NE(nullptr, cloned);
 		EXPECT_EQ(cloned->GetName(), entity->GetName());
+	}
+
+	TEST_F(CPrefabManagerTest, clonen_prefab_is_initialized)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+
+		m_prefabManager->RegisterPrefab("test", entity);
+
+		CEntity* cloned = m_prefabManager->ClonePrefab("test");
+		EXPECT_TRUE(cloned->IsInitialized());
+	}
+
+	TEST_F(CPrefabManagerTest, clonen_prefab_is_not_active)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+
+		m_prefabManager->RegisterPrefab("test", entity);
+
+		CEntity* cloned = m_prefabManager->ClonePrefab("test");
+		EXPECT_FALSE(cloned->IsActive());
 	}
 
 	TEST_F(CPrefabManagerTest, cloned_prefab_components_have_correct_owner)
 	{
 		CEntity* prefabEntity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, prefabEntity);
-		prefabEntity->SetName("test1");
 		CComponent* prefabComponent = prefabEntity->AddComponent("foo");
 		CHandle prefabEntityHandle = prefabEntity;
 		EXPECT_EQ(prefabComponent->GetOwner(), prefabEntityHandle);
 
-		bool success = m_prefabManager->RegisterPrefab("test", prefabEntity);
-		EXPECT_TRUE(success);
+		m_prefabManager->RegisterPrefab("test", prefabEntity);
 
 		CEntity* cloned = m_prefabManager->ClonePrefab("test");
-		EXPECT_NE(nullptr, cloned);
 
 		CComponent* clonedComponent = cloned->GetComponent("foo");
-		EXPECT_NE(nullptr, prefabComponent);
 		CHandle clonedHandle = cloned;
 		EXPECT_EQ(clonedComponent->GetOwner(), clonedHandle);
 	}

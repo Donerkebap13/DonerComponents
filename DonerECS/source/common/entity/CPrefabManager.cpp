@@ -67,6 +67,7 @@ namespace DonerECS
 			CEntity* prefab = (*prefabIt).second;
 			CEntity* entity = m_entityManager.CreateEntity();
 			entity->CloneFrom(prefab);
+			entity->Init();
 			return entity;
 		}
 		DECS_ERROR_MSG(EErrorCode::PrefabNotRegistered, "Prefab with nameId %u not registered", nameId);
