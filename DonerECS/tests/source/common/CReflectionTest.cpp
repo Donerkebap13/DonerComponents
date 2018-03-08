@@ -137,9 +137,8 @@ namespace DonerECS
 	{
 		CEntityParser parser;
 		CEntity* entity = parser.ParseSceneFromJson(::ReflectionTestInternal::FULL_DATA_ENTITY);
-		EXPECT_NE(nullptr, entity);
 		::ReflectionTestInternal::CCompFoo* component = entity->GetComponent<::ReflectionTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
+		
 		EXPECT_EQ(1, component->m_int);
 		EXPECT_EQ(16.f, component->m_float);
 		EXPECT_EQ(true, component->m_bool);
@@ -147,11 +146,13 @@ namespace DonerECS
 		EXPECT_EQ(10.0, component->m_double);
 		EXPECT_EQ("std::string", component->m_string);
 
+		// TODO_TESTS improve size check
 		EXPECT_EQ(3, component->m_intVector.size());
 		EXPECT_EQ(1, component->m_intVector[0]);
 		EXPECT_EQ(20, component->m_intVector[1]);
 		EXPECT_EQ(300, component->m_intVector[2]);
 
+		// TODO_TESTS improve size check
 		EXPECT_EQ(3, component->m_stringVector.size());
 		EXPECT_EQ("one", component->m_stringVector[0]);
 		EXPECT_EQ("two", component->m_stringVector[1]);
@@ -162,9 +163,8 @@ namespace DonerECS
 	{
 		CEntityParser parser;
 		CEntity* entity = parser.ParseSceneFromJson(::ReflectionTestInternal::PARTIALLY_FULL_ENTITY);
-		EXPECT_NE(nullptr, entity);
 		::ReflectionTestInternal::CCompFoo* component = entity->GetComponent<::ReflectionTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
+		
 		EXPECT_EQ(::ReflectionTestInternal::INT_DEFAULT_VALUE, component->m_int);
 		EXPECT_EQ(::ReflectionTestInternal::FLOAT_DEFAULT_VALUE, component->m_float);
 		EXPECT_EQ(true, component->m_bool);
@@ -184,9 +184,8 @@ namespace DonerECS
 	{
 		CEntityParser parser;
 		CEntity* entity = parser.ParseSceneFromJson(::ReflectionTestInternal::EMPTY_ENTITY);
-		EXPECT_NE(nullptr, entity);
 		::ReflectionTestInternal::CCompFoo* component = entity->GetComponent<::ReflectionTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
+		
 		EXPECT_EQ(::ReflectionTestInternal::INT_DEFAULT_VALUE, component->m_int);
 		EXPECT_EQ(::ReflectionTestInternal::FLOAT_DEFAULT_VALUE, component->m_float);
 		EXPECT_EQ(::ReflectionTestInternal::BOOL_DEFAULT_VALUE, component->m_bool);

@@ -56,11 +56,8 @@ namespace DonerECS
 		std::tuple<CEntity*, CEntity*, CEntity*> GetEntityWithChildren()
 		{
 			CEntity* entity = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, entity);
 			CEntity* child1 = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, child1);
 			CEntity* child11 = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, child11);
 			entity->AddChild(child1);
 			child1->AddChild(child11);
 
@@ -70,13 +67,9 @@ namespace DonerECS
 		std::tuple<CEntity*, CEntity*, CEntity*, CEntity*> GetEntityWithChildren2()
 		{
 			CEntity* entity = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, entity);
 			CEntity* child1 = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, child1);
 			CEntity* child11 = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, child11);
 			CEntity* child111 = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, child111);
 			entity->AddChild(child1);
 			child1->AddChild(child11);
 			child11->AddChild(child111);
@@ -87,9 +80,7 @@ namespace DonerECS
 		std::tuple<CEntity*, CEntity*> GetEntityWithChildrenRecursive()
 		{
 			CEntity* entity = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, entity);
 			CEntity* entity1 = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, entity1);
 
 			entity->AddChild(entity1);
 
@@ -103,7 +94,6 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_set_name)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		static const std::string entityName("TestName");
 		entity->SetName(entityName.c_str());
 		const std::string& name = entity->GetName();
@@ -114,7 +104,6 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_created_uninitalized_and_deactivated)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 
 		EXPECT_FALSE(entity->IsInitialized());
 		EXPECT_FALSE(entity->IsActive());
@@ -123,9 +112,7 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_add_child_as_entity)
 	{
 		CEntity* parent = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent);
 		CEntity* child = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, child);
 
 		bool success = parent->AddChild(child);
 		EXPECT_TRUE(success);
@@ -139,9 +126,7 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_add_child_as_handle)
 	{
 		CEntity* parent = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent);
 		CHandle child = m_entityManager->CreateEntity();
-		EXPECT_TRUE(static_cast<bool>(child));
 
 		bool success = parent->AddChild(child);
 		EXPECT_TRUE(success);
@@ -156,9 +141,7 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_add_child_twice_fails)
 	{
 		CEntity* parent = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent);
 		CHandle child = m_entityManager->CreateEntity();
-		EXPECT_TRUE(static_cast<bool>(child));
 
 		bool success = parent->AddChild(child);
 		EXPECT_TRUE(success);
@@ -172,9 +155,7 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_remove_child_as_entity)
 	{
 		CEntity* parent = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent);
 		CEntity* child = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, child);
 
 		bool success = parent->AddChild(child);
 		EXPECT_TRUE(success);
@@ -190,9 +171,7 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_remove_child_as_handle)
 	{
 		CEntity* parent = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent);
 		CHandle child = m_entityManager->CreateEntity();
-		EXPECT_TRUE(static_cast<bool>(child));
 
 		bool success = parent->AddChild(child);
 		EXPECT_TRUE(success);
@@ -209,9 +188,7 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_remove_child_twice_fails)
 	{
 		CEntity* parent = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent);
 		CEntity* child = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, child);
 
 		bool success = parent->AddChild(child);
 		EXPECT_TRUE(success);
@@ -227,9 +204,7 @@ namespace DonerECS
 	{
 		static const char* const CHILD_NAME("Test");
 		CEntity* parent = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent);
 		CEntity* child = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, child);
 		child->SetName(CHILD_NAME);
 
 		bool success = parent->AddChild(child);
@@ -248,9 +223,7 @@ namespace DonerECS
 		static const char* const CHILD_NAME("Test");
 		static const char* const WRONG_NAME("Test2");
 		CEntity* parent = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent);
 		CEntity* child = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, child);
 		child->SetName(CHILD_NAME);
 
 		bool success = parent->AddChild(child);
@@ -266,9 +239,7 @@ namespace DonerECS
 	{
 		static const char* const CHILD_NAME("Test");
 		CEntity* parent = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent);
 		CEntity* child = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, child);
 		child->SetName(CHILD_NAME);
 
 		bool success = parent->AddChild(child);
@@ -286,9 +257,7 @@ namespace DonerECS
 	{
 		static const char* const CHILD_NAME("Test");
 		CEntity* parent = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent);
 		CEntity* child = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, child);
 		child->SetName(CHILD_NAME);
 
 		bool success = parent->AddChild(child);
@@ -303,7 +272,6 @@ namespace DonerECS
 	TEST_F(CEntityTest, get_children_by_index_with_no_children)
 	{
 		CEntity* parent = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent);
 
 		CHandle childHandle = parent->GetChildByIndex(1);
 		EXPECT_FALSE(static_cast<bool>(childHandle));
@@ -312,11 +280,8 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_change_entity_parent)
 	{
 		CEntity* parent1 = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent1);
 		CEntity* parent2 = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, parent2);
 		CEntity* child = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, child);
 
 		bool success = parent1->AddChild(child);
 		EXPECT_TRUE(success);
@@ -339,9 +304,7 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_delete_also_deletes_children)
 	{
 		CHandle parent = m_entityManager->CreateEntity();
-		EXPECT_TRUE(static_cast<bool>(parent));
 		CHandle child = m_entityManager->CreateEntity();
-		EXPECT_TRUE(static_cast<bool>(child));
 
 		CEntity* parentEntity = parent;
 		bool success = parentEntity->AddChild(child);
@@ -357,9 +320,7 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_delete_removes_itself_from_its_parent)
 	{
 		CHandle parent = m_entityManager->CreateEntity();
-		EXPECT_TRUE(static_cast<bool>(parent));
 		CHandle child = m_entityManager->CreateEntity();
-		EXPECT_TRUE(static_cast<bool>(child));
 
 		CEntity* parentEntity = parent;
 		bool success = parentEntity->AddChild(child);
@@ -377,7 +338,6 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_not_activated_on_initialization)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 
 		EXPECT_FALSE(entity->IsInitialized());
 		EXPECT_FALSE(entity->IsActive());
@@ -389,7 +349,6 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_CheckFirstActivation_with_initiallyActive_true)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->SetIsInitiallyActive(true);
 		entity->Init();
 		entity->CheckFirstActivation();
@@ -399,7 +358,6 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_CheckFirstActivation_with_initiallyActive_false)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->SetIsInitiallyActive(false);
 		entity->Init();
 		entity->CheckFirstActivation();
@@ -409,7 +367,6 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_CheckFirstActivation_not_working_without_init_called_first)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->SetIsInitiallyActive(true);
 		entity->CheckFirstActivation();
 		EXPECT_FALSE(entity->IsActive());
@@ -418,7 +375,6 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_activate)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->SetIsInitiallyActive(false);
 		entity->CheckFirstActivation();
 		entity->Init();
@@ -430,7 +386,6 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_deactivate)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->Init();
 		entity->SetIsInitiallyActive(true);
 		entity->CheckFirstActivation();
@@ -442,7 +397,6 @@ namespace DonerECS
 	TEST_F(CEntityTest, entity_deactivate_not_accumulative)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->SetIsInitiallyActive(false);
 		entity->CheckFirstActivation();
 		entity->Init();

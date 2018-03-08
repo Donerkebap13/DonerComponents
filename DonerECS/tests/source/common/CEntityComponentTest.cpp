@@ -78,13 +78,9 @@ namespace DonerECS
 		std::tuple<CEntity*, CEntity*, CComponent*, CComponent*> GetEntityWithChildren()
 		{
 			CEntity* entity = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, entity);
 			CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
-			EXPECT_NE(nullptr, component);
 			CEntity* entity1 = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, entity1);
 			CComponent* component1 = entity1->AddComponent<EntityComponentTestInternal::CCompFoo>();
-			EXPECT_NE(nullptr, component1);
 
 			entity->AddChild(entity1);
 
@@ -94,17 +90,11 @@ namespace DonerECS
 		std::tuple<CEntity*, CEntity*, CEntity*, CComponent*, CComponent*, CComponent*> GetEntityWithChildrenRecursive()
 		{
 			CEntity* entity = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, entity);
 			CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
-			EXPECT_NE(nullptr, component);
 			CEntity* entity1 = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, entity1);
 			CComponent* component1 = entity1->AddComponent<EntityComponentTestInternal::CCompFoo>();
-			EXPECT_NE(nullptr, component1);
 			CEntity* entity11 = m_entityManager->CreateEntity();
-			EXPECT_NE(nullptr, entity11);
 			CComponent* component11 = entity11->AddComponent<EntityComponentTestInternal::CCompFoo>();
-			EXPECT_NE(nullptr, component11);
 
 			entity->AddChild(entity1);
 			entity1->AddChild(entity11);
@@ -119,9 +109,7 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, add_component_by_class)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
 		EntityComponentTestInternal::CCompFoo* foo = dynamic_cast<EntityComponentTestInternal::CCompFoo*>(component);
 		EXPECT_NE(nullptr, foo);
 		EntityComponentTestInternal::CCompBar* bar = dynamic_cast<EntityComponentTestInternal::CCompBar*>(component);
@@ -139,9 +127,7 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, add_component_by_name)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		CComponent* component = entity->AddComponent("foo");
-		EXPECT_NE(nullptr, component);
 		EntityComponentTestInternal::CCompFoo* foo = dynamic_cast<EntityComponentTestInternal::CCompFoo*>(component);
 		EXPECT_NE(nullptr, foo);
 		EntityComponentTestInternal::CCompBar* bar = dynamic_cast<EntityComponentTestInternal::CCompBar*>(component);
@@ -159,7 +145,6 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, get_component_by_class)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 		CComponent* component = entity->GetComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_NE(nullptr, component);
@@ -172,15 +157,13 @@ namespace DonerECS
     TEST_F(CEntityComponentTest, get_invalid_component_by_class_fails)
     {
         CEntity* entity = m_entityManager->CreateEntity();
-        EXPECT_NE(nullptr, entity);
-        CComponent* omponent = entity->GetComponent<EntityComponentTestInternal::CCompFoo>();
-        EXPECT_EQ(nullptr, omponent);
+        CComponent* component = entity->GetComponent<EntityComponentTestInternal::CCompFoo>();
+        EXPECT_EQ(nullptr, component);
     }
 
 	TEST_F(CEntityComponentTest, has_component_by_class)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 		bool hasComponent = entity->HasComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_TRUE(hasComponent);
@@ -189,7 +172,6 @@ namespace DonerECS
     TEST_F(CEntityComponentTest, has_invalid_component_by_class_fails)
     {
         CEntity* entity = m_entityManager->CreateEntity();
-        EXPECT_NE(nullptr, entity);
         bool hasComponent = entity->HasComponent<EntityComponentTestInternal::CCompFoo>();
         EXPECT_FALSE(hasComponent);
     }
@@ -197,7 +179,6 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, get_component_by_name)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 		CComponent* component = entity->GetComponent("foo");
 		EXPECT_NE(nullptr, component);
@@ -210,7 +191,6 @@ namespace DonerECS
     TEST_F(CEntityComponentTest, get_invalid_component_by_name_fails)
     {
         CEntity* entity = m_entityManager->CreateEntity();
-        EXPECT_NE(nullptr, entity);
         CComponent* omponent = entity->GetComponent("foo");
         EXPECT_EQ(nullptr, omponent);
     }
@@ -218,7 +198,6 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, has_component_by_name)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 		bool hasComponent = entity->HasComponent("foo");
 		EXPECT_TRUE(hasComponent);
@@ -227,7 +206,6 @@ namespace DonerECS
     TEST_F(CEntityComponentTest, has_invalid_component_by_name_fails)
     {
         CEntity* entity = m_entityManager->CreateEntity();
-        EXPECT_NE(nullptr, entity);
         bool hasComponent = entity->HasComponent("foo");
         EXPECT_FALSE(hasComponent);
     }
@@ -235,7 +213,6 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, remove_component_by_class)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 		CHandle handle = entity->GetComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_TRUE(static_cast<bool>(handle));
@@ -251,7 +228,6 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, remove_component_by_name)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 		CHandle handle = entity->GetComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_TRUE(static_cast<bool>(handle));
@@ -267,7 +243,6 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, check_cant_add_component_twice)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		CHandle handle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_TRUE(static_cast<bool>(handle));
 		handle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
@@ -277,7 +252,6 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, check_cant_remove_component_twice)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		CHandle handle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_TRUE(static_cast<bool>(handle));
 
@@ -290,7 +264,6 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, check_component_invalid_after_deleting_entity)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		CHandle handle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_TRUE(static_cast<bool>(handle));
 
@@ -305,9 +278,7 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, check_component_parent)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
 
 		CHandle entityHandle = entity;
 		EXPECT_TRUE(static_cast<bool>(entityHandle));
@@ -319,9 +290,7 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, init_entity_initialize_components)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
 
 		EXPECT_FALSE(entity->IsInitialized());
 		EXPECT_FALSE(component->IsInitialized());
@@ -333,7 +302,6 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, destroy_entity_destroys_components)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		CHandle compHandle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_TRUE(static_cast<bool>(compHandle));
 
@@ -346,9 +314,7 @@ namespace DonerECS
 	TEST_F(CEntityComponentTest, activate_entity_activates_components)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		CComponent* component = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
 		entity->Init();
 		EXPECT_FALSE(entity->IsActive());
 		EXPECT_FALSE(component->IsActive());

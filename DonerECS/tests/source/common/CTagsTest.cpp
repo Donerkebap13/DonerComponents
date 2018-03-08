@@ -60,31 +60,29 @@ namespace DonerECS
 
 	TEST_F(CTagsTest, register_existing_tag_fails)
 	{
+		// gmock possible usage instead of
+		m_tagManager->RegisterTag("test");
 		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
-		success = m_tagManager->RegisterTag("test");
 		EXPECT_FALSE(success);
 	}
 
 	TEST_F(CTagsTest, register_tag_correct_value)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
-		success = m_tagManager->RegisterTag("test2");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
+		m_tagManager->RegisterTag("test2");
+		
 		int tagId1 = m_tagManager->GetTagIdx("test");
 		EXPECT_EQ(0, tagId1);
 		int tagId2 = m_tagManager->GetTagIdx("test2");
 		EXPECT_EQ(1, tagId2);
 	}
 
-	TEST_F(CTagsTest, check_add_tag)
+	TEST_F(CTagsTest, add_tag)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
 
 		TagsMask mask;
-		success = m_tagManager->SetTag(mask, "test", true);
+		bool success = m_tagManager->SetTag(mask, "test", true);
 		EXPECT_TRUE(success);
 		success = m_tagManager->SetTag(mask, "test2", true);
 		EXPECT_FALSE(success);
@@ -95,32 +93,47 @@ namespace DonerECS
 		EXPECT_FALSE(success);
 	}
 
-	TEST_F(CTagsTest, check_remove_tag)
+	TEST_F(CTagsTest, has_tag)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
 
 		TagsMask mask;
-		success = m_tagManager->SetTag(mask, "test", true);
+		m_tagManager->SetTag(mask, "test", true);
+
+		bool success = m_tagManager->HasTag(mask, "test");
 		EXPECT_TRUE(success);
-		success = m_tagManager->HasTag(mask, "test");
+	}
+
+	TEST_F(CTagsTest, add_invalid_tag_fails)
+	{
+		m_tagManager->RegisterTag("test");
+
+		TagsMask mask;
+		bool success = m_tagManager->SetTag(mask, "test2", true);
+		EXPECT_FALSE(success);
+	}
+
+	TEST_F(CTagsTest, remove_tag)
+	{
+		m_tagManager->RegisterTag("test");
+
+		TagsMask mask;
+		m_tagManager->SetTag(mask, "test", true);
+		bool success = m_tagManager->HasTag(mask, "test");
 		EXPECT_TRUE(success);
 
-		success = m_tagManager->SetTag(mask, "test", false);
-		EXPECT_TRUE(success);
+		m_tagManager->SetTag(mask, "test", false);
 		success = m_tagManager->HasTag(mask, "test");
 		EXPECT_FALSE(success);
 	}
 
-	TEST_F(CTagsTest, check_add_tags_in_bunch)
+	TEST_F(CTagsTest, add_tags_in_bunch)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
-		success = m_tagManager->RegisterTag("test2");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
+		m_tagManager->RegisterTag("test2");
 
 		TagsMask mask;
-		success = m_tagManager->AddTags(mask, "test", "test2");
+		bool success = m_tagManager->AddTags(mask, "test", "test2");
 		EXPECT_TRUE(success);
 
 		success = m_tagManager->HasTag(mask, "test");
@@ -129,13 +142,12 @@ namespace DonerECS
 		EXPECT_TRUE(success);
 	}
 
-	TEST_F(CTagsTest, check_add_tags_in_bunch_with_incorrect_one)
+	TEST_F(CTagsTest, add_tags_in_bunch_with_incorrect_one)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
 
 		TagsMask mask;
-		success = m_tagManager->AddTags(mask, "test3", "test", "test2");
+		bool success = m_tagManager->AddTags(mask, "test3", "test", "test2");
 		EXPECT_FALSE(success);
 
 		success = m_tagManager->HasTag(mask, "test");
@@ -144,18 +156,15 @@ namespace DonerECS
 		EXPECT_FALSE(success);
 	}
 
-	TEST_F(CTagsTest, check_remove_tags_in_bunch)
+	TEST_F(CTagsTest, remove_tags_in_bunch)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
-		success = m_tagManager->RegisterTag("test2");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
+		m_tagManager->RegisterTag("test2");
 
 		TagsMask mask;
-		success = m_tagManager->AddTags(mask, "test", "test2");
-		EXPECT_TRUE(success);
+		m_tagManager->AddTags(mask, "test", "test2");
 
-		success = m_tagManager->HasTag(mask, "test");
+		bool success = m_tagManager->HasTag(mask, "test");
 		EXPECT_TRUE(success);
 		success = m_tagManager->HasTag(mask, "test2");
 		EXPECT_TRUE(success);
@@ -169,16 +178,14 @@ namespace DonerECS
 		EXPECT_FALSE(success);
 	}
 
-	TEST_F(CTagsTest, check_remove_tags_in_bunch_with_incorrect_one)
+	TEST_F(CTagsTest, remove_tags_in_bunch_with_incorrect_one)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
 
 		TagsMask mask;
-		success = m_tagManager->AddTags(mask, "test");
-		EXPECT_TRUE(success);
+		m_tagManager->AddTags(mask, "test");
 
-		success = m_tagManager->HasTag(mask, "test");
+		bool success = m_tagManager->HasTag(mask, "test");
 		EXPECT_TRUE(success);
 
 		success = m_tagManager->RemoveTags(mask, "test3", "test", "test2");
@@ -188,17 +195,13 @@ namespace DonerECS
 		EXPECT_FALSE(success);
 	}
 
-	TEST_F(CTagsTest, check_generate_tag_mask)
+	TEST_F(CTagsTest, generate_tag_mask)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
-		success = m_tagManager->RegisterTag("test2");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
+		m_tagManager->RegisterTag("test2");
 
 		int tagId1 = m_tagManager->GetTagIdx("test");
-		EXPECT_EQ(0, tagId1);
 		int tagId2 = m_tagManager->GetTagIdx("test2");
-		EXPECT_EQ(1, tagId2);
 
 		TagsMask mask;
 		mask[tagId1] = true;
@@ -210,13 +213,11 @@ namespace DonerECS
 		EXPECT_EQ(mask, newMask);
 	}
 
-	TEST_F(CTagsTest, check_nonexistent_tag)
+	TEST_F(CTagsTest, check_nonexistent_tag_behavior)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
 
 		int tagId1 = m_tagManager->GetTagIdx("test");
-		EXPECT_EQ(0, tagId1);
 		int tagId2 = m_tagManager->GetTagIdx("test2");
 		EXPECT_EQ(-1, tagId2);
 
@@ -228,29 +229,24 @@ namespace DonerECS
 
 	TEST_F(CTagsTest, generate_mask_with_nonexistent_tag)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
 
 		TagsMask mask = m_tagManager->GetTagMask("test", "test2");
 		EXPECT_TRUE(m_tagManager->HasTag(mask, "test"));
 		EXPECT_FALSE(m_tagManager->HasTag(mask, "test2"));
 	}
 
-	TEST_F(CTagsTest, check_has_all_tags)
+	TEST_F(CTagsTest, has_all_tags)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
-		success = m_tagManager->RegisterTag("test2");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
+		m_tagManager->RegisterTag("test2");
 
 		int tagId1 = m_tagManager->GetTagIdx("test");
-		EXPECT_EQ(0, tagId1);
 		int tagId2 = m_tagManager->GetTagIdx("test2");
-		EXPECT_EQ(1, tagId2);
 
 		TagsMask mask;
 		mask[tagId1] = true;
-		success = m_tagManager->HasAllTags(mask, "test");
+		bool success = m_tagManager->HasAllTags(mask, "test");
 		EXPECT_TRUE(success);
 		success = m_tagManager->HasAllTags(mask, "test", "test2");
 		EXPECT_FALSE(success);
@@ -263,19 +259,15 @@ namespace DonerECS
 
 	TEST_F(CTagsTest, check_has_any_tags)
 	{
-		bool success = m_tagManager->RegisterTag("test");
-		EXPECT_TRUE(success);
-		success = m_tagManager->RegisterTag("test2");
-		EXPECT_TRUE(success);
+		m_tagManager->RegisterTag("test");
+		m_tagManager->RegisterTag("test2");
 
 		int tagId1 = m_tagManager->GetTagIdx("test");
-		EXPECT_EQ(0, tagId1);
 		int tagId2 = m_tagManager->GetTagIdx("test2");
-		EXPECT_EQ(1, tagId2);
 
 		TagsMask mask;
 		mask[tagId1] = true;
-		success = m_tagManager->HasAnyTags(mask, "test");
+		bool success = m_tagManager->HasAnyTags(mask, "test");
 		EXPECT_TRUE(success);
 		success = m_tagManager->HasAnyTags(mask, "test", "test2");
 		EXPECT_TRUE(success);
@@ -293,9 +285,7 @@ namespace DonerECS
 		EXPECT_TRUE(success);
 
 		int tagId1 = m_tagManager->GetTagIdx("test");
-		EXPECT_EQ(0, tagId1);
 		int tagId2 = m_tagManager->GetTagIdx("test2");
-		EXPECT_EQ(1, tagId2);
 
 		TagsMask mask;
 		mask[tagId1] = true;

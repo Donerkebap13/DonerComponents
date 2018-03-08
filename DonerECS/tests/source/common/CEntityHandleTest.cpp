@@ -113,7 +113,6 @@ namespace DonerECS
 	TEST_F(CEntityHandleTest, cast_entity_to_handle)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 
 		CHandle entityHandle = entity;
 		EXPECT_EQ(CHandle::EElementType::Entity, entityHandle.m_elementType);
@@ -126,7 +125,6 @@ namespace DonerECS
 	TEST_F(CEntityHandleTest, invalidate_handle)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 
 		CHandle entityHandle = entity;
 		EXPECT_TRUE(static_cast<bool>(entityHandle));
@@ -152,9 +150,7 @@ namespace DonerECS
 	TEST_F(CEntityHandleTest, invalid_cast_to_handle_after_destroy)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		CHandle handle = entity;
-		EXPECT_TRUE(static_cast<bool>(handle));
 
 		m_entityManager->DestroyEntity(&entity);
 
