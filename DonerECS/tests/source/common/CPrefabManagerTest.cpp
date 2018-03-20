@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/entity/CPrefabManager.h>
 #include <donerecs/component/CComponent.h>
@@ -54,18 +55,21 @@ namespace DonerECS
 	{
 	public:
 		CPrefabManagerTest()
-			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
-			, m_entityManager(CEntityManager::CreateInstance())
-			, m_prefabManager(CPrefabManager::CreateInstance())
+			: m_componentFactoryManager(nullptr)
+			, m_entityManager(nullptr)
+			, m_prefabManager(nullptr)
 		{
+			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
+			m_componentFactoryManager = systems.GetComponentFactoryManager();
+			m_entityManager = systems.GetEntityManager();
+			m_prefabManager = systems.GetPrefabManager();
+
 			ADD_COMPONENT_FACTORY("foo", PrefabManagerTestInternal::CCompFoo, 10);
 		}
 
 		~CPrefabManagerTest()
 		{
-			CPrefabManager::DestroyInstance();
-			CEntityManager::DestroyInstance();
-			CComponentFactoryManager::DestroyInstance();
+			CDonerECSSystems::Get()->Destroy();
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;

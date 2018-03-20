@@ -26,6 +26,7 @@
 ////////////////////////////////////////////////////////////
 
 #include <donerecs/ErrorMessages.h>
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/entity/CEntityParser.h>
 #include <donerecs/entity/CPrefabManager.h>
@@ -40,8 +41,8 @@
 namespace DonerECS
 {
 	CEntityParser::CEntityParser()
-		: m_entityManager(*CEntityManager::Get())
-		, m_prefabManager(*CPrefabManager::Get())
+		: m_entityManager(*CDonerECSSystems::Get()->GetEntityManager())
+		, m_prefabManager(*CDonerECSSystems::Get()->GetPrefabManager())
 	{}
 
 	CHandle CEntityParser::ParseSceneFromFile(const char* const path)

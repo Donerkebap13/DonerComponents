@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 #include <donerecs/entity/CEntity.h>
@@ -99,17 +100,20 @@ namespace DonerECS
 	{
 	public:
 		CMessagesTest()
-			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
-			, m_entityManager(CEntityManager::CreateInstance())
+			: m_componentFactoryManager(nullptr)
+			, m_entityManager(nullptr)
 		{
+			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
+			m_componentFactoryManager = systems.GetComponentFactoryManager();
+			m_entityManager = systems.GetEntityManager();
+
 			ADD_COMPONENT_FACTORY("foo", MessagesTestInternal::CCompFoo, 2);
 			ADD_COMPONENT_FACTORY("bar", MessagesTestInternal::CCompBar, 2);
 		}
 
 		~CMessagesTest()
 		{
-			CEntityManager::DestroyInstance();
-			CComponentFactoryManager::DestroyInstance();
+			CDonerECSSystems::DestroyInstance();
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;
@@ -374,7 +378,7 @@ namespace DonerECS
 		EXPECT_EQ(0, compFoo->m_foo);
 		EXPECT_EQ(0, compBar->m_bar);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		CEntityManager::Get()->BroadcastMessage(message);
+		m_entityManager->BroadcastMessage(message);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compBar->m_bar);
 	}
@@ -393,11 +397,11 @@ namespace DonerECS
 		EXPECT_EQ(0, compFoo->m_foo);
 		EXPECT_EQ(0, compBar->m_bar);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		CEntityManager::Get()->BroadcastMessage(message);
+		m_entityManager->BroadcastMessage(message);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compBar->m_bar);
 
-		CEntityManager::Get()->BroadcastMessage(message);
+		m_entityManager->BroadcastMessage(message);
 
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE * 2, compBar->m_bar);
@@ -574,9 +578,9 @@ namespace DonerECS
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
 		entity->PostMessage(message);
 
-		m_entityManager->DestroyEntity(&entity);
-		EXPECT_EQ(nullptr, entity);
+		entity->Destroy();
 
+		m_entityManager->ExecuteScheduledDestroys();
 		m_entityManager->SendPostMsgs();
 
 		EXPECT_TRUE(true);

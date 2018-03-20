@@ -39,17 +39,19 @@ namespace DonerECS
 	class CEntity;
 	class CEntityManager;
 
-	class CPrefabManager : public CSingleton<CPrefabManager>
+	class CPrefabManager
 	{
+		friend class CDonerECSSystems;
 		friend class CEntity;
 	public:
-		CPrefabManager();
 		~CPrefabManager();
 
 		bool RegisterPrefab(CStrID nameId, CEntity* prefab);
 
 		CHandle ClonePrefab(CStrID nameId);
 	private:
+		CPrefabManager();
+
 		std::unordered_map<CStrID, CEntity*, std::hash<CStrID>> m_prefabs;
 
 		CEntityManager& m_entityManager;

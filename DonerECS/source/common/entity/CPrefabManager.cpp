@@ -26,6 +26,7 @@
 ////////////////////////////////////////////////////////////
 
 #include <donerecs/ErrorMessages.h>
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/entity/CPrefabManager.h>
 #include <donerecs/handle/CHandle.h>
@@ -33,17 +34,14 @@
 namespace DonerECS
 {
 	CPrefabManager::CPrefabManager()
-		: m_entityManager(*CEntityManager::Get())
+		: m_entityManager(*CDonerECSSystems::Get()->GetEntityManager())
 	{}
 
 	CPrefabManager::~CPrefabManager()
 	{
-		if (CEntityManager::Get())
+		for (auto& pair : m_prefabs)
 		{
-			for (auto& pair : m_prefabs)
-			{
-				m_entityManager.DestroyEntity(&pair.second);
-			}
+			pair.second->Destroy();
 		}
 		m_prefabs.clear();
 	}

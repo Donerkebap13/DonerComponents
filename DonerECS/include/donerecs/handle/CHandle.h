@@ -28,6 +28,7 @@
 #pragma once
 
 #include <donerecs/Defines.h>
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 
 namespace DonerECS
@@ -66,7 +67,7 @@ namespace DonerECS
 
 			if (*this)
 			{
-				return static_cast<T*>(CComponentFactoryManager::Get()->GetComponent(m_componentIdx, m_elementPosition, m_version));
+				return static_cast<T*>(CDonerECSSystems::Get()->GetComponentFactoryManager()->GetComponent(m_componentIdx, m_elementPosition, m_version));
 			}
             else
             {
@@ -83,7 +84,7 @@ namespace DonerECS
 		template<typename T>
 		void PostMessageToChildren(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 
-		bool Destroy();
+		void Destroy();
 
 		unsigned m_elementType : 2; //  4
 		unsigned m_componentIdx : 9; // 512

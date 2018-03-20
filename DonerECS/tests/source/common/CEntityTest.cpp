@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 #include <donerecs/handle/CHandle.h>
@@ -42,15 +43,17 @@ namespace DonerECS
 	{
 	public:
 		CEntityTest()
-			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
-			, m_entityManager(CEntityManager::CreateInstance())
+			: m_componentFactoryManager(nullptr)
+			, m_entityManager(nullptr)
 		{
+			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
+			m_componentFactoryManager = systems.GetComponentFactoryManager();
+			m_entityManager = systems.GetEntityManager();
 		}
 
 		~CEntityTest()
 		{
-			CEntityManager::DestroyInstance();
-			CComponentFactoryManager::DestroyInstance();
+			CDonerECSSystems::DestroyInstance();
 		}
 
 		std::tuple<CEntity*, CEntity*, CEntity*> GetEntityWithChildren()
@@ -312,7 +315,10 @@ namespace DonerECS
 		EXPECT_EQ(1, parentEntity->GetChildrenCount());
 		EXPECT_TRUE(parentEntity->HasChild(child));
 
-		m_entityManager->DestroyEntity(parent);
+		parentEntity->Destroy();
+		
+		m_entityManager->ExecuteScheduledDestroys();
+
 		EXPECT_FALSE(static_cast<bool>(parent));
 		EXPECT_FALSE(static_cast<bool>(child));
 	}
@@ -328,7 +334,11 @@ namespace DonerECS
 		EXPECT_EQ(1, parentEntity->GetChildrenCount());
 		EXPECT_TRUE(parentEntity->HasChild(child));
 
-		m_entityManager->DestroyEntity(child);
+		CEntity* childEntity = child;
+		childEntity->Destroy();
+
+		m_entityManager->ExecuteScheduledDestroys();
+
 		EXPECT_FALSE(static_cast<bool>(child));
 
 		EXPECT_EQ(0, parentEntity->GetChildrenCount());

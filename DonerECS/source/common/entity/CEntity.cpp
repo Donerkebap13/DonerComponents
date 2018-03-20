@@ -25,8 +25,10 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/component/CComponentFactoryManager.h>
+#include <donerecs/tags/CTagsManager.h>
 
 #include <algorithm>
 #include <cassert>
@@ -34,8 +36,9 @@
 namespace DonerECS
 {
 	CEntity::CEntity()
-		: m_componentFactoryManager(*CComponentFactoryManager::Get())
-		, m_tagsManager(*CTagsManager::Get())
+		: m_componentFactoryManager(*CDonerECSSystems::Get()->GetComponentFactoryManager())
+		, m_entityManager(*CDonerECSSystems::Get()->GetEntityManager())
+		, m_tagsManager(*CDonerECSSystems::Get()->GetTagsManager())
 		, m_numDeactivations(1)
 		, m_initialized(false)
 		, m_destroyed(false)
@@ -53,7 +56,7 @@ namespace DonerECS
 
 		handle.m_elementType = CHandle::EElementType::Entity;
 		handle.m_componentIdx = 0;
-		handle.m_elementPosition = CEntityManager::Get()->GetPositionForElement(this);
+		handle.m_elementPosition = m_entityManager.GetPositionForElement(this);
 		handle.m_version = GetVersion();
 
 		return handle;
@@ -63,7 +66,7 @@ namespace DonerECS
 	{
 		if (rhs.m_elementType == CHandle::EElementType::Entity)
 		{
-			*this = CEntityManager::Get()->GetElementByIdxAndVersion(rhs.m_elementPosition, rhs.m_version);
+			*this = m_entityManager.GetElementByIdxAndVersion(rhs.m_elementPosition, rhs.m_version);
 			return this;
 		}
 		return nullptr;
@@ -159,7 +162,9 @@ namespace DonerECS
 		int componentIdx = m_componentFactoryManager.GetFactoryIndexByName(nameId);
 		if (componentIdx >= 0 && m_components[componentIdx])
 		{
-			return m_componentFactoryManager.DestroyComponent(&m_components[componentIdx]);
+			m_components[componentIdx]->Destroy();
+			m_components[componentIdx] = nullptr;
+			return true;
 		}
 		DECS_WARNING_MSG(EErrorCode::ComponentdNotFoundInEntity, "Component %u hasn't been added to this entity", nameId);
 		return false;
@@ -217,20 +222,20 @@ namespace DonerECS
 			{
 				if (component)
 				{
-					m_componentFactoryManager.DestroyComponent(&component);
+					component->Destroy();
 				}
 			}
 
-			CEntityManager* entityManager = CEntityManager::Get();
 			for (CEntity* child : m_children)
 			{
 				if (child)
 				{
-					entityManager->DestroyEntity(&child);
+					child->Destroy();
 				}
 			}
 
 			m_destroyed = true;
+			m_entityManager.ScheduleDestroy(this);
 		}
 	}
 
@@ -381,12 +386,11 @@ namespace DonerECS
 				}
 			}
 
-			CEntityManager* entityManager = CEntityManager::Get();
 			for (CEntity *child : entity->m_children)
 			{
 				if (child)
 				{
-					CEntity* newChild = entityManager->CreateEntity();
+					CEntity* newChild = m_entityManager.CreateEntity();
 					if (newChild)
 					{
 						newChild->CloneFrom(child);
@@ -420,29 +424,15 @@ namespace DonerECS
 		return entity;
 	}
 
-	bool CEntityManager::DestroyEntity(CEntity** entity)
-	{
-		if (*entity)
-		{
-			if (FindElement(*entity))
-			{
-				(*entity)->Destroy();
-				return DestroyElement(entity);
-			}
-			DECS_WARNING_MSG(EErrorCode::EntityNotRegisteredInFactory, "Trying to destroy an entity which hasn't been created using CEntityManager");
-		}
-		return false;
-	}
-
 	bool CEntityManager::DestroyEntity(CHandle handle)
 	{
 		CEntity* entity = handle;
-		if (entity)
+		if (FindElement(entity))
 		{
 			entity->SetParent(nullptr);
-			entity->Destroy();
 			return DestroyElement(&entity);
 		}
+		DECS_WARNING_MSG(EErrorCode::EntityNotRegisteredInFactory, "Trying to destroy an entity which hasn't been created using CEntityManager");
 		return false;
 	}
 
@@ -454,5 +444,21 @@ namespace DonerECS
 			delete postMsg;
 		}
 		m_postMsgs.clear();
+	}
+
+	void CEntityManager::ScheduleDestroy(CHandle handle)
+	{
+		if (std::find(m_scheduledDestroys.begin(), m_scheduledDestroys.end(), handle) == m_scheduledDestroys.end())
+		{
+			m_scheduledDestroys.emplace_back(handle);
+		}
+	}
+
+	void CEntityManager::ExecuteScheduledDestroys()
+	{
+		for (CHandle handle : m_scheduledDestroys)
+		{
+			DestroyEntity(handle);
+		}
 	}
 }

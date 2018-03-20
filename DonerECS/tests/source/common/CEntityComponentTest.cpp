@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
@@ -62,17 +63,20 @@ namespace DonerECS
 	{
 	public:
 		CEntityComponentTest()
-			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
-			, m_entityManager(CEntityManager::CreateInstance())
+			: m_componentFactoryManager(nullptr)
+			, m_entityManager(nullptr)
 		{
+			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
+			m_componentFactoryManager = systems.GetComponentFactoryManager();
+			m_entityManager = systems.GetEntityManager();
+
 			ADD_COMPONENT_FACTORY("foo", EntityComponentTestInternal::CCompFoo, 10);
 			ADD_COMPONENT_FACTORY("bar", EntityComponentTestInternal::CCompBar, 1);
 		}
 
 		~CEntityComponentTest()
 		{
-			CEntityManager::DestroyInstance();
-			CComponentFactoryManager::DestroyInstance();
+			CDonerECSSystems::DestroyInstance();
 		}
 
 		std::tuple<CEntity*, CEntity*, CComponent*, CComponent*> GetEntityWithChildren()
@@ -237,6 +241,8 @@ namespace DonerECS
 
 		CComponent* component = entity->GetComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_EQ(nullptr, component);
+
+		m_componentFactoryManager->ExecuteScheduledDestroys();
 		EXPECT_FALSE(static_cast<bool>(handle));
 	}
 
@@ -267,8 +273,10 @@ namespace DonerECS
 		CHandle handle = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_TRUE(static_cast<bool>(handle));
 
-		m_entityManager->DestroyEntity(&entity);
-		EXPECT_EQ(nullptr, entity);
+		entity->Destroy();
+		EXPECT_TRUE(entity->IsDestroyed());
+
+		m_componentFactoryManager->ExecuteScheduledDestroys();
 
 		EXPECT_FALSE(static_cast<bool>(handle));
 		CComponent* component = handle;
@@ -308,6 +316,9 @@ namespace DonerECS
 		EXPECT_FALSE(entity->IsDestroyed());
 		entity->Destroy();
 		EXPECT_TRUE(entity->IsDestroyed());
+
+		m_componentFactoryManager->ExecuteScheduledDestroys();
+
 		EXPECT_FALSE(static_cast<bool>(compHandle));
 	}
 

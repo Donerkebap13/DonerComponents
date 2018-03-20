@@ -27,26 +27,36 @@
 
 #pragma once
 
-#include <donerecs/entity/CEntity.h>
-#include <donerecs/entity/CPrefabManager.h>
-#include <donerecs/component/CComponentFactoryManager.h>
-#include <donerecs/tags/CTagsManager.h>
+#include <donerecs/common/CSingleton.h>
 
 namespace DonerECS
 {
-	static void InitializeDonerECSSystems()
-	{
-		DonerECS::CComponentFactoryManager::CreateInstance();
-		DonerECS::CEntityManager::CreateInstance();
-		DonerECS::CTagsManager::CreateInstance();
-		DonerECS::CPrefabManager::CreateInstance();
-	}
+	class CComponentFactoryManager;
+	class CEntityManager;
+	class CTagsManager;
+	class CPrefabManager;
 
-	static void DestroyDonerECSSystems()
+	class CDonerECSSystems : public CSingleton<CDonerECSSystems>
 	{
-		DonerECS::CPrefabManager::DestroyInstance();
-		DonerECS::CTagsManager::DestroyInstance();
-		DonerECS::CEntityManager::DestroyInstance();
-		DonerECS::CComponentFactoryManager::DestroyInstance();
-	}
+	public:
+		CDonerECSSystems();
+		~CDonerECSSystems();
+
+		CDonerECSSystems& Init();
+		void Destroy();
+		void Update(float dt);
+
+		CComponentFactoryManager* GetComponentFactoryManager();
+		CEntityManager* GetEntityManager();
+		CTagsManager* GetTagsManager();
+		CPrefabManager* GetPrefabManager();
+
+	private:
+		CComponentFactoryManager* m_componentFactoryManager;
+		CEntityManager* m_entityManager;
+		CTagsManager* m_tagsManager;
+		CPrefabManager* m_prefabManager;
+
+		bool m_initialized;
+	};
 }

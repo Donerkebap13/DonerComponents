@@ -46,6 +46,11 @@ namespace DonerECS
 		virtual void Update(float dt) = 0;
 
 		bool SetHandleInfoFromComponent(CComponent* component, CHandle& handle);
+		void ScheduleDestroyComponent(CHandle component);
+		void ExecuteScheduledDestroys();
+
+	protected:
+		std::vector<CHandle> m_scheduledDestroys;
 	};
 
 	template <typename T>

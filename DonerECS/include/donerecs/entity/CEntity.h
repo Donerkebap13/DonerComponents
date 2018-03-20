@@ -29,7 +29,7 @@
 
 #include <donerecs/Defines.h>
 #include <donerecs/ErrorMessages.h>
-#include <donerecs/common/CECSElement.h>
+#include <donerecs/common/CFactory.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/handle/CHandle.h>
 #include <donerecs/messages/CPostMsg.h>
@@ -42,6 +42,7 @@
 namespace DonerECS
 {
 	class CComponentFactoryManager;
+	class CEntityManager;
 
 	class CEntity : public CECSElement
 	{
@@ -202,21 +203,24 @@ namespace DonerECS
 		template<typename T>
 		void SendMessage(const T& message, ESendMessageType type = ESendMessageType::NonRecursive)
 		{
-			for (CComponent* component : m_components)
+			if (!IsDestroyed())
 			{
-				if (component)
+				for (CComponent* component : m_components)
 				{
-					component->SendMessage(message);
-				}
-			}
-
-			if (type == ESendMessageType::Recursive)
-			{
-				for (CEntity* child : m_children)
-				{
-					if (child)
+					if (component)
 					{
-						child->SendMessage(message, type);
+						component->SendMessage(message);
+					}
+				}
+
+				if (type == ESendMessageType::Recursive)
+				{
+					for (CEntity* child : m_children)
+					{
+						if (child)
+						{
+							child->SendMessage(message, type);
+						}
 					}
 				}
 			}
@@ -225,11 +229,14 @@ namespace DonerECS
 		template<typename T>
 		void SendMessageToChildren(const T& message, ESendMessageType type = ESendMessageType::NonRecursive)
 		{
-			for (CEntity* child : m_children)
+			if (!IsDestroyed())
 			{
-				if (child)
+				for (CEntity* child : m_children)
 				{
-					child->SendMessage(message, type);
+					if (child)
+					{
+						child->SendMessage(message, type);
+					}
 				}
 			}
 		}
@@ -305,6 +312,7 @@ namespace DonerECS
 		std::vector<CComponent*> m_components;
 
 		CComponentFactoryManager& m_componentFactoryManager;
+		CEntityManager& m_entityManager;
 		CTagsManager& m_tagsManager;
 
 		TagsMask m_tags;
@@ -321,11 +329,11 @@ namespace DonerECS
 	// -- CEntityManager
 	// -------------------------
 
-	class CEntityManager : public CSingleton<CEntityManager>, public CFactory<CEntity>
+	class CEntityManager : public CFactory<CEntity>
 	{
+		friend class CDonerECSSystems;
 		friend class CEntity;
 	public:
-		CEntityManager();
 		~CEntityManager() override {}
 
 		template<typename T>
@@ -348,27 +356,35 @@ namespace DonerECS
 
 		CEntity* CreateEntity();
 
-		bool DestroyEntity(CEntity** entity);
-		bool DestroyEntity(CHandle handle);
 
 		void SendPostMsgs();
+		void ExecuteScheduledDestroys();
 
 	private:
+		CEntityManager();
+
+		bool DestroyEntity(CHandle handle);
+		void ScheduleDestroy(CHandle handle);
+
 		std::vector<CPostMessageBase*> m_postMsgs;
+		std::vector<CHandle> m_scheduledDestroys;
 	};
 
 	template<typename T>
 	void CEntity::PostMessage(const T& message, ESendMessageType type/* = ESendMessageType::NonRecursive*/)
 	{
-		CEntityManager::Get()->PostMessage(this, message);
-
-		if (type == ESendMessageType::Recursive)
+		if (!IsDestroyed())
 		{
-			for (CEntity* child : m_children)
+			m_entityManager.PostMessage(this, message);
+
+			if (type == ESendMessageType::Recursive)
 			{
-				if (child)
+				for (CEntity* child : m_children)
 				{
-					child->PostMessage(message, type);
+					if (child)
+					{
+						child->PostMessage(message, type);
+					}
 				}
 			}
 		}
@@ -377,11 +393,14 @@ namespace DonerECS
 	template<typename T>
 	void CEntity::PostMessageToChildren(const T& message, ESendMessageType type/* = ESendMessageType::NonRecursive*/)
 	{
-		for (CEntity* child : m_children)
+		if (!IsDestroyed())
 		{
-			if (child)
+			for (CEntity* child : m_children)
 			{
-				child->PostMessage(message, type);
+				if (child)
+				{
+					child->PostMessage(message, type);
+				}
 			}
 		}
 	}

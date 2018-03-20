@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/tags/CTagsManager.h>
 
 #include <gtest/gtest.h>
@@ -40,13 +41,14 @@ namespace DonerECS
 	{
 	public:
 		CTagsTest()
-			: m_tagManager(CTagsManager::CreateInstance())
+			: m_tagManager(nullptr)
 		{
+			m_tagManager = CDonerECSSystems::CreateInstance()->Init().GetTagsManager();
 		}
 
 		~CTagsTest()
 		{
-			CTagsManager::DestroyInstance();
+			CDonerECSSystems::DestroyInstance();
 		}
 
 		CTagsManager *m_tagManager;

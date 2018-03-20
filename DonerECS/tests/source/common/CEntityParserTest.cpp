@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/entity/CEntityParser.h>
 #include <donerecs/entity/CPrefabManager.h>
@@ -107,11 +108,17 @@ namespace DonerECS
 	{
 	public:
 		CEntityParserTest()
-			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
-			, m_entityManager(CEntityManager::CreateInstance())
-			, m_prefabManager(CPrefabManager::CreateInstance())
-			, m_tagManager(CTagsManager::CreateInstance())
+			: m_componentFactoryManager(nullptr)
+			, m_entityManager(nullptr)
+			, m_prefabManager(nullptr)
+			, m_tagManager(nullptr)
 		{
+			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
+			m_componentFactoryManager = systems.GetComponentFactoryManager();
+			m_entityManager = systems.GetEntityManager();
+			m_prefabManager = systems.GetPrefabManager();
+			m_tagManager = systems.GetTagsManager();
+
 			ADD_COMPONENT_FACTORY("foo", ::EntityParserTestInternal::CCompFoo, 10);
 
 			m_tagManager->RegisterTag("tag1");
@@ -121,10 +128,7 @@ namespace DonerECS
 
 		~CEntityParserTest()
 		{
-			CPrefabManager::DestroyInstance();
-			CEntityManager::DestroyInstance();
-			CTagsManager::DestroyInstance();
-			CComponentFactoryManager::DestroyInstance();
+			CDonerECSSystems::DestroyInstance();
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;

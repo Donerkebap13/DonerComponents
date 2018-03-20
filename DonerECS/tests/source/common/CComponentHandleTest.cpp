@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 #include <donerecs/handle/CHandle.h>
@@ -49,15 +50,16 @@ namespace DonerECS
 	{
 	public:
 		CComponentHandleTest()
-			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
+			: m_componentFactoryManager(nullptr)
 		{
+			m_componentFactoryManager = CDonerECSSystems::CreateInstance()->Init().GetComponentFactoryManager();
 			ADD_COMPONENT_FACTORY("foo", ComponentHandleTestInternal::CCompFoo, 1);
 			ADD_COMPONENT_FACTORY("bar", ComponentHandleTestInternal::CCompBar, 1);
 		}
 
 		~CComponentHandleTest()
 		{
-			CComponentFactoryManager::DestroyInstance();
+			CDonerECSSystems::DestroyInstance();
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;

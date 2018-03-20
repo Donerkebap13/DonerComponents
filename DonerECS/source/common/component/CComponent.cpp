@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 #include <donerecs/entity/CEntity.h>
@@ -49,14 +50,14 @@ namespace DonerECS
 
 	CComponent::operator CHandle()
 	{
-		return CComponentFactoryManager::Get()->SetHandleInfoFromComponent(this);
+		return CDonerECSSystems::Get()->GetComponentFactoryManager()->SetHandleInfoFromComponent(this);
 	}
 
 	const CComponent* CComponent::operator=(const CHandle& rhs)
 	{
 		if (rhs.m_elementType == CHandle::EElementType::Component)
 		{
-			*this = CComponentFactoryManager::Get()->GetComponent(rhs.m_componentIdx, rhs.m_elementPosition, rhs.m_version);
+			*this = CDonerECSSystems::Get()->GetComponentFactoryManager()->GetComponent(rhs.m_componentIdx, rhs.m_elementPosition, rhs.m_version);
 			return this;
 		}
 		return nullptr;
@@ -92,10 +93,14 @@ namespace DonerECS
 
 	void CComponent::Destroy()
 	{
-		if (m_initialized && !m_destroyed)
+		if (!m_destroyed)
 		{
-			DoDestroy();
+			if (m_initialized)
+			{
+				DoDestroy();
+			}
 			m_destroyed = true;
+			CDonerECSSystems::Get()->GetComponentFactoryManager()->ScheduleDestroyComponent(this);
 		}
 	}
 
