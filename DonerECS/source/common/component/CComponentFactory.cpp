@@ -63,5 +63,6 @@ namespace DonerECS
 				DestroyComponent(component);
 			}
 		}
+		m_scheduledDestroys.clear();
 	}
 }

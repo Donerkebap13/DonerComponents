@@ -196,6 +196,7 @@ namespace DonerECS
 			if (m_factories[i].m_address->GetComponentPosition(component) != -1)
 			{
 				m_factories[i].m_address->ScheduleDestroyComponent(component);
+				return;
 			}
 		}
 		DECS_ERROR_MSG(EErrorCode::ComponentNotRegisteredInFactory, "Trying to destroy component created outside a factory");

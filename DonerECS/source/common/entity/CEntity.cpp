@@ -460,5 +460,6 @@ namespace DonerECS
 		{
 			DestroyEntity(handle);
 		}
+		m_scheduledDestroys.clear();
 	}
 }
