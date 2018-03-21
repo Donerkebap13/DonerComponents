@@ -270,6 +270,8 @@ namespace DonerECS
 		CEntity();
 		~CEntity();
 
+		void DestroyInternal();
+
 		void ActivateFromParent();
 		void ActivateInternal();
 		void CheckFirstActivationInternal();

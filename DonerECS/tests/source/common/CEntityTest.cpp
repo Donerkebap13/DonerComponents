@@ -337,12 +337,12 @@ namespace DonerECS
 		CEntity* childEntity = child;
 		childEntity->Destroy();
 
+		EXPECT_EQ(0, parentEntity->GetChildrenCount());
+		EXPECT_FALSE(parentEntity->HasChild(child));
+
 		m_entityManager->ExecuteScheduledDestroys();
 
 		EXPECT_FALSE(static_cast<bool>(child));
-
-		EXPECT_EQ(0, parentEntity->GetChildrenCount());
-		EXPECT_FALSE(parentEntity->HasChild(child));
 	}
 
 	TEST_F(CEntityTest, entity_not_activated_on_initialization)

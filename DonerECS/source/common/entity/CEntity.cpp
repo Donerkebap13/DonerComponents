@@ -216,6 +216,12 @@ namespace DonerECS
 
 	void CEntity::Destroy()
 	{
+		SetParent(nullptr);
+		DestroyInternal();
+	}
+
+	void CEntity::DestroyInternal()
+	{
 		if (!m_destroyed)
 		{
 			for (CComponent* component : m_components)
@@ -230,7 +236,7 @@ namespace DonerECS
 			{
 				if (child)
 				{
-					child->Destroy();
+					child->DestroyInternal();
 				}
 			}
 
@@ -429,7 +435,6 @@ namespace DonerECS
 		CEntity* entity = handle;
 		if (FindElement(entity))
 		{
-			entity->SetParent(nullptr);
 			return DestroyElement(&entity);
 		}
 		DECS_WARNING_MSG(EErrorCode::EntityNotRegisteredInFactory, "Trying to destroy an entity which hasn't been created using CEntityManager");

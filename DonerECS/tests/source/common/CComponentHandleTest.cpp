@@ -159,7 +159,6 @@ namespace DonerECS
 	TEST_F(CComponentHandleTest, cast_component_to_handle)
 	{
 		CComponent* component = m_componentFactoryManager->CreateComponent<ComponentHandleTestInternal::CCompBar>();
-		EXPECT_NE(nullptr, component);
 
 		CHandle compHandle = component;
 		EXPECT_EQ(CHandle::EElementType::Component, compHandle.m_elementType);
@@ -172,7 +171,6 @@ namespace DonerECS
 	TEST_F(CComponentHandleTest, invalidate_handle)
 	{
 		CComponent* component = m_componentFactoryManager->CreateComponent<ComponentHandleTestInternal::CCompBar>();
-		EXPECT_NE(nullptr, component);
 
 		CHandle compHandle = component;
 		EXPECT_TRUE(static_cast<bool>(compHandle));
@@ -198,7 +196,6 @@ namespace DonerECS
 	TEST_F(CComponentHandleTest, invalid_cast_to_handle_after_destroy)
 	{
 		CComponent* component = m_componentFactoryManager->CreateComponent<ComponentHandleTestInternal::CCompBar>();
-		EXPECT_NE(nullptr, component);
 		CHandle handle = component;
 		EXPECT_TRUE(static_cast<bool>(handle));
 
@@ -212,16 +209,24 @@ namespace DonerECS
 	TEST_F(CComponentHandleTest, invalid_handle_because_of_version)
 	{
 		CComponent* component = m_componentFactoryManager->CreateComponent<ComponentHandleTestInternal::CCompBar>();
-		EXPECT_NE(nullptr, component);
 		CHandle handle = component;
 		EXPECT_TRUE(static_cast<bool>(handle));
 
 		m_componentFactoryManager->DestroyComponent(&component);
 
 		CComponent* component2 = m_componentFactoryManager->CreateComponent<ComponentHandleTestInternal::CCompBar>();
-		EXPECT_NE(nullptr, component2);
 		EXPECT_EQ(1, component2->GetVersion());
 
+		EXPECT_FALSE(static_cast<bool>(handle));
+	}
+
+	TEST_F(CComponentHandleTest, destroy_component_through_handle)
+	{
+		CComponent* component = m_componentFactoryManager->CreateComponent<ComponentHandleTestInternal::CCompBar>();
+		CHandle handle = component;
+
+		handle.Destroy();
+		EXPECT_TRUE(component->IsDestroyed());
 		EXPECT_FALSE(static_cast<bool>(handle));
 	}
 }

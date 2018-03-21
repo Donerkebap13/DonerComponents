@@ -585,4 +585,82 @@ namespace DonerECS
 
 		EXPECT_TRUE(true);
 	}
+
+	TEST_F(CMessagesTest, sendMsg_to_destroyed_entity_not_received)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+
+		entity->Init();
+		entity->Activate();
+
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		EXPECT_EQ(0, compFoo->m_foo);
+
+		entity->Destroy();
+
+		entity->SendMessage(message);
+
+		EXPECT_EQ(0, compFoo->m_foo);
+	}
+
+	TEST_F(CMessagesTest, sendMsg_to_destroyed_entity_with_child_not_received)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		CEntity* entity1 = m_entityManager->CreateEntity();
+		entity->AddChild(entity1);
+		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+
+		entity->Init();
+		entity->Activate();
+
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		EXPECT_EQ(0, compFoo->m_foo);
+
+		entity->Destroy();
+
+		entity->SendMessageToChildren(message);
+
+		EXPECT_EQ(0, compFoo->m_foo);
+	}
+
+	TEST_F(CMessagesTest, postMsg_to_destroyed_entity_not_received)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+
+		entity->Init();
+		entity->Activate();
+
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		EXPECT_EQ(0, compFoo->m_foo);
+
+		entity->Destroy();
+
+		entity->PostMessage(message);
+		m_entityManager->SendPostMsgs();
+
+		EXPECT_EQ(0, compFoo->m_foo);
+	}
+
+	TEST_F(CMessagesTest, postMsg_to_destroyed_entity_with_child_not_received)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		CEntity* entity1 = m_entityManager->CreateEntity();
+		entity->AddChild(entity1);
+		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+
+		entity->Init();
+		entity->Activate();
+
+		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
+		EXPECT_EQ(0, compFoo->m_foo);
+
+		entity->Destroy();
+
+		entity->PostMessageToChildren(message);
+		m_entityManager->SendPostMsgs();
+
+		EXPECT_EQ(0, compFoo->m_foo);
+	}
 }

@@ -165,4 +165,14 @@ namespace DonerECS
 		entity = handle;
 		EXPECT_EQ(nullptr, entity);
 	}
+
+	TEST_F(CEntityHandleTest, destroy_entity_through_handle)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		CHandle handle = entity;
+
+		handle.Destroy();
+		EXPECT_TRUE(entity->IsDestroyed());
+		EXPECT_FALSE(static_cast<bool>(handle));
+	}
 }
