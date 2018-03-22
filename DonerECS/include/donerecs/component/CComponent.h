@@ -55,7 +55,6 @@ namespace DonerECS
 
 		operator CHandle();
 		const CComponent* operator=(const CHandle& rhs);
-        const CComponent& operator=(const CComponent& rhs);
 
 		void SetOwner(CHandle parent) { m_owner = parent; }
 		CHandle GetOwner() const { return m_owner; }
@@ -92,6 +91,9 @@ namespace DonerECS
 
 	protected:
 		CComponent();
+		CComponent(CComponent& rhs) = default;
+		CComponent(CComponent&& rhs) = default;
+		const CComponent& operator=(const CComponent& rhs);
 
 		void CheckFirstActivationInternal();
 

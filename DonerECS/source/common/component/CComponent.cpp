@@ -66,10 +66,10 @@ namespace DonerECS
     const CComponent& CComponent::operator=(const CComponent& rhs)
     {
         m_owner = CHandle();
-        m_numDeactivations = 1;
-        m_initialized = false;
-        m_destroyed = false;
-        m_initiallyActive = true;
+        m_numDeactivations = rhs.m_numDeactivations;
+        m_initialized = rhs.m_initialized;
+        m_destroyed = rhs.m_destroyed;
+        m_initiallyActive = rhs.m_initiallyActive;
         return *this;
     }
 

@@ -846,8 +846,6 @@ namespace DonerECS
 		CEntity* entity, *child1, *child11 = nullptr;
 		std::tie(entity, child1, child11) = GetEntityWithChildren();
 
-		entity->SetIsInitiallyActive(false);
-
 		CEntity* clonedEntity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, clonedEntity);
 		clonedEntity->CloneFrom(entity);

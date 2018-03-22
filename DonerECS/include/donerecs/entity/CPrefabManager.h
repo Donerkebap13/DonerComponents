@@ -43,14 +43,15 @@ namespace DonerECS
 	{
 		friend class CDonerECSSystems;
 		friend class CEntity;
+		friend class CEntityParser;
 	public:
 		~CPrefabManager();
-
-		bool RegisterPrefab(CStrID nameId, CEntity* prefab);
 
 		CHandle ClonePrefab(CStrID nameId);
 	private:
 		CPrefabManager();
+
+		bool RegisterPrefab(CStrID nameId, CEntity* prefab);
 
 		std::unordered_map<CStrID, CEntity*, std::hash<CStrID>> m_prefabs;
 

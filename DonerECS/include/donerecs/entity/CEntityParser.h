@@ -44,13 +44,24 @@ namespace DonerECS
 	class CEntityParser
 	{
 	public:
+		enum class EParsedEntityType { Scene, Prefab };
+		
 		CEntityParser();
 
 		CHandle ParseSceneFromFile(const char* const path);
 		CHandle ParseSceneFromMemory(const unsigned char* jsonStringBuffer, std::size_t size);
+
+		CHandle ParsePrefabFromFile(const char* const path);
+		CHandle ParsePrefabFromMemory(const unsigned char* jsonStringBuffer, std::size_t size);
+
 		CHandle ParseSceneFromJson(const char* const jsonStr);
+		CHandle ParsePrefabFromJson(const char* const jsonStr);
 
 	private:
+		CHandle ParseFromFile(const char* const path, EParsedEntityType type);
+		CHandle ParseFromMemory(const unsigned char* jsonStringBuffer, std::size_t size, EParsedEntityType type);
+		CHandle ParseFromJson(const char* const jsonStr, EParsedEntityType type);
+
 		CHandle ParseEntity(Json::Value& entityData, CEntity* parent);
 		CHandle ParsePrefab(Json::Value& entityData);
 

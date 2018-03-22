@@ -378,10 +378,10 @@ namespace DonerECS
 
 			m_tags = entity->m_tags;
 
-			m_numDeactivations = 1;
-			m_initialized = false;
-			m_destroyed = false;
-			m_initiallyActive = true;
+			m_numDeactivations = entity->m_numDeactivations;
+			m_initialized = entity->m_initialized;
+			m_destroyed = entity->m_destroyed;
+			m_initiallyActive =entity->m_initiallyActive;
 
 			m_componentFactoryManager.CloneComponents(entity->m_components, m_components);
 			for (CComponent* component : m_components)

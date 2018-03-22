@@ -52,54 +52,54 @@ namespace EntityParserTestInternal
 
 	DECS_COMPONENT_REFLECTION_IMPL(CCompFoo)
 
-		const char* const ONE_LEVEL_ENTITY = "{ \"type\": \"scene\", \"root\": {"
-		"\"type\": \"entity\", \"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
+	const char* const ONE_LEVEL_ENTITY = "{ \"root\": {"
+		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
 		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
 
-	const char* const ONE_LEVEL_ENTITY_INITIALLY_DISABLED = "{ \"type\": \"scene\", \"root\": {"
-		"\"type\": \"entity\", \"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"], \"initiallyActive\":false,"
+	const char* const ONE_LEVEL_ENTITY_INITIALLY_DISABLED = "{ \"root\": {"
+		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"], \"initiallyActive\":false,"
 		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
 
-	const char* const ONE_LEVEL_ENTITY_COMPONENT_INITIALLY_DISABLED = "{ \"type\": \"scene\", \"root\": {"
-		"\"type\": \"entity\", \"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
+	const char* const ONE_LEVEL_ENTITY_COMPONENT_INITIALLY_DISABLED = "{ \"root\": {"
+		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
 		"\"components\": [{ \"name\": \"foo\", \"initiallyActive\":false, \"a\": 1, \"b\": -3 }]}}";
 
-	const char* const ONE_LEVEL_ENTITY_INVALID_COMPONENT = "{ \"type\": \"scene\", \"root\": {"
+	const char* const ONE_LEVEL_ENTITY_INVALID_COMPONENT = "{ \"root\": {"
 		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
 		"\"components\": [{ \"name\": \"bar\", \"a\": 1, \"b\": -3 }]}}";
 
-	const char* const ONE_LEVEL_ENTITY_INVALID_TAG = "{ \"type\": \"scene\", \"root\": {"
+	const char* const ONE_LEVEL_ENTITY_INVALID_TAG = "{ \"root\": {"
 		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\", \"tag4\"],"
 		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
 
-	const char* const TWO_LEVEL_ENTITY = "{ \"type\": \"scene\", \"root\": {"
+	const char* const TWO_LEVEL_ENTITY = "{ \"root\": {"
 		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
 		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }],"
 		"\"children\": [{ \"name\": \"test11\", \"tags\": [\"tag1\", \"tag3\"], \"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
 
-	const char* const TWO_LEVEL_ENTITY_INITIALLY_DISABLED = "{ \"type\": \"scene\", \"root\": {"
+	const char* const TWO_LEVEL_ENTITY_INITIALLY_DISABLED = "{ \"root\": {"
 		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
 		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }],"
 		"\"children\": [{ \"name\": \"test11\", \"initiallyActive\":false, \"tags\": [\"tag1\", \"tag3\"], \"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
 
-	const char* const ENTITY_BASED_ON_PREFAB = "{ \"type\": \"scene\", \"root\": {"
+	const char* const ENTITY_BASED_ON_PREFAB = "{ \"root\": {"
 		"\"name\": \"test1\", \"prefab\": \"prefabTest\"}}";
 
-	const char* const ENTITY_BASED_ON_PREFAB_MODIFYING_COMPONENT_DATA = "{ \"type\": \"scene\", \"root\": {"
+	const char* const ENTITY_BASED_ON_PREFAB_MODIFYING_COMPONENT_DATA = "{ \"root\": {"
 		"\"name\": \"test1\", \"prefab\": \"prefabTest\","
 		"\"components\": [{ \"name\": \"foo\", \"b\": 1337, \"initiallyActive\":false }]}}";
 
-	const char* const ENTITY_BASED_ON_PREFAB_ADDING_EXTRA_TAGS = "{ \"type\": \"scene\", \"root\": {"
+	const char* const ENTITY_BASED_ON_PREFAB_ADDING_EXTRA_TAGS = "{ \"root\": {"
 		"\"name\": \"test1\", \"prefab\": \"prefabTest\", \"tags\": [\"tag2\", \"tag3\"]}}";
 
-	const char* const BASIC_PREFAB = "{ \"type\": \"prefab\", \"root\": {"
+	const char* const BASIC_PREFAB = "{ \"root\": {"
 		"\"name\": \"prefabTest\", \"tags\": [\"tag1\", \"tag3\"],"
 		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
 }
 
 DECS_DEFINE_REFLECTION_DATA(EntityParserTestInternal::CCompFoo,
-							DECS_ADD_VAR_INFO(m_a, "a"),
-							DECS_ADD_VAR_INFO(m_b, "b")
+							DECS_ADD_NAMED_VAR_INFO(m_a, "a"),
+							DECS_ADD_NAMED_VAR_INFO(m_b, "b")
 )
 
 namespace DonerECS
@@ -257,9 +257,7 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_prefab)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParseSceneFromJson(::EntityParserTestInternal::ONE_LEVEL_ENTITY);
-
-		m_prefabManager->RegisterPrefab("prefabTest", prefabEntity);
+		CEntity* prefabEntity = parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
 		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB);
 		EXPECT_EQ(std::string("test1"), entity->GetName());
@@ -284,9 +282,7 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_prefab_modifying_component_data)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParseSceneFromJson(::EntityParserTestInternal::ONE_LEVEL_ENTITY);
-
-		m_prefabManager->RegisterPrefab("prefabTest", prefabEntity);
+		CEntity* prefabEntity = parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
 		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB_MODIFYING_COMPONENT_DATA);
 
@@ -302,9 +298,7 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_prefab_with_extra_tags)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParseSceneFromJson(::EntityParserTestInternal::ONE_LEVEL_ENTITY);
-
-		m_prefabManager->RegisterPrefab("prefabTest", prefabEntity);
+		CEntity* prefabEntity = parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
 		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB_ADDING_EXTRA_TAGS);
 
@@ -316,7 +310,7 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_parsed_prefab)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParseSceneFromJson(::EntityParserTestInternal::BASIC_PREFAB);
+		CEntity* prefabEntity = parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
 		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB);
 		EXPECT_EQ(std::string("test1"), entity->GetName());

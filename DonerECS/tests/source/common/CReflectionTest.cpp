@@ -76,30 +76,30 @@ namespace ReflectionTestInternal
 
 	DECS_COMPONENT_REFLECTION_IMPL(ReflectionTestInternal::CCompFoo)
 
-		const char* const FULL_DATA_ENTITY = "{ \"type\": \"scene\", \"root\": {"
+		const char* const FULL_DATA_ENTITY = "{ \"root\": {"
 		"\"type\": \"entity\", \"name\": \"test1\","
 		"\"components\": [{ \"name\": \"foo\", \"int\": 1, \"float\": 16.0, \"bool\": true, \"long_long\": 99999, \"double\": 10.0, \"string\": \"std::string\","
 		" \"int_vector\": [1, 20, 300], \"string_vector\": [\"one\", \"two\", \"three\"] }]}}";
 
-	const char* const PARTIALLY_FULL_ENTITY = "{ \"type\": \"scene\", \"root\": {"
+	const char* const PARTIALLY_FULL_ENTITY = "{ \"root\": {"
 		"\"type\": \"entity\", \"name\": \"test1\","
 		"\"components\": [{ \"name\": \"foo\", \"bool\": true, \"string\": \"std::string\","
 		" \"string_vector\": [\"one\", \"two\", \"three\"] }]}}";
 
-	const char* const EMPTY_ENTITY = "{ \"type\": \"scene\", \"root\": {"
+	const char* const EMPTY_ENTITY = "{ \"root\": {"
 		"\"type\": \"entity\", \"name\": \"test1\","
 		"\"components\": [{ \"name\": \"foo\"}]}}";
 }
 
 DECS_DEFINE_REFLECTION_DATA(::ReflectionTestInternal::CCompFoo,
-							DECS_ADD_VAR_INFO(m_int, "int"),
-							DECS_ADD_VAR_INFO(m_float, "float"),
-							DECS_ADD_VAR_INFO(m_bool, "bool"),
-							DECS_ADD_VAR_INFO(m_longLong, "long_long"),
-							DECS_ADD_VAR_INFO(m_double, "double"),
-							DECS_ADD_VAR_INFO(m_string, "string"),
-							DECS_ADD_VAR_INFO(m_intVector, "int_vector"),
-							DECS_ADD_VAR_INFO(m_stringVector, "string_vector")
+							DECS_ADD_NAMED_VAR_INFO(m_int, "int"),
+							DECS_ADD_NAMED_VAR_INFO(m_float, "float"),
+							DECS_ADD_NAMED_VAR_INFO(m_bool, "bool"),
+							DECS_ADD_NAMED_VAR_INFO(m_longLong, "long_long"),
+							DECS_ADD_NAMED_VAR_INFO(m_double, "double"),
+							DECS_ADD_NAMED_VAR_INFO(m_string, "string"),
+							DECS_ADD_NAMED_VAR_INFO(m_intVector, "int_vector"),
+							DECS_ADD_NAMED_VAR_INFO(m_stringVector, "string_vector")
 )
 
 namespace DonerECS

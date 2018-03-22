@@ -47,6 +47,36 @@ namespace DonerECS
 
 	CHandle CEntityParser::ParseSceneFromFile(const char* const path)
 	{
+		return ParseFromFile(path, EParsedEntityType::Scene);
+	}
+
+	CHandle CEntityParser::ParseSceneFromMemory(const unsigned char* jsonStringBuffer, std::size_t size)
+	{
+		return ParseFromMemory(jsonStringBuffer, size, EParsedEntityType::Scene);
+	}
+
+	CHandle CEntityParser::ParsePrefabFromFile(const char* const path)
+	{
+		return ParseFromFile(path, EParsedEntityType::Prefab);
+	}
+
+	CHandle CEntityParser::ParsePrefabFromMemory(const unsigned char* jsonStringBuffer, std::size_t size)
+	{
+		return ParseFromMemory(jsonStringBuffer, size, EParsedEntityType::Prefab);
+	}
+
+	CHandle CEntityParser::ParseSceneFromJson(const char* const jsonStr)
+	{
+		return ParseFromJson(jsonStr, EParsedEntityType::Scene);
+	}
+
+	CHandle CEntityParser::ParsePrefabFromJson(const char* const jsonStr)
+	{
+		return ParseFromJson(jsonStr, EParsedEntityType::Prefab);
+	}
+
+	CHandle CEntityParser::ParseFromFile(const char* const path, EParsedEntityType type)
+	{
 		CMemoryDataProvider mdp(path);
 		if (!mdp.IsValid())
 		{
@@ -54,10 +84,10 @@ namespace DonerECS
 			return CHandle();
 		}
 
-		return ParseSceneFromJson((const char*)mdp.GetBaseData());
+		return ParseFromJson((const char*)mdp.GetBaseData(), type);
 	}
 
-	CHandle CEntityParser::ParseSceneFromMemory(const unsigned char* jsonStringBuffer, std::size_t size)
+	CHandle CEntityParser::ParseFromMemory(const unsigned char* jsonStringBuffer, std::size_t size, EParsedEntityType type)
 	{
 		CMemoryDataProvider mdp(jsonStringBuffer, size);
 		if (!mdp.IsValid())
@@ -66,10 +96,10 @@ namespace DonerECS
 			return CHandle();
 		}
 
-		return ParseSceneFromJson((const char*)mdp.GetBaseData());
+		return ParseFromJson((const char*)mdp.GetBaseData(), type);
 	}
 
-	CHandle CEntityParser::ParseSceneFromJson(const char* const jsonStr)
+	CHandle CEntityParser::ParseFromJson(const char* const jsonStr, EParsedEntityType type)
 	{
 		CHandle result;
 		Json::Value jsonValue;
@@ -82,11 +112,11 @@ namespace DonerECS
 			return result;
 		}
 
-		Json::Value& type = jsonValue["type"];
-		if (type.type() == Json::stringValue)
+		Json::Value& rootEntity = jsonValue["root"];
+
+		switch (type)
 		{
-			Json::Value& rootEntity = jsonValue["root"];
-			if (type.asString() == "scene")
+			case DonerECS::CEntityParser::EParsedEntityType::Scene:
 			{
 				result = ParseEntity(rootEntity, nullptr);
 				CEntity* entity = result;
@@ -96,14 +126,12 @@ namespace DonerECS
 					entity->CheckFirstActivation();
 				}
 			}
-			else if (type.asString() == "prefab")
+			break;
+			case DonerECS::CEntityParser::EParsedEntityType::Prefab:
 			{
 				result = ParsePrefab(rootEntity);
 			}
-			else
-			{
-				DECS_ERROR_MSG(EErrorCode::InvalidSceneParsingType, "Trying to parse scene of invalid type: %s. Valid types are 'scene' and 'prefab'", type.asCString());
-			}
+			break;
 		}
 
 		return result;

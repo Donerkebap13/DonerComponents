@@ -45,7 +45,10 @@
 		constexpr static std::size_t s_propertiesCount = std::tuple_size<decltype(s_properties)>::value; \
 	};
 
-#define DECS_ADD_VAR_INFO(var, name) \
+#define DECS_ADD_VAR_INFO(var) \
+	DonerECS::Reflection::SProperty<T, decltype(T::var)> { &T::var, ##var }
+
+#define DECS_ADD_NAMED_VAR_INFO(var, name) \
 	DonerECS::Reflection::SProperty<T, decltype(T::var)> { &T::var, name }
 
 #define DECS_DECLARE_COMPONENT_AS_REFLECTABLE(base_class)        \

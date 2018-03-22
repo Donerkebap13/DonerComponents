@@ -78,7 +78,7 @@ namespace DonerECS
 		template<typename T>
 		void SendMessage(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 		template<typename T>
-		void SendMessageToChildren(const T& message,ESendMessageType type = ESendMessageType::NonRecursive);
+		void SendMessageToChildren(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 		template<typename T>
 		void PostMessage(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 		template<typename T>
