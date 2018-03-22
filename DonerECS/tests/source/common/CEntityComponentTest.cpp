@@ -44,11 +44,6 @@ namespace DonerECS
 		public:
 			CCompFoo() : m_x(0) {}
 
-			const CCompFoo& operator=(const CCompFoo& rhs)
-			{
-				m_x = rhs.m_x;
-				return *this;
-			}
 			int m_x;
 		};
 
@@ -731,35 +726,6 @@ namespace DonerECS
 		EntityComponentTestInternal::CCompFoo* componentClone = clone->GetComponent<EntityComponentTestInternal::CCompFoo>();
 		EXPECT_NE(nullptr, componentClone);
 		EXPECT_EQ(VALUE, componentClone->m_x);
-	}
-
-	TEST_F(CEntityComponentTest, component_copy)
-	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
-		EntityComponentTestInternal::CCompFoo* component1 = entity->AddComponent<EntityComponentTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component1);
-
-		EntityComponentTestInternal::CCompFoo* component2 = static_cast<EntityComponentTestInternal::CCompFoo*>(
-			m_componentFactoryManager->CreateComponent<EntityComponentTestInternal::CCompFoo>());
-		EXPECT_NE(nullptr, component2);
-
-		CHandle parent1 = component1->GetOwner();
-		EXPECT_TRUE(parent1);
-
-		*component2 = *component1;
-		EXPECT_TRUE(parent1);
-
-		CHandle parent2 = component2->GetOwner();
-		EXPECT_FALSE(parent2);
-
-		CHandle entity2 = m_entityManager->CreateEntity();
-		EXPECT_TRUE(entity2);
-		component2->SetOwner(entity2);
-
-		parent2 = component2->GetOwner();
-		EXPECT_TRUE(parent2);
-		EXPECT_EQ(entity2, parent2);
 	}
     
     TEST_F(CEntityComponentTest, get_unregistered_component_by_class_fails)

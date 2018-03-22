@@ -1,3 +1,5 @@
 projects
 .idea
 /generate_solution_scripts
+/project_clang
+/project_gcc

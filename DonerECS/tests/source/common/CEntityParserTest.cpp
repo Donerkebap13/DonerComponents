@@ -257,7 +257,7 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_prefab)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
+		parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
 		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB);
 		EXPECT_EQ(std::string("test1"), entity->GetName());
@@ -282,7 +282,7 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_prefab_modifying_component_data)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
+		parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
 		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB_MODIFYING_COMPONENT_DATA);
 
@@ -298,7 +298,7 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_prefab_with_extra_tags)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
+		parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
 		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB_ADDING_EXTRA_TAGS);
 
@@ -310,7 +310,7 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_parsed_prefab)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
+		parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
 		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB);
 		EXPECT_EQ(std::string("test1"), entity->GetName());
