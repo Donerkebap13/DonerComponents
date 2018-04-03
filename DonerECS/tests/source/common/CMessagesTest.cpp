@@ -49,6 +49,9 @@ namespace DonerECS
 		struct STestMessage2
 		{};
 
+		struct SPostMessage
+		{};
+
 		class CCompFoo : public CComponent
 		{
 		public:
@@ -59,11 +62,18 @@ namespace DonerECS
 			void RegisterMessages() override
 			{
 				RegisterMessage(&CCompFoo::OnTestMessage);
+				RegisterMessage(&CCompFoo::OnPostMessage);
 			}
 
 			void OnTestMessage(const STestMessage& message)
 			{
 				m_foo = message.m_dummy;
+			}
+
+			void OnPostMessage(const SPostMessage& message)
+			{
+				++m_foo;
+				m_owner.PostMessage(message);
 			}
 
 			int m_foo;
@@ -662,5 +672,25 @@ namespace DonerECS
 		m_entityManager->SendPostMsgs();
 
 		EXPECT_EQ(0, compFoo->m_foo);
+	}
+
+	TEST_F(CMessagesTest, postMsg_recursive_doesnt_crash)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+
+		entity->Init();
+		entity->Activate();
+
+		MessagesTestInternal::SPostMessage message;
+		EXPECT_EQ(0, compFoo->m_foo);
+
+		entity->PostMessage(message);
+
+		for (int i = 1; i < MessagesTestInternal::LOOP_COUNT; ++i)
+		{
+			m_entityManager->SendPostMsgs();
+			EXPECT_EQ(i, compFoo->m_foo);
+		}
 	}
 }

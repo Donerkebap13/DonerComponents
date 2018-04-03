@@ -443,12 +443,13 @@ namespace DonerECS
 
 	void CEntityManager::SendPostMsgs()
 	{
-		for (CPostMessageBase* postMsg : m_postMsgs)
+		std::vector<CPostMessageBase*> currentMsgs = m_postMsgs;
+		m_postMsgs.clear();
+		for (CPostMessageBase* postMsg : currentMsgs)
 		{
 			postMsg->SendMessage();
 			delete postMsg;
 		}
-		m_postMsgs.clear();
 	}
 
 	void CEntityManager::ScheduleDestroy(CHandle handle)
