@@ -27,17 +27,20 @@
 
 #pragma once
 
+#include <functional>
+
 namespace DonerECS
 {
 	template<typename TypeClass>
 	class CSingleton
 	{
 	public:
-		static TypeClass* CreateInstance()
+		template<typename... Args>
+		static TypeClass* CreateInstance(Args... args)
 		{
 			if (s_instance == nullptr)
 			{
-				s_instance = new TypeClass();
+				s_instance = new TypeClass(std::forward<Args>(args)...);
 			}
 			return s_instance;
 		}
