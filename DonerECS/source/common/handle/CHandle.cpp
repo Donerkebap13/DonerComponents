@@ -82,12 +82,24 @@ namespace DonerECS
 		return false;
 	}
 
+	CHandle::operator int() const
+	{
+		void* voidHandle = static_cast<void*>(const_cast<DonerECS::CHandle*>(this));
+		int* intHandle = static_cast<int*>(voidHandle);
+		return *intHandle;
+	}
+
 	bool CHandle::operator==(const CHandle& rhs) const
 	{
 		return m_elementType == rhs.m_elementType &&
 			m_componentIdx == rhs.m_componentIdx &&
 			m_elementPosition == rhs.m_elementPosition &&
 			m_version == rhs.m_version;
+	}
+
+	bool  CHandle::operator!=(const CHandle& rhs) const
+	{
+		return !operator==(rhs);
 	}
 
 	void CHandle::Destroy()

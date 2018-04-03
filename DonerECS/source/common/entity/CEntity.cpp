@@ -376,7 +376,8 @@ namespace DonerECS
 			SetParent(nullptr);
 			SetName(entity->GetName());
 
-			m_tags = entity->m_tags;
+			m_tags.reset();
+			m_tags |= entity->m_tags;
 
 			m_numDeactivations = entity->m_numDeactivations;
 			m_initialized = entity->m_initialized;

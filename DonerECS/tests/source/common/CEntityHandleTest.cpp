@@ -31,6 +31,7 @@
 #include <donerecs/component/CComponentFactoryManager.h>
 
 #include <gtest/gtest.h>
+#include <unordered_map>
 
 namespace DonerECS
 {
@@ -174,5 +175,22 @@ namespace DonerECS
 		handle.Destroy();
 		EXPECT_TRUE(entity->IsDestroyed());
 		EXPECT_FALSE(static_cast<bool>(handle));
+	}
+
+	TEST_F(CEntityHandleTest, handle_as_valid_map_index)
+	{
+		static constexpr int testValue = 1337;
+
+		CEntity* entity = m_entityManager->CreateEntity();
+		CHandle handle = entity;
+
+		std::unordered_map<CHandle, int> map;
+		map[handle] = testValue;
+
+		auto it = map.find(handle);
+		ASSERT_TRUE(it != map.end());
+
+		int value = it->second;
+		ASSERT_EQ(testValue, value);
 	}
 }

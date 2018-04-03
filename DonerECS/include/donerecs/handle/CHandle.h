@@ -31,6 +31,8 @@
 #include <donerecs/CDonerECSSystems.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 
+#include <functional>
+
 namespace DonerECS
 {
 	class CEntity;
@@ -54,8 +56,10 @@ namespace DonerECS
 		const CHandle & operator=(CComponent* rhs);
 		operator CEntity*();
 		operator bool();
+		operator int() const;
 
 		bool operator==(const CHandle& rhs) const;
+		bool operator!=(const CHandle& rhs) const;
 
 		template<typename T>
 		operator T*()
@@ -90,5 +94,17 @@ namespace DonerECS
 		unsigned m_componentIdx : 9; // 512
 		unsigned m_elementPosition : 13; // 8.192
 		unsigned m_version : 8; // 256
+	};
+}
+
+namespace std
+{
+	template <>
+	struct hash<DonerECS::CHandle>
+	{
+		std::size_t operator()(const DonerECS::CHandle& handle) const 
+		{ 
+			return std::hash<int>()(handle);
+		}
 	};
 }
