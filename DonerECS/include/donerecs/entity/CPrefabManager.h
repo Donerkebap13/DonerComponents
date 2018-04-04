@@ -45,9 +45,12 @@ namespace DonerECS
 		friend class CEntity;
 		friend class CEntityParser;
 	public:
+		enum class ECloneMode { ActivateAutomaticallyAfterCreation, KeepUninitialized };
+
 		~CPrefabManager();
 
 		CHandle ClonePrefab(CStrID nameId);
+		CHandle ClonePrefab(CStrID nameId, ECloneMode cloneMode);
 	private:
 		CPrefabManager();
 

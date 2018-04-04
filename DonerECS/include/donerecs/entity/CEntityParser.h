@@ -65,6 +65,8 @@ namespace DonerECS
 		CHandle ParseEntity(Json::Value& entityData, CEntity* parent);
 		CHandle ParsePrefab(Json::Value& entityData);
 
+		void ParseOverrideableData(Json::Value& entityData, CEntity* entity);
+
 		bool ParseTags(Json::Value& tags, CEntity* entity);
 		bool ParseComponents(Json::Value& components, CEntity* entity);
 		bool ParseChildren(Json::Value& children, CEntity* entity);

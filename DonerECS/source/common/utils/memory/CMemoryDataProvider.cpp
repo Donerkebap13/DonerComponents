@@ -95,11 +95,6 @@ namespace DonerECS
 		if (!dp.IsValid())
 		{
 			printf("CMemoryDataProvider::load( %s ) : File not found\n", filename);
-			assert(dp.IsValid());
-		}
-
-		if (!dp.IsValid())
-		{
 			return false;
 		}
 

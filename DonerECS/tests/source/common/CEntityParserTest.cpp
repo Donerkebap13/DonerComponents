@@ -57,12 +57,12 @@ namespace EntityParserTestInternal
 		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
 
 	const char* const ONE_LEVEL_ENTITY_INITIALLY_DISABLED = "{ \"root\": {"
-		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"], \"initiallyActive\":false,"
+		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"], \"initially_active\":false,"
 		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
 
 	const char* const ONE_LEVEL_ENTITY_COMPONENT_INITIALLY_DISABLED = "{ \"root\": {"
 		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
-		"\"components\": [{ \"name\": \"foo\", \"initiallyActive\":false, \"a\": 1, \"b\": -3 }]}}";
+		"\"components\": [{ \"name\": \"foo\", \"initially_active\":false, \"a\": 1, \"b\": -3 }]}}";
 
 	const char* const ONE_LEVEL_ENTITY_INVALID_COMPONENT = "{ \"root\": {"
 		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
@@ -80,21 +80,29 @@ namespace EntityParserTestInternal
 	const char* const TWO_LEVEL_ENTITY_INITIALLY_DISABLED = "{ \"root\": {"
 		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
 		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }],"
-		"\"children\": [{ \"name\": \"test11\", \"initiallyActive\":false, \"tags\": [\"tag1\", \"tag3\"], \"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
+		"\"children\": [{ \"name\": \"test11\", \"initially_active\":false, \"tags\": [\"tag1\", \"tag3\"], \"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
 
 	const char* const ENTITY_BASED_ON_PREFAB = "{ \"root\": {"
 		"\"name\": \"test1\", \"prefab\": \"prefabTest\"}}";
 
 	const char* const ENTITY_BASED_ON_PREFAB_MODIFYING_COMPONENT_DATA = "{ \"root\": {"
 		"\"name\": \"test1\", \"prefab\": \"prefabTest\","
-		"\"components\": [{ \"name\": \"foo\", \"b\": 1337, \"initiallyActive\":false }]}}";
+		"\"components\": [{ \"name\": \"foo\", \"b\": 1337, \"initially_active\":false }]}}";
 
 	const char* const ENTITY_BASED_ON_PREFAB_ADDING_EXTRA_TAGS = "{ \"root\": {"
 		"\"name\": \"test1\", \"prefab\": \"prefabTest\", \"tags\": [\"tag2\", \"tag3\"]}}";
 
+	const char* const ENTITY_BASED_ON_TWO_LEVEL_PREFAB = "{ \"root\": {"
+		"\"name\": \"test1\", \"prefab\": \"2levelPrefab\","
+		"\"children\": [{ \"name\": \"test11\", \"components\": [{ \"name\": \"foo\", \"a\": 1337 }]}]}}";
+
 	const char* const BASIC_PREFAB = "{ \"root\": {"
 		"\"name\": \"prefabTest\", \"tags\": [\"tag1\", \"tag3\"],"
 		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
+
+	const char* const TWO_LEVEL_PREFAB = "{ \"root\": {"
+		"\"name\": \"2levelPrefab\", \"tags\": [\"tag1\", \"tag3\"],"
+		"\"children\": [{ \"name\": \"test11\", \"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
 }
 
 DECS_DEFINE_REFLECTION_DATA(EntityParserTestInternal::CCompFoo,
@@ -357,5 +365,17 @@ namespace DonerECS
 		EXPECT_TRUE(entity->HasTags("tag1"));
 		EXPECT_FALSE(entity->HasTags("tag2"));
 		EXPECT_TRUE(entity->HasTags("tag3"));
+	}
+
+	TEST_F(CEntityParserTest, parse_entity_based_on_prefab_modifying_prefab_children_info)
+	{
+		CEntityParser parser;
+		parser.ParsePrefabFromJson(::EntityParserTestInternal::TWO_LEVEL_PREFAB);
+
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_TWO_LEVEL_PREFAB);
+		CEntity* entity1 = entity->GetChildByName("test11");
+		::EntityParserTestInternal::CCompFoo* component = entity1->GetComponent<::EntityParserTestInternal::CCompFoo>();
+
+		EXPECT_EQ(1337, component->m_a);
 	}
 }

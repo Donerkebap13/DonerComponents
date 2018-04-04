@@ -203,7 +203,7 @@ namespace DonerECS
 		template<typename T>
 		void SendMessage(const T& message, ESendMessageType type = ESendMessageType::NonRecursive)
 		{
-			if (!IsDestroyed())
+			if (IsActive() && !IsDestroyed())
 			{
 				for (CComponent* component : m_components)
 				{
@@ -229,7 +229,7 @@ namespace DonerECS
 		template<typename T>
 		void SendMessageToChildren(const T& message, ESendMessageType type = ESendMessageType::NonRecursive)
 		{
-			if (!IsDestroyed())
+			if (IsActive() && !IsDestroyed())
 			{
 				for (CEntity* child : m_children)
 				{
@@ -375,7 +375,7 @@ namespace DonerECS
 	template<typename T>
 	void CEntity::PostMessage(const T& message, ESendMessageType type/* = ESendMessageType::NonRecursive*/)
 	{
-		if (!IsDestroyed())
+		if (IsActive() && !IsDestroyed())
 		{
 			m_entityManager.PostMessage(this, message);
 
@@ -395,7 +395,7 @@ namespace DonerECS
 	template<typename T>
 	void CEntity::PostMessageToChildren(const T& message, ESendMessageType type/* = ESendMessageType::NonRecursive*/)
 	{
-		if (!IsDestroyed())
+		if (IsActive() && !IsDestroyed())
 		{
 			for (CEntity* child : m_children)
 			{

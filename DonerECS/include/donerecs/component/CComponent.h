@@ -64,7 +64,7 @@ namespace DonerECS
 		template<typename T>
 		void SendMessage(const T& message)
 		{
-			if (m_initialized && !m_destroyed)
+			if (m_initialized && IsActive() && !m_destroyed)
 			{
 				static const CTypeHasher::HashId hash = CTypeHasher::Hash<T>();
 				auto registeredMsg = m_messages.find(hash);

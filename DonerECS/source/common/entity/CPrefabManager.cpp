@@ -59,12 +59,27 @@ namespace DonerECS
 
 	CHandle CPrefabManager::ClonePrefab(CStrID nameId)
 	{
+		return ClonePrefab(nameId, ECloneMode::ActivateAutomaticallyAfterCreation);
+	}
+
+	CHandle CPrefabManager::ClonePrefab(CStrID nameId, ECloneMode cloneMode)
+	{
 		auto prefabIt = m_prefabs.find(nameId);
 		if (prefabIt != m_prefabs.end())
 		{
 			CEntity* prefab = (*prefabIt).second;
 			CEntity* entity = m_entityManager.CreateEntity();
-			entity->CloneFrom(prefab);
+			if (entity)
+			{
+				entity->CloneFrom(prefab);
+
+				if (cloneMode == ECloneMode::ActivateAutomaticallyAfterCreation)
+				{
+					entity->Init();
+					entity->CheckFirstActivation();
+					entity->Activate();
+				}
+			}
 			return entity;
 		}
 		DECS_ERROR_MSG(EErrorCode::PrefabNotRegistered, "Prefab with nameId %u not registered", nameId);

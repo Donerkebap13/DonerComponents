@@ -142,7 +142,7 @@ namespace DonerECS
 		CEntity* entity = nullptr;
 		if (!entityData["prefab"].empty())
 		{
-			entity = m_prefabManager.ClonePrefab(CStrID(entityData["prefab"].asCString()));
+			entity = m_prefabManager.ClonePrefab(CStrID(entityData["prefab"].asCString()), CPrefabManager::ECloneMode::KeepUninitialized);
 		}
 		else
 		{
@@ -159,18 +159,23 @@ namespace DonerECS
 			entity->SetName(entityData["name"].asCString());
 		}
 
-		bool initiallyActive = !entityData["initiallyActive"].empty() ? entityData["initiallyActive"].asBool() : true;
-		entity->SetIsInitiallyActive(initiallyActive);
-
-		ParseTags(entityData["tags"], entity);
-		ParseComponents(entityData["components"], entity);
-		ParseChildren(entityData["children"], entity);
+		ParseOverrideableData(entityData, entity);
 
 		if (parent)
 		{
 			parent->AddChild(entity);
 		}
 		return entity;
+	}
+
+	void CEntityParser::ParseOverrideableData(Json::Value& entityData, CEntity* entity)
+	{
+		bool initiallyActive = !entityData["initially_active"].empty() ? entityData["initially_active"].asBool() : true;
+		entity->SetIsInitiallyActive(initiallyActive);
+
+		ParseTags(entityData["tags"], entity);
+		ParseComponents(entityData["components"], entity);
+		ParseChildren(entityData["children"], entity);
 	}
 
 	CHandle CEntityParser::ParsePrefab(Json::Value& entityData)
@@ -216,7 +221,7 @@ namespace DonerECS
 				}
 				if (component)
 				{
-					bool initiallyActive = !componentJson["initiallyActive"].empty() ? componentJson["initiallyActive"].asBool() : true;
+					bool initiallyActive = !componentJson["initially_active"].empty() ? componentJson["initially_active"].asBool() : true;
 					component->SetIsInitiallyActive(initiallyActive);
 					component->ParseAtts(componentJson);
 				}
@@ -241,7 +246,16 @@ namespace DonerECS
 			for (Json::ArrayIndex i = 0; i < children.size(); ++i)
 			{
 				Json::Value& childJson = children[i];
-				ParseEntity(childJson, entity);
+
+				CEntity* existingChild = entity->GetChildByName(childJson["name"].asString());
+				if (existingChild)
+				{
+					ParseOverrideableData(childJson, existingChild);
+				}
+				else
+				{
+					ParseEntity(childJson, entity);
+				}
 			}
 			return true;
 		}

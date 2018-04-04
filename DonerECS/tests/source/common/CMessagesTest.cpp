@@ -210,7 +210,7 @@ namespace DonerECS
 		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, not_active_entity_with_component_receives_message)
+	TEST_F(CMessagesTest, not_active_entity_with_component_doesnt_receives_message)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
 		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
@@ -220,7 +220,7 @@ namespace DonerECS
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
 		entity->SendMessage(message);
-		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
+		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
 	TEST_F(CMessagesTest, two_different_components_in_same_entity_receives_same_message)
@@ -356,7 +356,7 @@ namespace DonerECS
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, inactive_child_receives_message)
+	TEST_F(CMessagesTest, inactive_child_doesnt_receives_message)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
 		CEntity* entity1 = m_entityManager->CreateEntity();
@@ -370,7 +370,7 @@ namespace DonerECS
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
 		entity->SendMessage(message, ESendMessageType::Recursive);
-		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
+		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
 	TEST_F(CMessagesTest, two_different_entities_receives_same_message_through_BroadcastMessage)
