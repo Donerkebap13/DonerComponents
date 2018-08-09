@@ -34,7 +34,6 @@
 #include <donerecs/utils/hash/CTypeHasher.h>
 
 #include <donerserializer/ISerializable.h>
-#include <donerserializer/DonerDeserialize.h>
 
 #include <rapidjson/document.h>
 

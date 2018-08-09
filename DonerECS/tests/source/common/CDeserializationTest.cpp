@@ -36,6 +36,8 @@
 #include <donerecs/json/json.h>
 #include <donerecs/utils/memory/CMemoryDataProvider.h>
 
+#include <donerserializer/DonerDeserialize.h>
+
 #include <gtest/gtest.h>
 
 #include <string>
