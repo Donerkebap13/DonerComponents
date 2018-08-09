@@ -42,15 +42,16 @@ namespace EntityParserTestInternal
 {
 	class CCompFoo : public DonerECS::CComponent
 	{
-		DECS_DECLARE_COMPONENT_AS_REFLECTABLE(CCompFoo)
+		DONER_DECLARE_OBJECT_AS_REFLECTABLE(CCompFoo)
 	public:
 		CCompFoo() : m_a(-1), m_b(-1) {}
 
+		void ParseAtts(const rapidjson::Value& atts) override;
+
 		int m_a;
 		int m_b;
-	};
 
-	DECS_COMPONENT_REFLECTION_IMPL(CCompFoo)
+	};
 
 	const char* const ONE_LEVEL_ENTITY = "{ \"root\": {"
 		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
@@ -105,10 +106,12 @@ namespace EntityParserTestInternal
 		"\"children\": [{ \"name\": \"test11\", \"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
 }
 
-DECS_DEFINE_REFLECTION_DATA(EntityParserTestInternal::CCompFoo,
-							DECS_ADD_NAMED_VAR_INFO(m_a, "a"),
-							DECS_ADD_NAMED_VAR_INFO(m_b, "b")
+DONER_DEFINE_REFLECTION_DATA(EntityParserTestInternal::CCompFoo,
+							DONER_ADD_NAMED_VAR_INFO(m_a, "a"),
+							DONER_ADD_NAMED_VAR_INFO(m_b, "b")
 )
+
+void ::EntityParserTestInternal::CCompFoo::ParseAtts(const rapidjson::Value& atts) { DONER_DESERIALIZE_OBJECT_FROM_JSON(*this, atts) }
 
 namespace DonerECS
 {

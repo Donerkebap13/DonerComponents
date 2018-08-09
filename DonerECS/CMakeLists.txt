@@ -14,6 +14,8 @@ project("${project_name}")
 
 message(STATUS "${project_name} version ${DECS_VERSION}")
 
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/DonerSerializer/DonerSerializer" "${CMAKE_BINARY_DIR}/DonerSerializer")
+
 file(GLOB_RECURSE header_files "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 file(GLOB_RECURSE source_files "${CMAKE_CURRENT_SOURCE_DIR}/source/*.cpp")
 
@@ -43,6 +45,8 @@ else()
 	
 	set_target_properties("${project_name}" PROPERTIES DEBUG_POSTFIX -d FOLDER "${project_name}")
 endif()
+
+target_link_libraries("${project_name}" "DonerSerializer")
 
 set_compile_flags("${project_name}")
 

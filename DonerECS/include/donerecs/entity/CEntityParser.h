@@ -30,6 +30,8 @@
 #include <donerecs/common/CFactory.h>
 #include <donerecs/entity/CEntity.h>
 
+#include <rapidjson/document.h>
+
 namespace DonerECS
 {
 	class CEntity;
@@ -62,14 +64,14 @@ namespace DonerECS
 		CHandle ParseFromMemory(const unsigned char* jsonStringBuffer, std::size_t size, EParsedEntityType type);
 		CHandle ParseFromJson(const char* const jsonStr, EParsedEntityType type);
 
-		CHandle ParseEntity(Json::Value& entityData, CEntity* parent);
-		CHandle ParsePrefab(Json::Value& entityData);
+		CHandle ParseEntity(const rapidjson::Value& entityData, CEntity* parent);
+		CHandle ParsePrefab(const rapidjson::Value& entityData);
 
-		void ParseOverrideableData(Json::Value& entityData, CEntity* entity);
+		void ParseOverrideableData(const rapidjson::Value& entityData, CEntity* entity);
 
-		bool ParseTags(Json::Value& tags, CEntity* entity);
-		bool ParseComponents(Json::Value& components, CEntity* entity);
-		bool ParseChildren(Json::Value& children, CEntity* entity);
+		bool ParseTags(const rapidjson::Value& tags, CEntity* entity);
+		bool ParseComponents(const rapidjson::Value& components, CEntity* entity);
+		bool ParseChildren(const rapidjson::Value& children, CEntity* entity);
 
 		CEntityManager& m_entityManager;
 		CPrefabManager& m_prefabManager;

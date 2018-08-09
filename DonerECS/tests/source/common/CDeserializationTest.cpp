@@ -41,7 +41,7 @@
 #include <string>
 #include <vector>
 
-namespace ReflectionTestInternal
+namespace DeserializationTestInternal
 {
 	const int INT_DEFAULT_VALUE = 0;
 	const float FLOAT_DEFAULT_VALUE = 0.f;
@@ -52,7 +52,7 @@ namespace ReflectionTestInternal
 
 	class CCompFoo : public DonerECS::CComponent
 	{
-		DECS_DECLARE_COMPONENT_AS_REFLECTABLE(CCompFoo)
+		DONER_DECLARE_OBJECT_AS_REFLECTABLE(CCompFoo)
 	public:
 		CCompFoo()
 			: m_int(INT_DEFAULT_VALUE)
@@ -62,6 +62,8 @@ namespace ReflectionTestInternal
 			, m_double(DOUBLE_DEFAULT_VALUE)
 			, m_string(STRING_DEFAULT_VALUE)
 		{}
+
+		void ParseAtts(const rapidjson::Value& atts) override;
 
 		int m_int;
 		float m_float;
@@ -73,8 +75,6 @@ namespace ReflectionTestInternal
 		std::vector<int> m_intVector;
 		std::vector<std::string> m_stringVector;
 	};
-
-	DECS_COMPONENT_REFLECTION_IMPL(ReflectionTestInternal::CCompFoo)
 
 		const char* const FULL_DATA_ENTITY = "{ \"root\": {"
 		"\"type\": \"entity\", \"name\": \"test1\","
@@ -91,23 +91,25 @@ namespace ReflectionTestInternal
 		"\"components\": [{ \"name\": \"foo\"}]}}";
 }
 
-DECS_DEFINE_REFLECTION_DATA(::ReflectionTestInternal::CCompFoo,
-							DECS_ADD_NAMED_VAR_INFO(m_int, "int"),
-							DECS_ADD_NAMED_VAR_INFO(m_float, "float"),
-							DECS_ADD_NAMED_VAR_INFO(m_bool, "bool"),
-							DECS_ADD_NAMED_VAR_INFO(m_longLong, "long_long"),
-							DECS_ADD_NAMED_VAR_INFO(m_double, "double"),
-							DECS_ADD_NAMED_VAR_INFO(m_string, "string"),
-							DECS_ADD_NAMED_VAR_INFO(m_intVector, "int_vector"),
-							DECS_ADD_NAMED_VAR_INFO(m_stringVector, "string_vector")
+DONER_DEFINE_REFLECTION_DATA(::DeserializationTestInternal::CCompFoo,
+							DONER_ADD_NAMED_VAR_INFO(m_int, "int"),
+							DONER_ADD_NAMED_VAR_INFO(m_float, "float"),
+							DONER_ADD_NAMED_VAR_INFO(m_bool, "bool"),
+							DONER_ADD_NAMED_VAR_INFO(m_longLong, "long_long"),
+							DONER_ADD_NAMED_VAR_INFO(m_double, "double"),
+							DONER_ADD_NAMED_VAR_INFO(m_string, "string"),
+							DONER_ADD_NAMED_VAR_INFO(m_intVector, "int_vector"),
+							DONER_ADD_NAMED_VAR_INFO(m_stringVector, "string_vector")
 )
+
+void ::DeserializationTestInternal::CCompFoo::ParseAtts(const rapidjson::Value& atts) { DONER_DESERIALIZE_OBJECT_FROM_JSON(*this, atts) }
 
 namespace DonerECS
 {
-	class CReflectionTest : public ::testing::Test
+	class CDeserializationTest : public ::testing::Test
 	{
 	public:
-		CReflectionTest()
+		CDeserializationTest()
 			: m_componentFactoryManager(nullptr)
 			, m_entityManager(nullptr)
 			, m_prefabManager(nullptr)
@@ -119,14 +121,14 @@ namespace DonerECS
 			m_prefabManager = systems.GetPrefabManager();
 			m_tagManager = systems.GetTagsManager();
 
-			ADD_COMPONENT_FACTORY("foo", ::ReflectionTestInternal::CCompFoo, 10);
+			ADD_COMPONENT_FACTORY("foo", ::DeserializationTestInternal::CCompFoo, 10);
 
 			m_tagManager->RegisterTag("tag1");
 			m_tagManager->RegisterTag("tag2");
 			m_tagManager->RegisterTag("tag3");
 		}
 
-		~CReflectionTest()
+		~CDeserializationTest()
 		{
 			CDonerECSSystems::DestroyInstance();
 		}
@@ -137,11 +139,11 @@ namespace DonerECS
 		CTagsManager *m_tagManager;
 	};
 
-	TEST_F(CReflectionTest, parse_entity_with_full_data)
+	TEST_F(CDeserializationTest, parse_entity_with_full_data)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(::ReflectionTestInternal::FULL_DATA_ENTITY);
-		::ReflectionTestInternal::CCompFoo* component = entity->GetComponent<::ReflectionTestInternal::CCompFoo>();
+		CEntity* entity = parser.ParseSceneFromJson(::DeserializationTestInternal::FULL_DATA_ENTITY);
+		::DeserializationTestInternal::CCompFoo* component = entity->GetComponent<::DeserializationTestInternal::CCompFoo>();
 		
 		EXPECT_EQ(1, component->m_int);
 		EXPECT_EQ(16.f, component->m_float);
@@ -163,17 +165,17 @@ namespace DonerECS
 		EXPECT_EQ("three", component->m_stringVector[2]);
 	}
 
-	TEST_F(CReflectionTest, parse_entity_with_partial_data)
+	TEST_F(CDeserializationTest, parse_entity_with_partial_data)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(::ReflectionTestInternal::PARTIALLY_FULL_ENTITY);
-		::ReflectionTestInternal::CCompFoo* component = entity->GetComponent<::ReflectionTestInternal::CCompFoo>();
+		CEntity* entity = parser.ParseSceneFromJson(::DeserializationTestInternal::PARTIALLY_FULL_ENTITY);
+		::DeserializationTestInternal::CCompFoo* component = entity->GetComponent<::DeserializationTestInternal::CCompFoo>();
 		
-		EXPECT_EQ(::ReflectionTestInternal::INT_DEFAULT_VALUE, component->m_int);
-		EXPECT_EQ(::ReflectionTestInternal::FLOAT_DEFAULT_VALUE, component->m_float);
+		EXPECT_EQ(::DeserializationTestInternal::INT_DEFAULT_VALUE, component->m_int);
+		EXPECT_EQ(::DeserializationTestInternal::FLOAT_DEFAULT_VALUE, component->m_float);
 		EXPECT_EQ(true, component->m_bool);
-		EXPECT_EQ(::ReflectionTestInternal::LONG_LONG_DEFAULT_VALUE, component->m_longLong);
-		EXPECT_EQ(::ReflectionTestInternal::DOUBLE_DEFAULT_VALUE, component->m_double);
+		EXPECT_EQ(::DeserializationTestInternal::LONG_LONG_DEFAULT_VALUE, component->m_longLong);
+		EXPECT_EQ(::DeserializationTestInternal::DOUBLE_DEFAULT_VALUE, component->m_double);
 		EXPECT_EQ("std::string", component->m_string);
 
 		EXPECT_EQ(0, component->m_intVector.size());
@@ -184,18 +186,18 @@ namespace DonerECS
 		EXPECT_EQ("three", component->m_stringVector[2]);
 	}
 
-	TEST_F(CReflectionTest, parse_entity_with_no_data)
+	TEST_F(CDeserializationTest, parse_entity_with_no_data)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(::ReflectionTestInternal::EMPTY_ENTITY);
-		::ReflectionTestInternal::CCompFoo* component = entity->GetComponent<::ReflectionTestInternal::CCompFoo>();
+		CEntity* entity = parser.ParseSceneFromJson(::DeserializationTestInternal::EMPTY_ENTITY);
+		::DeserializationTestInternal::CCompFoo* component = entity->GetComponent<::DeserializationTestInternal::CCompFoo>();
 		
-		EXPECT_EQ(::ReflectionTestInternal::INT_DEFAULT_VALUE, component->m_int);
-		EXPECT_EQ(::ReflectionTestInternal::FLOAT_DEFAULT_VALUE, component->m_float);
-		EXPECT_EQ(::ReflectionTestInternal::BOOL_DEFAULT_VALUE, component->m_bool);
-		EXPECT_EQ(::ReflectionTestInternal::LONG_LONG_DEFAULT_VALUE, component->m_longLong);
-		EXPECT_EQ(::ReflectionTestInternal::DOUBLE_DEFAULT_VALUE, component->m_double);
-		EXPECT_EQ(::ReflectionTestInternal::STRING_DEFAULT_VALUE, component->m_string);
+		EXPECT_EQ(::DeserializationTestInternal::INT_DEFAULT_VALUE, component->m_int);
+		EXPECT_EQ(::DeserializationTestInternal::FLOAT_DEFAULT_VALUE, component->m_float);
+		EXPECT_EQ(::DeserializationTestInternal::BOOL_DEFAULT_VALUE, component->m_bool);
+		EXPECT_EQ(::DeserializationTestInternal::LONG_LONG_DEFAULT_VALUE, component->m_longLong);
+		EXPECT_EQ(::DeserializationTestInternal::DOUBLE_DEFAULT_VALUE, component->m_double);
+		EXPECT_EQ(::DeserializationTestInternal::STRING_DEFAULT_VALUE, component->m_string);
 
 		EXPECT_EQ(0, component->m_intVector.size());
 		EXPECT_EQ(0, component->m_stringVector.size());

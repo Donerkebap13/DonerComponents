@@ -36,8 +36,6 @@
 #include <donerecs/utils/hash/CStrID.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 
-#include <donerecs/json/json.h>
-
 namespace DonerECS
 {
 	CEntityParser::CEntityParser()
@@ -84,7 +82,8 @@ namespace DonerECS
 			return CHandle();
 		}
 
-		return ParseFromJson((const char*)mdp.GetBaseData(), type);
+		std::string zeroTerminatedStr((const char*)mdp.GetBaseData(), mdp.GetSize());
+		return ParseFromJson(zeroTerminatedStr.c_str(), type);
 	}
 
 	CHandle CEntityParser::ParseFromMemory(const unsigned char* jsonStringBuffer, std::size_t size, EParsedEntityType type)
@@ -95,54 +94,57 @@ namespace DonerECS
 			DECS_ERROR_MSG(EErrorCode::ReadFromBufferFailed, "Error reading from Buffer");
 			return CHandle();
 		}
-
-		return ParseFromJson((const char*)mdp.GetBaseData(), type);
+		std::string zeroTerminatedStr((const char*)mdp.GetBaseData(), mdp.GetSize());
+		return ParseFromJson(zeroTerminatedStr.c_str(), type);
 	}
 
 	CHandle CEntityParser::ParseFromJson(const char* const jsonStr, EParsedEntityType type)
 	{
+		rapidjson::Document document;
+		rapidjson::Value& root = document.Parse(jsonStr);
+
 		CHandle result;
-		Json::Value jsonValue;
-		Json::Reader reader;
-		bool parsingSuccessful = reader.parse(jsonStr, jsonValue);
-		if (!parsingSuccessful)
+		if (document.HasParseError())
 		{
-			std::string error = reader.getFormattedErrorMessages();
-			DECS_ERROR_MSG(EErrorCode::JSONError, "Error processing Json: %s", error.c_str());
+			rapidjson::ParseErrorCode error = document.GetParseError();
+			DECS_ERROR_MSG(EErrorCode::JSONError, "Error processing Json: %d", error);
 			return result;
 		}
 
-		Json::Value& rootEntity = jsonValue["root"];
-
-		switch (type)
+		if (root.HasMember("root"))
 		{
-			case DonerECS::CEntityParser::EParsedEntityType::Scene:
+			rapidjson::Value& rootEntity = root["root"];
+
+			switch (type)
 			{
-				result = ParseEntity(rootEntity, nullptr);
-				CEntity* entity = result;
-				if (entity)
+				case DonerECS::CEntityParser::EParsedEntityType::Scene:
 				{
-					entity->Init();
-					entity->CheckFirstActivation();
+					result = ParseEntity(rootEntity, nullptr);
+					CEntity* entity = result;
+					if (entity)
+					{
+						entity->Init();
+						entity->CheckFirstActivation();
+					}
 				}
+				break;
+				case DonerECS::CEntityParser::EParsedEntityType::Prefab:
+				{
+					result = ParsePrefab(rootEntity);
+				}
+				break;
 			}
-			break;
-			case DonerECS::CEntityParser::EParsedEntityType::Prefab:
-			{
-				result = ParsePrefab(rootEntity);
-			}
-			break;
 		}
 
 		return result;
 	}
 
-	CHandle CEntityParser::ParseEntity(Json::Value& entityData, CEntity* parent)
+	CHandle CEntityParser::ParseEntity(const rapidjson::Value& entityData, CEntity* parent)
 	{
 		CEntity* entity = nullptr;
-		if (!entityData["prefab"].empty())
+		if (entityData.HasMember("prefab"))
 		{
-			entity = m_prefabManager.ClonePrefab(CStrID(entityData["prefab"].asCString()), CPrefabManager::ECloneMode::KeepUninitialized);
+			entity = m_prefabManager.ClonePrefab(CStrID(entityData["prefab"].GetString()), CPrefabManager::ECloneMode::KeepUninitialized);
 		}
 		else
 		{
@@ -154,9 +156,9 @@ namespace DonerECS
 			return CHandle();
 		}
 
-		if (!entityData["name"].empty())
+		if (entityData.HasMember("name"))
 		{
-			entity->SetName(entityData["name"].asCString());
+			entity->SetName(entityData["name"].GetString());
 		}
 
 		ParseOverrideableData(entityData, entity);
@@ -168,52 +170,59 @@ namespace DonerECS
 		return entity;
 	}
 
-	void CEntityParser::ParseOverrideableData(Json::Value& entityData, CEntity* entity)
+	void CEntityParser::ParseOverrideableData(const rapidjson::Value& entityData, CEntity* entity)
 	{
-		bool initiallyActive = !entityData["initially_active"].empty() ? entityData["initially_active"].asBool() : true;
+		bool initiallyActive = entityData.HasMember("initially_active") ? entityData["initially_active"].GetBool() : true;
 		entity->SetIsInitiallyActive(initiallyActive);
 
-		ParseTags(entityData["tags"], entity);
-		ParseComponents(entityData["components"], entity);
-		ParseChildren(entityData["children"], entity);
+		if (entityData.HasMember("tags"))
+		{
+			ParseTags(entityData["tags"], entity);
+		}
+		if (entityData.HasMember("components"))
+		{
+			ParseComponents(entityData["components"], entity);
+		}
+		if (entityData.HasMember("children"))
+		{
+			ParseChildren(entityData["children"], entity);
+		}
 	}
 
-	CHandle CEntityParser::ParsePrefab(Json::Value& entityData)
+	CHandle CEntityParser::ParsePrefab(const rapidjson::Value& entityData)
 	{
 		CEntity* prefab = ParseEntity(entityData, nullptr);
 		if (prefab)
 		{
-			m_prefabManager.RegisterPrefab(CStrID(entityData["name"].asCString()), prefab);
+			m_prefabManager.RegisterPrefab(CStrID(entityData["name"].GetString()), prefab);
 		}
 		return prefab;
 	}
 
-	bool CEntityParser::ParseTags(Json::Value& tags, CEntity* entity)
+	bool CEntityParser::ParseTags(const rapidjson::Value& tags, CEntity* entity)
 	{
-		if (tags.type() == Json::arrayValue)
+		if (tags.IsArray())
 		{
-			for (Json::ArrayIndex i = 0; i < tags.size(); ++i)
+			for (const rapidjson::Value& tag : tags.GetArray())
 			{
-				Json::Value& tag = tags[i];
-				entity->AddTags(tag.asCString());
+				entity->AddTags(tag.GetString());
 			}
 			return true;
 		}
-		else if (tags.type() != Json::nullValue)
+		else if (!tags.IsNull())
 		{
 			DECS_ERROR_MSG(EErrorCode::JSONBadFormat, "Your tags info for entity '%s' is bad formatted", entity->GetName().c_str());
 		}
 		return false;
 	}
 
-	bool CEntityParser::ParseComponents(Json::Value& components, CEntity* entity)
+	bool CEntityParser::ParseComponents(const rapidjson::Value& components, CEntity* entity)
 	{
-		if (components.type() == Json::arrayValue)
+		if (components.IsArray())
 		{
-			for (Json::ArrayIndex i = 0; i < components.size(); ++i)
+			for (const rapidjson::Value& componentJson : components.GetArray())
 			{
-				Json::Value& componentJson = components[i];
-				CStrID componentId = CStrID(componentJson["name"].asCString());
+				CStrID componentId = CStrID(componentJson["name"].GetString());
 				CComponent* component = entity->GetComponent(componentId);
 				if (!component)
 				{
@@ -221,7 +230,7 @@ namespace DonerECS
 				}
 				if (component)
 				{
-					bool initiallyActive = !componentJson["initially_active"].empty() ? componentJson["initially_active"].asBool() : true;
+					bool initiallyActive = componentJson.HasMember("initially_active") ? componentJson["initially_active"].GetBool() : true;
 					component->SetIsInitiallyActive(initiallyActive);
 					component->ParseAtts(componentJson);
 				}
@@ -232,22 +241,20 @@ namespace DonerECS
 			}
 			return true;
 		}
-		else if (components.type() != Json::nullValue)
+		else if (!components.IsNull())
 		{
 			DECS_ERROR_MSG(EErrorCode::JSONBadFormat, "Your components info for entity '%s' is bad formatted", entity->GetName().c_str());
 		}
 		return false;
 	}
 
-	bool CEntityParser::ParseChildren(Json::Value& children, CEntity* entity)
+	bool CEntityParser::ParseChildren(const rapidjson::Value& children, CEntity* entity)
 	{
-		if (children.type() == Json::arrayValue)
+		if (children.IsArray())
 		{
-			for (Json::ArrayIndex i = 0; i < children.size(); ++i)
+			for (const rapidjson::Value& childJson : children.GetArray())
 			{
-				Json::Value& childJson = children[i];
-
-				CEntity* existingChild = entity->GetChildByName(childJson["name"].asString());
+				CEntity* existingChild = entity->GetChildByName(childJson["name"].GetString());
 				if (existingChild)
 				{
 					ParseOverrideableData(childJson, existingChild);
@@ -259,7 +266,7 @@ namespace DonerECS
 			}
 			return true;
 		}
-		else if (children.type() != Json::nullValue)
+		else if (!children.IsNull())
 		{
 			DECS_ERROR_MSG(EErrorCode::JSONBadFormat, "Your children info for entity '%s' is bad formatted", entity->GetName().c_str());
 		}

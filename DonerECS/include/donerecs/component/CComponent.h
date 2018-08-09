@@ -32,18 +32,17 @@
 #include <donerecs/common/CECSElement.h>
 #include <donerecs/messages/CMsgHandler.h>
 #include <donerecs/utils/hash/CTypeHasher.h>
-#include <donerecs/reflection/Reflection.h>
+
+#include <donerserializer/ISerializable.h>
+#include <donerserializer/DonerDeserialize.h>
+
+#include <rapidjson/document.h>
 
 #include <unordered_map>
 
 namespace DonerECS
 {
-	namespace Json
-	{
-		class Value;
-	}
-
-	class CComponent : public CECSElement
+	class CComponent : public CECSElement, DonerSerializer::ISerializable
 	{
 		template<class CComponent> friend class CFactory;
 	public:
@@ -82,7 +81,7 @@ namespace DonerECS
 		bool IsActive() const { return m_numDeactivations == 0; }
 		bool IsDestroyed() const { return m_destroyed; }
 
-		virtual void ParseAtts(const Json::Value& /*atts*/) {}
+		virtual void ParseAtts(const rapidjson::Value& /*atts*/) {}
 
 		bool GetIsInitiallyActive() const { return m_initiallyActive; }
 		void SetIsInitiallyActive(bool initiallyActive) { m_initiallyActive = initiallyActive; }
@@ -129,12 +128,6 @@ namespace DonerECS
 			{
 				DECS_WARNING_MSG(EErrorCode::MessageAlreadyRegistered, "The message is already registered for this component");
 			}
-		}
-
-		template<typename BaseClass>
-		void ParseAttsInternal(BaseClass* caller, const Json::Value& data)
-		{
-			Reflection::CReflectionHelper<BaseClass>::DeserializeFromJson(data, caller);
 		}
 
 		CHandle m_owner;

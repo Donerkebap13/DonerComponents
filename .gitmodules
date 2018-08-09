@@ -1,0 +1,3 @@
+[submodule "DonerECS/thirdparty/DonerSerializer"]
+	path = DonerECS/thirdparty/DonerSerializer
+	url = https://github.com/Donerkebap13/DonerSerializer.git
