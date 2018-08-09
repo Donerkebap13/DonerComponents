@@ -44,11 +44,9 @@ namespace EntityParserTestInternal
 {
 	class CCompFoo : public DonerECS::CComponent
 	{
-		DONER_DECLARE_OBJECT_AS_REFLECTABLE(CCompFoo)
+		DECS_DECLARE_COMPONENT_AS_SERIALIZABLE(CCompFoo)
 	public:
 		CCompFoo() : m_a(-1), m_b(-1) {}
-
-		void ParseAtts(const rapidjson::Value& atts) override;
 
 		int m_a;
 		int m_b;
@@ -113,7 +111,7 @@ DONER_DEFINE_REFLECTION_DATA(EntityParserTestInternal::CCompFoo,
 							DONER_ADD_NAMED_VAR_INFO(m_b, "b")
 )
 
-void ::EntityParserTestInternal::CCompFoo::ParseAtts(const rapidjson::Value& atts) { DONER_DESERIALIZE_OBJECT_FROM_JSON(*this, atts) }
+DECS_SERIALIZABLE_COMPONENT_IMPL(::EntityParserTestInternal::CCompFoo)
 
 namespace DonerECS
 {

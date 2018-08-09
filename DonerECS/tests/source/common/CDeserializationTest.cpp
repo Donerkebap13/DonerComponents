@@ -54,7 +54,7 @@ namespace DeserializationTestInternal
 
 	class CCompFoo : public DonerECS::CComponent
 	{
-		DONER_DECLARE_OBJECT_AS_REFLECTABLE(CCompFoo)
+		DECS_DECLARE_COMPONENT_AS_SERIALIZABLE(CCompFoo)
 	public:
 		CCompFoo()
 			: m_int(INT_DEFAULT_VALUE)
@@ -64,8 +64,6 @@ namespace DeserializationTestInternal
 			, m_double(DOUBLE_DEFAULT_VALUE)
 			, m_string(STRING_DEFAULT_VALUE)
 		{}
-
-		void ParseAtts(const rapidjson::Value& atts) override;
 
 		std::int32_t m_int;
 		float m_float;
@@ -104,7 +102,7 @@ DONER_DEFINE_REFLECTION_DATA(::DeserializationTestInternal::CCompFoo,
 							DONER_ADD_NAMED_VAR_INFO(m_stringVector, "string_vector")
 )
 
-void ::DeserializationTestInternal::CCompFoo::ParseAtts(const rapidjson::Value& atts) { DONER_DESERIALIZE_OBJECT_FROM_JSON(*this, atts) }
+DECS_SERIALIZABLE_COMPONENT_IMPL(::DeserializationTestInternal::CCompFoo)
 
 namespace DonerECS
 {

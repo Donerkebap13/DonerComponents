@@ -39,6 +39,17 @@
 
 #include <unordered_map>
 
+#define DECS_DECLARE_COMPONENT_AS_SERIALIZABLE(class_name)                     \
+  friend struct SDonerReflectionClassProperties<class_name>;                   \
+public:                                                                        \
+  void ParseAtts(const rapidjson::Value &atts) override;
+
+#define DECS_SERIALIZABLE_COMPONENT_IMPL(base_class)                           \
+void base_class::ParseAtts(const rapidjson::Value &atts)					   \
+{                                                                              \
+    DonerSerializer::CJsonDeserializer::Deserialize(*this, atts);			   \
+}
+
 namespace DonerECS
 {
 	class CComponent : public CECSElement, DonerSerializer::ISerializable
