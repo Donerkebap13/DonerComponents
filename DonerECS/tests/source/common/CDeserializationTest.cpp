@@ -43,10 +43,10 @@
 
 namespace DeserializationTestInternal
 {
-	const int INT_DEFAULT_VALUE = 0;
+	const std::int32_t INT_DEFAULT_VALUE = 0;
 	const float FLOAT_DEFAULT_VALUE = 0.f;
 	const bool BOOL_DEFAULT_VALUE = false;
-	const long long LONG_LONG_DEFAULT_VALUE = 0L;
+	const std::int64_t LONG_LONG_DEFAULT_VALUE = 0L;
 	const double DOUBLE_DEFAULT_VALUE = 0.0;
 	const std::string STRING_DEFAULT_VALUE = "default";
 
@@ -65,10 +65,10 @@ namespace DeserializationTestInternal
 
 		void ParseAtts(const rapidjson::Value& atts) override;
 
-		int m_int;
+		std::int32_t m_int;
 		float m_float;
 		bool m_bool;
-		long long m_longLong;
+		std::int64_t m_longLong;
 		double m_double;
 		std::string m_string;
 
