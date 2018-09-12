@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
@@ -38,34 +39,26 @@ namespace DonerECS
 	{
 	public:
 		CEntityManagerTest()
-			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
-			, m_entityManager(CEntityManager::CreateInstance())
+			: m_componentFactoryManager(nullptr)
+			, m_entityManager(nullptr)
 		{
+			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
+			m_componentFactoryManager = systems.GetComponentFactoryManager();
+			m_entityManager = systems.GetEntityManager();
 		}
 
 		~CEntityManagerTest()
 		{
-			CEntityManager::DestroyInstance();
-			CComponentFactoryManager::DestroyInstance();
+			CDonerECSSystems::DestroyInstance();
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;
 		CEntityManager *m_entityManager;
 	};
 
-	TEST_F(CEntityManagerTest, destroy_entity_with_entity)
+	TEST_F(CEntityManagerTest, create_entity)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
 		EXPECT_NE(nullptr, entity);
-		m_entityManager->DestroyEntity(&entity);
-		EXPECT_EQ(nullptr, entity);
-	}
-
-	TEST_F(CEntityManagerTest, destroy_entity_with_handle)
-	{
-		CHandle entity = m_entityManager->CreateEntity();
-		EXPECT_TRUE(static_cast<bool>(entity));
-		m_entityManager->DestroyEntity(entity);
-		EXPECT_FALSE(static_cast<bool>(entity));
 	}
 }

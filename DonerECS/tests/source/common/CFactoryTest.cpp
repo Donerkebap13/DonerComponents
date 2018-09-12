@@ -63,6 +63,7 @@ namespace DonerECS
 
 	TEST_F(CFactoryTest, get_invalid_value_if_overflow)
 	{
+		// googlemock improvement
 		VersionableFactoryTestInternal::Foo* foo1 = m_factory.GetNewElement();
 		EXPECT_NE(nullptr, foo1);
 		VersionableFactoryTestInternal::Foo* foo2 = m_factory.GetNewElement();

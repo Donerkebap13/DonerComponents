@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 #include <donerecs/tags/CTagsManager.h>
@@ -48,10 +49,15 @@ namespace DonerECS
 	{
 	public:
 		CEntityTagsTest()
-			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
-			, m_entityManager(CEntityManager::CreateInstance())
-			, m_TagsManager(CTagsManager::CreateInstance())
+			: m_componentFactoryManager(nullptr)
+			, m_entityManager(nullptr)
+			, m_TagsManager(nullptr)
 		{
+			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
+			m_componentFactoryManager = systems.GetComponentFactoryManager();
+			m_entityManager = systems.GetEntityManager();
+			m_TagsManager = systems.GetTagsManager();
+
 			m_TagsManager->RegisterTag(EntityTagsTestInternal::TAG1);
 			m_TagsManager->RegisterTag(EntityTagsTestInternal::TAG2);
 			m_TagsManager->RegisterTag(EntityTagsTestInternal::TAG3);
@@ -59,9 +65,7 @@ namespace DonerECS
 
 		~CEntityTagsTest()
 		{
-			CEntityManager::DestroyInstance();
-			CTagsManager::DestroyInstance();
-			CComponentFactoryManager::DestroyInstance();
+			CDonerECSSystems::DestroyInstance();
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;

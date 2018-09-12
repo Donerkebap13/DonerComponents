@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 #include <donerecs/handle/CHandle.h>
@@ -68,14 +69,16 @@ namespace DonerECS
 	{
 	public:
 		CComponentTest()
-			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
+			: m_componentFactoryManager(nullptr)
 		{
+			m_componentFactoryManager = CDonerECSSystems::CreateInstance()->Init().GetComponentFactoryManager();
+
 			ADD_COMPONENT_FACTORY("foo", ComponentTestInternal::CCompFoo, 2);
 		}
 
 		~CComponentTest()
 		{
-			CComponentFactoryManager::DestroyInstance();
+			CDonerECSSystems::DestroyInstance();
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;
@@ -270,19 +273,6 @@ namespace DonerECS
 			EXPECT_TRUE(component->IsDestroyed());
 			EXPECT_EQ(1, component->m_destroyCount);
 		}
-	}
-
-	TEST_F(CComponentTest, component_dont_destroy_itself_if_uninitialized)
-	{
-		ComponentTestInternal::CCompFoo* component = static_cast<ComponentTestInternal::CCompFoo*>(
-			m_componentFactoryManager->CreateComponent<ComponentTestInternal::CCompFoo>());
-		EXPECT_NE(nullptr, component);
-
-		EXPECT_FALSE(component->IsInitialized());
-
-		component->Destroy();
-		EXPECT_FALSE(component->IsDestroyed());
-		EXPECT_EQ(0, component->m_destroyCount);
 	}
 
 	TEST_F(CComponentTest, component_call_doUpdate)

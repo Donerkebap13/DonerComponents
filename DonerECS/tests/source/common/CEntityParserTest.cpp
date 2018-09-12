@@ -25,6 +25,7 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/entity/CEntityParser.h>
 #include <donerecs/entity/CPrefabManager.h>
@@ -35,80 +36,101 @@
 #include <donerecs/json/json.h>
 #include <donerecs/utils/memory/CMemoryDataProvider.h>
 
+#include <donerserializer/DonerDeserialize.h>
+
 #include <gtest/gtest.h>
+
+namespace EntityParserTestInternal
+{
+	class CCompFoo : public DonerECS::CComponent
+	{
+		DECS_DECLARE_COMPONENT_AS_SERIALIZABLE(CCompFoo)
+	public:
+		CCompFoo() : m_a(-1), m_b(-1) {}
+
+		int m_a;
+		int m_b;
+
+	};
+
+	const char* const ONE_LEVEL_ENTITY = "{ \"root\": {"
+		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
+		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
+
+	const char* const ONE_LEVEL_ENTITY_INITIALLY_DISABLED = "{ \"root\": {"
+		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"], \"initially_active\":false,"
+		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
+
+	const char* const ONE_LEVEL_ENTITY_COMPONENT_INITIALLY_DISABLED = "{ \"root\": {"
+		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
+		"\"components\": [{ \"name\": \"foo\", \"initially_active\":false, \"a\": 1, \"b\": -3 }]}}";
+
+	const char* const ONE_LEVEL_ENTITY_INVALID_COMPONENT = "{ \"root\": {"
+		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
+		"\"components\": [{ \"name\": \"bar\", \"a\": 1, \"b\": -3 }]}}";
+
+	const char* const ONE_LEVEL_ENTITY_INVALID_TAG = "{ \"root\": {"
+		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\", \"tag4\"],"
+		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
+
+	const char* const TWO_LEVEL_ENTITY = "{ \"root\": {"
+		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
+		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }],"
+		"\"children\": [{ \"name\": \"test11\", \"tags\": [\"tag1\", \"tag3\"], \"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
+
+	const char* const TWO_LEVEL_ENTITY_INITIALLY_DISABLED = "{ \"root\": {"
+		"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
+		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }],"
+		"\"children\": [{ \"name\": \"test11\", \"initially_active\":false, \"tags\": [\"tag1\", \"tag3\"], \"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
+
+	const char* const ENTITY_BASED_ON_PREFAB = "{ \"root\": {"
+		"\"name\": \"test1\", \"prefab\": \"prefabTest\"}}";
+
+	const char* const ENTITY_BASED_ON_PREFAB_MODIFYING_COMPONENT_DATA = "{ \"root\": {"
+		"\"name\": \"test1\", \"prefab\": \"prefabTest\","
+		"\"components\": [{ \"name\": \"foo\", \"b\": 1337, \"initially_active\":false }]}}";
+
+	const char* const ENTITY_BASED_ON_PREFAB_ADDING_EXTRA_TAGS = "{ \"root\": {"
+		"\"name\": \"test1\", \"prefab\": \"prefabTest\", \"tags\": [\"tag2\", \"tag3\"]}}";
+
+	const char* const ENTITY_BASED_ON_TWO_LEVEL_PREFAB = "{ \"root\": {"
+		"\"name\": \"test1\", \"prefab\": \"2levelPrefab\","
+		"\"children\": [{ \"name\": \"test11\", \"components\": [{ \"name\": \"foo\", \"a\": 1337 }]}]}}";
+
+	const char* const BASIC_PREFAB = "{ \"root\": {"
+		"\"name\": \"prefabTest\", \"tags\": [\"tag1\", \"tag3\"],"
+		"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
+
+	const char* const TWO_LEVEL_PREFAB = "{ \"root\": {"
+		"\"name\": \"2levelPrefab\", \"tags\": [\"tag1\", \"tag3\"],"
+		"\"children\": [{ \"name\": \"test11\", \"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
+}
+
+DONER_DEFINE_REFLECTION_DATA(EntityParserTestInternal::CCompFoo,
+							DONER_ADD_NAMED_VAR_INFO(m_a, "a"),
+							DONER_ADD_NAMED_VAR_INFO(m_b, "b")
+)
+
+DECS_SERIALIZABLE_COMPONENT_IMPL(::EntityParserTestInternal::CCompFoo)
 
 namespace DonerECS
 {
-	namespace EntityParserTestInternal
-	{
-		class CCompFoo : public CComponent
-		{
-		public:
-			CCompFoo() : m_a(-1), m_b(-1) {}
-			void ParseAtts(const Json::Value& atts) override
-			{
-				m_a = !atts["a"].isNull() ? atts["a"].asInt() : m_a;
-				m_b = !atts["b"].isNull() ? atts["b"].asInt() : m_b;
-			}
-			int m_a;
-			int m_b;
-		};
-
-		const char* const ONE_LEVEL_ENTITY = "{ \"type\": \"scene\", \"root\": {"
-			"\"type\": \"entity\", \"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
-			"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
-
-		const char* const ONE_LEVEL_ENTITY_INITIALLY_DISABLED = "{ \"type\": \"scene\", \"root\": {"
-			"\"type\": \"entity\", \"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"], \"initiallyActive\":false,"
-			"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
-
-		const char* const ONE_LEVEL_ENTITY_COMPONENT_INITIALLY_DISABLED = "{ \"type\": \"scene\", \"root\": {"
-			"\"type\": \"entity\", \"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
-			"\"components\": [{ \"name\": \"foo\", \"initiallyActive\":false, \"a\": 1, \"b\": -3 }]}}";
-
-		const char* const ONE_LEVEL_ENTITY_INVALID_COMPONENT = "{ \"type\": \"scene\", \"root\": {"
-			"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
-			"\"components\": [{ \"name\": \"bar\", \"a\": 1, \"b\": -3 }]}}";
-
-		const char* const ONE_LEVEL_ENTITY_INVALID_TAG = "{ \"type\": \"scene\", \"root\": {"
-			"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\", \"tag4\"],"
-			"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
-
-		const char* const TWO_LEVEL_ENTITY = "{ \"type\": \"scene\", \"root\": {"
-			"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
-			"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }],"
-			"\"children\": [{ \"name\": \"test11\", \"tags\": [\"tag1\", \"tag3\"], \"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
-
-		const char* const TWO_LEVEL_ENTITY_INITIALLY_DISABLED = "{ \"type\": \"scene\", \"root\": {"
-			"\"name\": \"test1\", \"tags\": [\"tag1\", \"tag3\"],"
-			"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }],"
-			"\"children\": [{ \"name\": \"test11\", \"initiallyActive\":false, \"tags\": [\"tag1\", \"tag3\"], \"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}]}}";
-
-		const char* const ENTITY_BASED_ON_PREFAB = "{ \"type\": \"scene\", \"root\": {"
-			"\"name\": \"test1\", \"prefab\": \"prefabTest\"}}";
-
-		const char* const ENTITY_BASED_ON_PREFAB_MODIFYING_COMPONENT_DATA = "{ \"type\": \"scene\", \"root\": {"
-			"\"name\": \"test1\", \"prefab\": \"prefabTest\","
-			"\"components\": [{ \"name\": \"foo\", \"b\": 1337, \"initiallyActive\":false }]}}";
-
-		const char* const ENTITY_BASED_ON_PREFAB_ADDING_EXTRA_TAGS = "{ \"type\": \"scene\", \"root\": {"
-			"\"name\": \"test1\", \"prefab\": \"prefabTest\", \"tags\": [\"tag2\", \"tag3\"]}}";
-
-		const char* const BASIC_PREFAB = "{ \"type\": \"prefab\", \"root\": {"
-			"\"name\": \"prefabTest\", \"tags\": [\"tag1\", \"tag3\"],"
-			"\"components\": [{ \"name\": \"foo\", \"a\": 1, \"b\": -3 }]}}";
-	}
-
 	class CEntityParserTest : public ::testing::Test
 	{
 	public:
 		CEntityParserTest()
-			: m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
-			, m_entityManager(CEntityManager::CreateInstance())
-			, m_prefabManager(CPrefabManager::CreateInstance())
-			, m_tagManager(CTagsManager::CreateInstance())
+			: m_componentFactoryManager(nullptr)
+			, m_entityManager(nullptr)
+			, m_prefabManager(nullptr)
+			, m_tagManager(nullptr)
 		{
-			ADD_COMPONENT_FACTORY("foo", EntityParserTestInternal::CCompFoo, 10);
+			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
+			m_componentFactoryManager = systems.GetComponentFactoryManager();
+			m_entityManager = systems.GetEntityManager();
+			m_prefabManager = systems.GetPrefabManager();
+			m_tagManager = systems.GetTagsManager();
+
+			ADD_COMPONENT_FACTORY("foo", ::EntityParserTestInternal::CCompFoo, 10);
 
 			m_tagManager->RegisterTag("tag1");
 			m_tagManager->RegisterTag("tag2");
@@ -117,10 +139,7 @@ namespace DonerECS
 
 		~CEntityParserTest()
 		{
-			CPrefabManager::DestroyInstance();
-			CEntityManager::DestroyInstance();
-			CTagsManager::DestroyInstance();
-			CComponentFactoryManager::DestroyInstance();
+			CDonerECSSystems::DestroyInstance();
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;
@@ -132,7 +151,7 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ONE_LEVEL_ENTITY);
 		EXPECT_NE(nullptr, entity);
 		EXPECT_EQ(std::string("test1"), entity->GetName());
 		EXPECT_TRUE(entity->GetIsInitiallyActive());
@@ -144,8 +163,7 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_initiallyActive_false)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY_INITIALLY_DISABLED);
-		EXPECT_NE(nullptr, entity);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ONE_LEVEL_ENTITY_INITIALLY_DISABLED);
 		EXPECT_EQ(std::string("test1"), entity->GetName());
 		EXPECT_FALSE(entity->GetIsInitiallyActive());
 		EXPECT_TRUE(entity->IsInitialized());
@@ -156,10 +174,8 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_with_component)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY);
-		EXPECT_NE(nullptr, entity);
-		EntityParserTestInternal::CCompFoo* component = entity->GetComponent<EntityParserTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ONE_LEVEL_ENTITY);
+		::EntityParserTestInternal::CCompFoo* component = entity->GetComponent<::EntityParserTestInternal::CCompFoo>();
 		EXPECT_TRUE(component->GetIsInitiallyActive());
 		EXPECT_TRUE(component->IsInitialized());
 		EXPECT_TRUE(component->IsActive());
@@ -171,10 +187,8 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_with_component_initiallyActive_false)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY_COMPONENT_INITIALLY_DISABLED);
-		EXPECT_NE(nullptr, entity);
-		EntityParserTestInternal::CCompFoo* component = entity->GetComponent<EntityParserTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ONE_LEVEL_ENTITY_COMPONENT_INITIALLY_DISABLED);
+		::EntityParserTestInternal::CCompFoo* component = entity->GetComponent<::EntityParserTestInternal::CCompFoo>();
 		EXPECT_FALSE(component->GetIsInitiallyActive());
 		EXPECT_TRUE(component->IsInitialized());
 		EXPECT_FALSE(component->IsActive());
@@ -186,17 +200,15 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_with_invalid_component)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY_INVALID_COMPONENT);
-		EXPECT_NE(nullptr, entity);
-		EntityParserTestInternal::CCompFoo* component = entity->GetComponent<EntityParserTestInternal::CCompFoo>();
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ONE_LEVEL_ENTITY_INVALID_COMPONENT);
+		::EntityParserTestInternal::CCompFoo* component = entity->GetComponent<::EntityParserTestInternal::CCompFoo>();
 		EXPECT_EQ(nullptr, component);
 	}
 
 	TEST_F(CEntityParserTest, parse_entity_with_tags)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY);
-		EXPECT_NE(nullptr, entity);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ONE_LEVEL_ENTITY);
 		EXPECT_TRUE(entity->HasTags("tag1", "tag3"));
 		EXPECT_FALSE(entity->HasTags("tag1", "tag2"));
 	}
@@ -204,8 +216,7 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_with_invalid_tag)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY_INVALID_TAG);
-		EXPECT_NE(nullptr, entity);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ONE_LEVEL_ENTITY_INVALID_TAG);
 		EXPECT_TRUE(entity->HasTags("tag1", "tag3"));
 		EXPECT_FALSE(entity->HasTags("tag4"));
 	}
@@ -213,11 +224,9 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_with_child)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::TWO_LEVEL_ENTITY);
-		EXPECT_NE(nullptr, entity);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::TWO_LEVEL_ENTITY);
 		EXPECT_EQ(1, entity->GetChildrenCount());
 		CEntity* child1 = entity->GetChildByName("test11");
-		EXPECT_NE(nullptr, child1);
 
 		EXPECT_EQ(std::string("test11"), child1->GetName());
 		EXPECT_TRUE(child1->GetIsInitiallyActive());
@@ -225,8 +234,7 @@ namespace DonerECS
 		EXPECT_TRUE(child1->IsActive());
 		EXPECT_FALSE(child1->IsDestroyed());
 
-		EntityParserTestInternal::CCompFoo* component = child1->GetComponent<EntityParserTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
+		::EntityParserTestInternal::CCompFoo* component = child1->GetComponent<::EntityParserTestInternal::CCompFoo>();
 		EXPECT_TRUE(component->GetIsInitiallyActive());
 		EXPECT_TRUE(component->IsInitialized());
 		EXPECT_TRUE(component->IsActive());
@@ -241,19 +249,16 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_with_child_initiallyActive_false)
 	{
 		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::TWO_LEVEL_ENTITY_INITIALLY_DISABLED);
-		EXPECT_NE(nullptr, entity);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::TWO_LEVEL_ENTITY_INITIALLY_DISABLED);
 		EXPECT_EQ(1, entity->GetChildrenCount());
 		CEntity* child1 = entity->GetChildByName("test11");
-		EXPECT_NE(nullptr, child1);
 
 		EXPECT_FALSE(child1->GetIsInitiallyActive());
 		EXPECT_TRUE(child1->IsInitialized());
 		EXPECT_FALSE(child1->IsActive());
 		EXPECT_FALSE(child1->IsDestroyed());
 
-		EntityParserTestInternal::CCompFoo* component = child1->GetComponent<EntityParserTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
+		::EntityParserTestInternal::CCompFoo* component = child1->GetComponent<::EntityParserTestInternal::CCompFoo>();
 		EXPECT_TRUE(component->GetIsInitiallyActive());
 		EXPECT_TRUE(component->IsInitialized());
 		EXPECT_FALSE(component->IsActive());
@@ -263,23 +268,16 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_prefab)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY);
-		EXPECT_NE(nullptr, prefabEntity);
+		parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
-		bool success = m_prefabManager->RegisterPrefab("prefabTest", prefabEntity);
-		EXPECT_TRUE(success);
-
-
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ENTITY_BASED_ON_PREFAB);
-		EXPECT_NE(nullptr, entity);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB);
 		EXPECT_EQ(std::string("test1"), entity->GetName());
 		EXPECT_TRUE(entity->GetIsInitiallyActive());
 		EXPECT_TRUE(entity->IsInitialized());
 		EXPECT_TRUE(entity->IsActive());
 		EXPECT_FALSE(entity->IsDestroyed());
 
-		EntityParserTestInternal::CCompFoo* component = entity->GetComponent<EntityParserTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
+		::EntityParserTestInternal::CCompFoo* component = entity->GetComponent<::EntityParserTestInternal::CCompFoo>();
 		EXPECT_TRUE(component->GetIsInitiallyActive());
 		EXPECT_TRUE(component->IsInitialized());
 		EXPECT_TRUE(component->IsActive());
@@ -295,17 +293,11 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_prefab_modifying_component_data)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY);
-		EXPECT_NE(nullptr, prefabEntity);
+		parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
-		bool success = m_prefabManager->RegisterPrefab("prefabTest", prefabEntity);
-		EXPECT_TRUE(success);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB_MODIFYING_COMPONENT_DATA);
 
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ENTITY_BASED_ON_PREFAB_MODIFYING_COMPONENT_DATA);
-		EXPECT_NE(nullptr, entity);
-
-		EntityParserTestInternal::CCompFoo* component = entity->GetComponent<EntityParserTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
+		::EntityParserTestInternal::CCompFoo* component = entity->GetComponent<::EntityParserTestInternal::CCompFoo>();
 		EXPECT_FALSE(component->GetIsInitiallyActive());
 		EXPECT_TRUE(component->IsInitialized());
 		EXPECT_FALSE(component->IsActive());
@@ -317,14 +309,9 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_prefab_with_extra_tags)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParseSceneFromJson(EntityParserTestInternal::ONE_LEVEL_ENTITY);
-		EXPECT_NE(nullptr, prefabEntity);
+		parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
-		bool success = m_prefabManager->RegisterPrefab("prefabTest", prefabEntity);
-		EXPECT_TRUE(success);
-
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ENTITY_BASED_ON_PREFAB_ADDING_EXTRA_TAGS);
-		EXPECT_NE(nullptr, entity);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB_ADDING_EXTRA_TAGS);
 
 		EXPECT_TRUE(entity->HasTags("tag1"));
 		EXPECT_TRUE(entity->HasTags("tag2"));
@@ -334,19 +321,16 @@ namespace DonerECS
 	TEST_F(CEntityParserTest, parse_entity_based_on_parsed_prefab)
 	{
 		CEntityParser parser;
-		CEntity* prefabEntity = parser.ParseSceneFromJson(EntityParserTestInternal::BASIC_PREFAB);
-		EXPECT_NE(nullptr, prefabEntity);
+		parser.ParsePrefabFromJson(::EntityParserTestInternal::BASIC_PREFAB);
 
-		CEntity* entity = parser.ParseSceneFromJson(EntityParserTestInternal::ENTITY_BASED_ON_PREFAB);
-		EXPECT_NE(nullptr, entity);
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_PREFAB);
 		EXPECT_EQ(std::string("test1"), entity->GetName());
 		EXPECT_TRUE(entity->GetIsInitiallyActive());
 		EXPECT_TRUE(entity->IsInitialized());
 		EXPECT_TRUE(entity->IsActive());
 		EXPECT_FALSE(entity->IsDestroyed());
 
-		EntityParserTestInternal::CCompFoo* component = entity->GetComponent<EntityParserTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
+		::EntityParserTestInternal::CCompFoo* component = entity->GetComponent<::EntityParserTestInternal::CCompFoo>();
 		EXPECT_TRUE(component->GetIsInitiallyActive());
 		EXPECT_TRUE(component->IsInitialized());
 		EXPECT_TRUE(component->IsActive());
@@ -361,21 +345,19 @@ namespace DonerECS
 
 	TEST_F(CEntityParserTest, parse_entity_from_memory_buffer)
 	{
-		std::string entityStr(EntityParserTestInternal::ONE_LEVEL_ENTITY);
+		std::string entityStr(::EntityParserTestInternal::ONE_LEVEL_ENTITY);
 		CMemoryDataProvider mdp((unsigned char*)entityStr.c_str(), entityStr.size());
 
 		CEntityParser parser;
 		CEntity* entity = parser.ParseSceneFromMemory(mdp.GetBaseData(), mdp.GetSize());
 
-		EXPECT_NE(nullptr, entity);
 		EXPECT_EQ(std::string("test1"), entity->GetName());
 		EXPECT_TRUE(entity->GetIsInitiallyActive());
 		EXPECT_TRUE(entity->IsInitialized());
 		EXPECT_TRUE(entity->IsActive());
 		EXPECT_FALSE(entity->IsDestroyed());
 
-		EntityParserTestInternal::CCompFoo* component = entity->GetComponent<EntityParserTestInternal::CCompFoo>();
-		EXPECT_NE(nullptr, component);
+		::EntityParserTestInternal::CCompFoo* component = entity->GetComponent<::EntityParserTestInternal::CCompFoo>();
 		EXPECT_TRUE(component->GetIsInitiallyActive());
 		EXPECT_TRUE(component->IsInitialized());
 		EXPECT_TRUE(component->IsActive());
@@ -386,5 +368,17 @@ namespace DonerECS
 		EXPECT_TRUE(entity->HasTags("tag1"));
 		EXPECT_FALSE(entity->HasTags("tag2"));
 		EXPECT_TRUE(entity->HasTags("tag3"));
+	}
+
+	TEST_F(CEntityParserTest, parse_entity_based_on_prefab_modifying_prefab_children_info)
+	{
+		CEntityParser parser;
+		parser.ParsePrefabFromJson(::EntityParserTestInternal::TWO_LEVEL_PREFAB);
+
+		CEntity* entity = parser.ParseSceneFromJson(::EntityParserTestInternal::ENTITY_BASED_ON_TWO_LEVEL_PREFAB);
+		CEntity* entity1 = entity->GetChildByName("test11");
+		::EntityParserTestInternal::CCompFoo* component = entity1->GetComponent<::EntityParserTestInternal::CCompFoo>();
+
+		EXPECT_EQ(1337, component->m_a);
 	}
 }

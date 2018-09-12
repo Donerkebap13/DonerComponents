@@ -29,6 +29,8 @@
 #include <donerecs/component/CComponentFactory.h>
 #include <donerecs/handle/CHandle.h>
 
+#include <algorithm>
+
 namespace DonerECS
 {
 	bool IComponentFactory::SetHandleInfoFromComponent(CComponent* component, CHandle& handle)
@@ -42,5 +44,25 @@ namespace DonerECS
 			return true;
 		}
 		return false;
+	}
+
+	void IComponentFactory::ScheduleDestroyComponent(CHandle component)
+	{
+		if (std::find(m_scheduledDestroys.begin(), m_scheduledDestroys.end(), component) == m_scheduledDestroys.end())
+		{
+			m_scheduledDestroys.emplace_back(component);
+		}
+	}
+
+	void IComponentFactory::ExecuteScheduledDestroys()
+	{
+		for (CComponent* component : m_scheduledDestroys)
+		{
+			if (component)
+			{
+				DestroyComponent(component);
+			}
+		}
+		m_scheduledDestroys.clear();
 	}
 }

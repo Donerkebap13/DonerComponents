@@ -39,7 +39,7 @@ function(set_compile_flags TARGET)
 		endif()
 		set(CURRENT_COMPILE_FLAGS_RELEASE "${CURRENT_COMPILE_FLAGS_RELEASE} -g -O2 -DNDEBUG")
 		
-	elseif(CMAKE_CXX_COMPILER_ID STREQUAL 'MSVC')
+	elseif(MSVC)
 		# /Zi - Produces a program database (PDB) that contains type information and symbolic debugging information for use with the debugger.
 		# /FS - Allows multiple cl.exe processes to write to the same .pdb file
 		# /DEBUG - Enable debug during linking

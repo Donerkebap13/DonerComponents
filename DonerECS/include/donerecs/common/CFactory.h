@@ -32,6 +32,7 @@
 #include <cstdio>
 #include <memory>
 #include <stdlib.h>
+#include <type_traits>
 #include <vector>
 
 namespace DonerECS
@@ -74,11 +75,12 @@ namespace DonerECS
 			free(m_buffer);
 		}
 
-		T* GetNewElement()
+		template<typename... Args>
+		T* GetNewElement(Args... args)
 		{
 			if (m_current)
 			{
-				T* data = new(static_cast<void*>(m_current->m_data))T();
+				T* data = new(static_cast<void*>(m_current->m_data))T(std::forward<Args>(args)...);
 				data->SetVersion(m_current->m_version);
 				m_current->m_used = true;
 				m_current = m_current->m_next;

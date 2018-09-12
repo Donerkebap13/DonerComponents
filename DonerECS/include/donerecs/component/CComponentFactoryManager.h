@@ -28,21 +28,22 @@
 #pragma once
 
 #include <donerecs/ErrorMessages.h>
-#include <donerecs/common/CSingleton.h>
 #include <donerecs/component/CComponentFactory.h>
 #include <donerecs/utils/hash/CTypeHasher.h>
 #include <donerecs/utils/hash/CStrID.h>
 
 #include <vector>
 
-#define ADD_COMPONENT_FACTORY(name, T, N) DonerECS::CComponentFactoryManager::Get()->AddFactory(name, new CComponentFactory<T>(N))
+#define ADD_COMPONENT_FACTORY(name, T, N) DonerECS::CDonerECSSystems::Get()->GetComponentFactoryManager()->AddFactory(name, new DonerECS::CComponentFactory<T>(N))
 
 namespace DonerECS
 {
 	class CComponent;
 
-	class CComponentFactoryManager : public CSingleton<CComponentFactoryManager>
+	class CComponentFactoryManager
 	{
+		friend class CDonerECSSystems;
+
 		struct SFactoryData
 		{
 			CTypeHasher::HashId m_id;
@@ -147,7 +148,11 @@ namespace DonerECS
 
 		void Update(float dt);
 
+		void ScheduleDestroyComponent(CComponent* component);
+		void ExecuteScheduledDestroys();
+
 	private:
+		CComponentFactoryManager() = default;
 
 		template<typename T>
 		bool FactoryExists()

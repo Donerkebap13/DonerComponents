@@ -25,61 +25,38 @@
 //
 ////////////////////////////////////////////////////////////
 
-#include <donerecs/CDonerECSSystems.h>
-#include <donerecs/entity/CEntity.h>
-#include <donerecs/entity/CPrefabManager.h>
-#include <donerecs/component/CComponent.h>
-#include <donerecs/component/CComponentFactoryManager.h>
-#include <donerecs/handle/CHandle.h>
+#pragma once
 
-#include <gtest/gtest.h>
-
-// gmock
-// using ::testing::Return;
+#include <donerecs/common/CSingleton.h>
 
 namespace DonerECS
 {
-	namespace PrefabManagerTestInternal
-	{
-		class CCompFoo : public DonerECS::CComponent
-		{
-		public:
-			CCompFoo() : m_a(-1), m_b(-1) {}
+	class CComponentFactoryManager;
+	class CEntityManager;
+	class CTagsManager;
+	class CPrefabManager;
 
-			int m_a;
-			int m_b;
-		};
-	}
-
-	class CPrefabManagerTest : public ::testing::Test
+	class CDonerECSSystems : public CSingleton<CDonerECSSystems>
 	{
 	public:
-		CPrefabManagerTest()
-			: m_componentFactoryManager(nullptr)
-			, m_entityManager(nullptr)
-			, m_prefabManager(nullptr)
-		{
-			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
-			m_componentFactoryManager = systems.GetComponentFactoryManager();
-			m_entityManager = systems.GetEntityManager();
-			m_prefabManager = systems.GetPrefabManager();
+		CDonerECSSystems();
+		~CDonerECSSystems();
 
-			ADD_COMPONENT_FACTORY("foo", PrefabManagerTestInternal::CCompFoo, 10);
-		}
+		CDonerECSSystems& Init();
+		void Destroy();
+		void Update(float dt);
 
-		~CPrefabManagerTest()
-		{
-			CDonerECSSystems::Get()->Destroy();
-		}
+		CComponentFactoryManager* GetComponentFactoryManager();
+		CEntityManager* GetEntityManager();
+		CTagsManager* GetTagsManager();
+		CPrefabManager* GetPrefabManager();
 
-		CComponentFactoryManager *m_componentFactoryManager;
+	private:
+		CComponentFactoryManager* m_componentFactoryManager;
 		CEntityManager* m_entityManager;
+		CTagsManager* m_tagsManager;
 		CPrefabManager* m_prefabManager;
-	};
 
-	TEST_F(CPrefabManagerTest, clone_invalid_prefab_return_invalid_entity)
-	{
-		CEntity* cloned = m_prefabManager->ClonePrefab("test");
-		EXPECT_EQ(nullptr, cloned);
-	}
+		bool m_initialized;
+	};
 }
