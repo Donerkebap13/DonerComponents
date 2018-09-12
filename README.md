@@ -1,7 +1,7 @@
 # DonerECS - A Tweaked Entity-Component System
 [![Build Status](https://travis-ci.org/Donerkebap13/DonerECS.svg?branch=master)](https://travis-ci.org/Donerkebap13/DonerECS) [![Build status](https://ci.appveyor.com/api/projects/status/3l2174mt6qm7627w/branch/master?svg=true)](https://ci.appveyor.com/project/Donerkebap13/donerecs/branch/master) [![Coverage Status](https://coveralls.io/repos/github/Donerkebap13/DonerECS/badge.svg?branch=master&service=github)](https://coveralls.io/github/Donerkebap13/DonerECS?branch=master&service=github)
 
-DonerECS, Doner Entity-Component System, or simply DECS, is a framework that uses C++11 features to provide a **Unity-like** entity-component System.
+DonerECS, Doner Entity-Component System, or simply DECS, is a framework that uses C++14 features to provide a **Unity-like** entity-component System.
 
 ## Features
 - Support for **complex entity hierarchies**, with parent/children relationships, activation, deactivation etc. 
@@ -9,11 +9,11 @@ DonerECS, Doner Entity-Component System, or simply DECS, is a framework that use
 - Easy **component creation/registration** which can be easily added to your entities on the fly.
 - **Messages** between entities, which are forwarded also to their children and their components.
 - **Tags system** to add specific attributes to your entities.
-- **Prefab system** to reuse and compose more complex hierarchies.
+- **Prefab system** to reuse and compose more complex hierarchies. It supports **Nested Prefabs**.
 - A **JSON parsing system** to load your prefabs/entities/scenes from disk.
 - **200+ Unit Tests ensures that everything works as expected.**
 
-## Disclaimer
+## Disclaimer: I do this for the fun of learning
 **DonerECS doesn't pretend to be a cache friendly Entity-Component System.** It's not based on Systems either. In DonerECS each component has it's own `Update()` method, and also others such as `Init()`, `Activate()`, `Deactivate()` and so on. The way of sharing information around is through messages. 
 If you are not familiar with this way of working, I recommend you to have a look to the [Example Project](#example) or the  [Tutorial](#tutorial)  and give it a try!
 
@@ -33,17 +33,35 @@ You can contact me directly via [email](mailto:donerkebap13@gmail.com)
 Also, if you have any suggestion or you find any bug, please don't hesitate to [create a new Issue.](https://github.com/Donerkebap13/DonerECS/issues)
 
 ## Example
-[DonerECS_Asteroids_Example](https://github.com/Donerkebap13/DonerECS_Asteroids_Example)
-An example project is **coming soon**. It'll be a simple Asteroids clone. My intention with that project is showing all the features the framework supports right now, such as:
-- Entity hierarchy.
-- Messaging between entities.
-- Prefab system.
-- Entity parsing from JSON.
-- Component creation.
-- Entity Tags.
+[DonerECS_Asteroids_Example](https://github.com/Donerkebap13/DonerECS_Asteroids_Example) is an **example project** I've created in order to show how to use **DonerECS**. It's a really simple Asteroids-wannabe clone. My intention with that project is to show all the features the framework supports right now, such as:
+- Entity hierarchy
+- Messaging between entities
+- Prefab system
+- Entity parsing from JSON
+- Component creation
+- Entity Tags
 
 ## Tutorial
 Here I'll try to illustrate the basic usage of the main systems of DonerECS. After reading this you'll have the basic knowledge on how things are organized and how they can be used. For a deeper understanding I recommend you to have a look to the [Example Project.](#example)
+
+### Initialization
+``CDonerECSSystems`` is a **singleton**that initializes and gives access to all **DonerECS** different systems.
+It should be initialized:
+ ```c++
+#include <donerecs/CDonerECSSystems.h>
+
+DonerECS::CDonerECSSystems::CreateInstance();
+DonerECS::CDonerECSSystems::Get()->Init();
+```
+Updated:
+ ```c++
+float elapsed = ...;
+DonerECS::CDonerECSSystems::Get()->Update(elapsed);
+```
+And destroyed:
+ ```c++
+DonerECS::CDonerECSSystems::DestroyInstance();
+```
 
 ### Entities
 `DonerECS::CEntity` is DonerECS's main actor. This class can contain different `DonerECS::CComponent` that defines its behavior. It also has information about its parent and its children. It can also receive POD messages and forward them to its components and its children. Last but not least, it can also be tagged.
@@ -52,21 +70,20 @@ Creating a new entity is as simple as:
 ```c++
 #include <donerecs/entity/CEntity.h>
 
-DonerECS::CEntityManager::CreateInstance();
-
-DonerECS::CEntity *entity = DonerECS::CEntityManager::Get()->GetNewElement();
+DonerECS::CEntityManager* entityManager = DonerECS::CDonerECSSystems::Get()->GetEntityManager();
+DonerECS::CEntity *entity = entityManager->GetNewElement();
 ```
-`DonerECS::CEntityManager::Get()->GetNewElement();` will return a valid `DonerECS::CEntity` as long as it hasn't run out of entities to generate. By default, DonerECS can have 4096 entities alive at the same time. This value is modifiable through the compiler flag `-DMAX_ENTITIES=4096` with a **maximum of  8.192 entities.**
+`GetNewElement();` will return a valid `DonerECS::CEntity` as long as it hasn't run out of entities to generate. By default, DonerECS can have 4096 entities alive at the same time. This value is modifiable through the compiler flag `-DMAX_ENTITIES=4096` with a **maximum of  8.192 entities.**
 
 #### Prefabs
 DonerECS supports the definition of prefabs, so the user can define a specific entity hierarchy for reusing it wherever it's needed:
 ```c++
 #include <donerecs/entity/CPrefabManager.h>
 
-DonerECS::CPrefabManager::CreateInstance();
-
-DonerECS::CPrefabManager::Get()->RegisterPrefab("prefabTest", anyEntityCreatedPreviously);
+DonerECS::CEntityManager* prefabManager = DonerECS::CDonerECSSystems::Get()->GetPrefabManager();
+prefabManager->RegisterPrefab("prefabName", anyEntityCreatedPreviously);
 ```
+**Prefabs** could be also loaded from a [JSON file](https://github.com/Donerkebap13/DonerECS/tree/feature/DonerECS-asteroids-development#parsing-a-prefab).
 
 ### Components
 `DonerECS::CComponent` is the base class for any component in DonerECS. Components defines the entity's behavior by aggregation. They can listen to specific messages and perform actions accordingly. Any new component should inherit from this class and it can implement some basic methods, if needed. **The user can register up to 512 different components.**
@@ -91,12 +108,10 @@ To register this component in the system, so any entity can use it, we need to d
 ```c++
 #include <donerecs/component/CComponentFactoryManager.h>
 
-DonerECS::CComponentFactoryManager::CreateInstance();
-
 static constexpr int amountOfFooComponentsAvailable = 512;
 ADD_COMPONENT_FACTORY("foo", CCompFoo, amountOfFooComponentsAvailable);
 ```
-After creating the `DonerECS::CComponentFactoryManager` we can start registering our components into the system using the macro `ADD_COMPONENT_FACTORY`. The string it receives is to identify the component while parsing our entities from a **JSON file.** The last parameters is how many components will be available. As with the entities, **there's a maximum of  8.192 components** of the same kind alive at the same time.
+After initializing the `DonerECS::CDonerECSSystems` we can start registering our components into the system using the macro `ADD_COMPONENT_FACTORY`. The string it receives is to identify the component while [parsing our entities from a **JSON file**](https://github.com/Donerkebap13/DonerECS/tree/feature/DonerECS-asteroids-development#parsing-a-scene-from-a-json-file). The last parameters is how many components will be available. As with the entities, **there's a maximum of  8.192 components** of the same kind alive at the same time.
 
 #### Adding a Component to an Entity
 Once a componet is registered into the system, it can be added to an entity in two different ways:
@@ -111,7 +126,7 @@ CCompFoo* component = entity->AddComponent("foo");
 ```
 
 #### Updating your Components
-In DonerECS, components are updated by type, one type at a time, in the order they were registered into the system.
+In **DonerECS**, components are updated by type, one type at a time, in the order they were registered into the system.
 So in the example:
 ```c++
 ADD_COMPONENT_FACTORY("foo", CCompFoo, 128);
@@ -119,10 +134,40 @@ ADD_COMPONENT_FACTORY("bar", CCompBar, 128);
 ```
 All existing `CCompFoo` will be updated sequentially before updating all existing `CCompBar` components.
 
-To do so, in you system's Update() loop, you should call:
+#### Defining Serializable data for your components
+You can define which data will be exposed to be modified in **JSON** using **[DonerSerializer](https://github.com/Donerkebap13/DonerSerializer)**. You can check [here](https://github.com/Donerkebap13/DonerSerializer#how-to-use-it) how to use it. In here I'm just going to show an example.
 ```c++
-DonerECS::CComponentFactoryManager::Get()->Update(yourDeltaTime);
+class CCompFoo : public DonerECS::CComponent
+{
+	DECS_DECLARE_COMPONENT_AS_SERIALIZABLE(CCompFoo)
+public:
+	CCompFoo();
+private:
+	float m_dummy1;
+	std::vector<std::string> m_dummy2;
+};
+
+DONER_DEFINE_REFLECTION_DATA(CCompFoo,
+	DONER_ADD_NAMED_VAR_INFO(m_dummy1, "dummy1"),
+	DONER_ADD_NAMED_VAR_INFO(m_dummy2, "dummy2")
+)
 ```
+After exposing ``m_dummy1`` and ``m_dummy2``, we can define their values in **JSON** like this:
+```json
+{
+	"root": {
+		"name": "test1",
+		"components": [
+        	{
+				"name": "foo",
+				"dummy1": 1.0,
+				"dummy2": ["Test1", "Test2", "Test3"]
+			}
+		]
+	}
+}
+```
+For a more in-depth look on how to read from **JSON** check **[this](https://github.com/Donerkebap13/DonerECS/tree/feature/DonerECS-asteroids-development#parsing-a-scene-from-a-json-file)**.
 
 ### Messages
 DonerECS supports a message system to interact between different entities and components. **A message could be any Struct/Class defined by the user.** Usually it'll only contain data, no logic, but there's no limitation to this. 
@@ -138,20 +183,33 @@ struct SDummyMessage {
 }
 
 // Inside your component
+CCompFoo::RegisterMessages() {
+	RegisterMessage(&CCompFoo::OnDummyMessage);
+}
 
 void CCompFoo::OnDummyMessage(const SDummyMessage& message) {
 	// ...
-}
-
-CCompFoo::RegisterMessages() {
-	RegisterMessage(&CCompFoo::OnDummyMessage);
 }
 ```
 After registering the messages you want, you can start sending messages like this:
 ```c++
 SDummyMessage message(2, 3);
-entity->SendMessage(message); // this will propagate the message to all entity's components.
-entity->SendMessageRecursive(message); // this will also propagate the message to all entity's children and their components.
+// This will propagate the message to all entity's components.
+entity->SendMessage(message); 
+// This will propagate the message to all entity's components and its children's components.
+entity->SendMessage(message, DonerECS::ESendMessageType::Recursive); 
+// This won't send the message to the current entity but it's children.
+entity->SendMessageToChildren(message); 
+// Same as before but recursively through all entity's children and children's children.
+entity->SendMessageToChildren(message, DonerECS::ESendMessageType::Recursive); 
+```
+``SendMessage`` sends the message right away, in the same frame. If you want to delay sending the message until the end of the frame, use ``PostMessage`` instead.
+
+Last but not least, if you want to send a message to **ALL** living entities, you can use ``BroadcastMessage``:
+```c++
+SDummyMessage message(2, 3);
+// This will propagate the message to all entities alive.
+entityManager->BroadcastMessage(message); 
 ```
 
 ### Handles
@@ -165,7 +223,7 @@ Here's an example:
 
 using namespace DonerECS;
 
-CHandle entityHandle = CEntityManager::Get()->GetNewElement();
+CHandle entityHandle = m_entityManager->GetNewElement();
 
 if (entityHandle) {
 	// CEntityManager has return a valid CEntity
@@ -175,11 +233,11 @@ if (entityHandle) {
 CEntity* entity = entityHandle;
 // entity will be valid as entityHandle points to an alive entity
 
-CEntityManager::Get()->DestroyEntity(&entity);
+m_entityManager->DestroyEntity(&entity);
 // entity is nullptr at this point
 // entityHandle == false as it points to a destroyed entity.
 ```
-Also, you can send messages through handles. If the handle is valid, the message will be propagated properly. Otherwise, the message will be lost but nothing will crash:
+Also, you can send messages through handles. If the handle is valid, the message will be propagated properly. Otherwise, the message will be ignored:
 ```c++
 DonerECS::CHandle handle = entity;
 SDummyMessage message(2, 3);
@@ -193,18 +251,13 @@ First one, declaring them directly in code:
 ```c++
 #include <donerecs/tags/CTagsManager.h>
 
-DonerECS::CTagsManager::CreateInstance();
-
-DonerECS::CTagsManager::Get()->RegisterTag("Tag1");
-DonerECS::CTagsManager::Get()->RegisterTag("TagN");
+DonerECS::CTagsManager* tagsManager = DonerECS::CDonerECSSystems::Get()->GetTagsManager();
+tagsManager->RegisterTag("Tag1");
+tagsManager->RegisterTag("TagN");
 ```
 The second one, parsing them from a JSON file:
 ```c++
-#include <donerecs/tags/CTagsManager.h>
-
-DonerECS::CTagsManager::CreateInstance();
-
-DonerECS::CTagsManager::Get()->ParseTagsFromFile("path/to/your/tags.json");
+tagsManager->ParseTagsFromFile("path/to/your/tags.json");
 ```
 The format of the tags.json file is something similar to this:
 ```json
@@ -212,19 +265,17 @@ The format of the tags.json file is something similar to this:
 ```
 
 ### Parsing a scene from a JSON file
-DonerECS supports loading from disk using JSON (thanks to JSONCPP), so there's a way fo creating prefabs or scenes that can be stored as assets instead of building them from scratch in code every time we run our application.
+DonerECS supports loading from disk using JSON thanks to **[DonerSerializer](https://github.com/Donerkebap13/DonerSerializer)**, so there's a way fo creating prefabs or scenes that can be stored as assets instead of building them from scratch in code every time we run our application.
 The basic usage is as follows:
 ```c++
 #include <donerecs/entities/CEntityParser.h>
 
 DonerECS::CEntityParser parser;
-
 CEntity* entity = parser.ParseSceneFromFile("path/to/your/scene.json");
 ```
 The format of a scene.json file is something similar to this:
 ```json
 {
-	"type": "scene",
 	"root": {
 		"name": "test1",
 		"tags": ["tag1", "tag2", "tag3"],
@@ -254,11 +305,71 @@ The format of a scene.json file is something similar to this:
 }
 ```
 #### Parsing a prefab
-If, instead of parsing a scene we want to parse a **prefab** to register it automatically into `DonerECS::CPrefabManager`, we just need to change the `type` to `"prefab"`:
-```json
-{
-	"type": "prefab",
-	"root": { ... }
-}
+If, instead of parsing a scene we want to parse a **prefab** to register it automatically into `DonerECS::CPrefabManager`, we just need to call ``ParsePrefabFromFile``:
+```c++
+#include <donerecs/entities/CEntityParser.h>
+
+DonerECS::CEntityParser parser;
+CEntity* entity = parser.ParsePrefabFromFile("path/to/your/prefab.json");
 ```
 After doing this the prefab is available for any new parsed scene to use.
+
+#### Nested Prefabs
+**DonerECS** supports prefabs that includes other prefabs, being able to override its component's information:
+
+Prefab1.json
+```json
+{
+	"root": {
+		"name": "Prefab1",
+		"components": [
+        	{
+				"name": "comp_location",
+				"x": 1,
+				"y": -3,
+				"z": 9
+			},
+			{
+				"name": "comp_rotation",
+				"radians": 0.2
+			},
+			{
+				"name": "sprite",
+				"texture": "res/common/textures/asteroid_med.png"
+			}
+		]
+	}
+}
+```
+Prefab2.json
+```json
+{
+	"root": {
+		"name": "Prefab2",
+		"prefab": "Prefab1"
+		"components": [
+        	{
+				"name": "sprite",
+				"texture": "res/common/textures/flower_big.png"
+			}
+		]
+	}
+}
+```
+Scene.json
+```json
+{
+	"root": {
+		"name": "root",
+		"prefab": "Prefab2"
+		"components": [
+        	{
+				"name": "comp_location",
+				"x": 0,
+				"y": 0,
+				"z": 0
+			}
+		]
+	}
+}
+```
