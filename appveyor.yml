@@ -1,5 +1,7 @@
 version: 1.0.{build}
 image: Visual Studio 2015 CTP 6
+install:
+- git submodule update --init --recursive
 build_script:
 - cmd: |-
     python project_generation_scripts.py --generate-tests --all-platforms
