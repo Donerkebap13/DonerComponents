@@ -39,6 +39,7 @@ namespace DonerECS
 	{
 	public:
 		virtual CComponent* CreateComponent() = 0;
+		virtual CComponent* CreateComponent(CComponent* rhs) = 0;
 		virtual CComponent* CloneComponent(CComponent* component) = 0;
 		virtual CComponent* GetByIdxAndVersion(int index, int version) = 0;
 		virtual int GetComponentPosition(CComponent* component) = 0;
@@ -46,6 +47,11 @@ namespace DonerECS
 		virtual void Update(float dt) = 0;
 
 		bool SetHandleInfoFromComponent(CComponent* component, CHandle& handle);
+		void ScheduleDestroyComponent(CHandle component);
+		void ExecuteScheduledDestroys();
+
+	protected:
+		std::vector<CHandle> m_scheduledDestroys;
 	};
 
 	template <typename T>
@@ -70,14 +76,24 @@ namespace DonerECS
 			return component;
 		}
 
+		CComponent* CreateComponent(CComponent* rhs) override
+		{
+			CComponent* component = CFactory<T>::GetNewElement(static_cast<T&>(*rhs));
+			if (!component)
+			{
+				DECS_ERROR_MSG(EErrorCode::NoMoreComponentsAvailable, "No more components of this kind available");
+			}
+			return component;
+		}
+
 		CComponent* CloneComponent(CComponent* component) override
 		{
-			T* newComponent = static_cast<T*>(CreateComponent());
-			if (newComponent)
+			if (component)
 			{
-				*newComponent = *(static_cast<T*>(component));
+				T* newComponent = static_cast<T*>(CreateComponent(component));
+				return newComponent;
 			}
-			return newComponent;
+			return nullptr;
 		}
 
 		CComponent* GetByIdxAndVersion(int index, int version) override

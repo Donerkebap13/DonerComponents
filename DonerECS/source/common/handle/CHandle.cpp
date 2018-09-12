@@ -26,6 +26,7 @@
 ////////////////////////////////////////////////////////////
 
 #include <donerecs/handle/CHandle.h>
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
@@ -65,20 +66,27 @@ namespace DonerECS
 
 	CHandle::operator CEntity*()
 	{
-		return *this ? CEntityManager::Get()->GetElementByIdxAndVersion(m_elementPosition, m_version) : nullptr;
+		return *this ? CDonerECSSystems::Get()->GetEntityManager()->GetElementByIdxAndVersion(m_elementPosition, m_version) : nullptr;
 	}
 
 	CHandle::operator bool()
 	{
 		if (m_elementType == CHandle::EElementType::Entity)
 		{
-			return CEntityManager::Get()->GetElementByIdxAndVersion(m_elementPosition, m_version) != nullptr;
+			return CDonerECSSystems::Get()->GetEntityManager()->GetElementByIdxAndVersion(m_elementPosition, m_version) != nullptr;
 		}
 		else if (m_elementType == CHandle::EElementType::Component)
 		{
-			return CComponentFactoryManager::Get()->GetComponent(m_componentIdx, m_elementPosition, m_version) != nullptr;
+			return CDonerECSSystems::Get()->GetComponentFactoryManager()->GetComponent(m_componentIdx, m_elementPosition, m_version) != nullptr;
 		}
 		return false;
+	}
+
+	CHandle::operator int() const
+	{
+		void* voidHandle = static_cast<void*>(const_cast<DonerECS::CHandle*>(this));
+		int* intHandle = static_cast<int*>(voidHandle);
+		return *intHandle;
 	}
 
 	bool CHandle::operator==(const CHandle& rhs) const
@@ -89,26 +97,29 @@ namespace DonerECS
 			m_version == rhs.m_version;
 	}
 
-	bool CHandle::Destroy()
+	bool  CHandle::operator!=(const CHandle& rhs) const
 	{
-		bool success = false;
-		if (*this)
+		return !operator==(rhs);
+	}
+
+	void CHandle::Destroy()
+	{
+		if (m_elementType == CHandle::EElementType::Entity)
 		{
-			if (m_elementType == CHandle::EElementType::Entity)
+			CEntity* entity = *this;
+			if (entity)
 			{
-				CEntity* entity = *this;
-				success = CEntityManager::Get()->DestroyEntity(&entity);
-			}
-			else if (m_elementType == CHandle::EElementType::Component)
-			{
-				CComponent* component = *this;
-				success = CComponentFactoryManager::Get()->DestroyComponent(&component);
+				entity->Destroy();
 			}
 		}
-		if (success)
+		else if (m_elementType == CHandle::EElementType::Component)
 		{
-			*this = CHandle();
+			CComponent* component = *this;
+			if (component)
+			{
+				component->Destroy();
+			}
 		}
-		return success;
+		*this = CHandle();
 	}
 }

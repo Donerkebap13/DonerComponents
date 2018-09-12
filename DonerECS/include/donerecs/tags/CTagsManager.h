@@ -37,8 +37,9 @@ namespace DonerECS
 {
 	using TagsMask = std::bitset<MAX_TAGS>;
 
-	class CTagsManager : public CSingleton<CTagsManager>
+	class CTagsManager
 	{
+		friend class CDonerECSSystems;
 	public:
 		bool RegisterTag(CStrID tag);
 		int GetTagIdx(CStrID tag) const;
@@ -83,6 +84,8 @@ namespace DonerECS
 		bool ParseTagsFromJson(const char* const jsonStr);
 
 	private:
+		CTagsManager() = default;
+
 		template<typename... Args>
 		bool AddTagsInternal(TagsMask& mask, CStrID tag, Args... args)
 		{

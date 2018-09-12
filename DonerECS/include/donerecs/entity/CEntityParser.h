@@ -30,6 +30,8 @@
 #include <donerecs/common/CFactory.h>
 #include <donerecs/entity/CEntity.h>
 
+#include <rapidjson/document.h>
+
 namespace DonerECS
 {
 	class CEntity;
@@ -44,19 +46,32 @@ namespace DonerECS
 	class CEntityParser
 	{
 	public:
+		enum class EParsedEntityType { Scene, Prefab };
+		
 		CEntityParser();
 
 		CHandle ParseSceneFromFile(const char* const path);
 		CHandle ParseSceneFromMemory(const unsigned char* jsonStringBuffer, std::size_t size);
+
+		CHandle ParsePrefabFromFile(const char* const path);
+		CHandle ParsePrefabFromMemory(const unsigned char* jsonStringBuffer, std::size_t size);
+
 		CHandle ParseSceneFromJson(const char* const jsonStr);
+		CHandle ParsePrefabFromJson(const char* const jsonStr);
 
 	private:
-		CHandle ParseEntity(Json::Value& entityData, CEntity* parent);
-		CHandle ParsePrefab(Json::Value& entityData);
+		CHandle ParseFromFile(const char* const path, EParsedEntityType type);
+		CHandle ParseFromMemory(const unsigned char* jsonStringBuffer, std::size_t size, EParsedEntityType type);
+		CHandle ParseFromJson(const char* const jsonStr, EParsedEntityType type);
 
-		bool ParseTags(Json::Value& tags, CEntity* entity);
-		bool ParseComponents(Json::Value& components, CEntity* entity);
-		bool ParseChildren(Json::Value& children, CEntity* entity);
+		CHandle ParseEntity(const rapidjson::Value& entityData, CEntity* parent);
+		CHandle ParsePrefab(const rapidjson::Value& entityData);
+
+		void ParseOverrideableData(const rapidjson::Value& entityData, CEntity* entity);
+
+		bool ParseTags(const rapidjson::Value& tags, CEntity* entity);
+		bool ParseComponents(const rapidjson::Value& components, CEntity* entity);
+		bool ParseChildren(const rapidjson::Value& children, CEntity* entity);
 
 		CEntityManager& m_entityManager;
 		CPrefabManager& m_prefabManager;

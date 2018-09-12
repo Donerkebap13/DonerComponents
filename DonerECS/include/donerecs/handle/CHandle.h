@@ -27,7 +27,11 @@
 
 #pragma once
 
+#include <donerecs/Defines.h>
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/component/CComponentFactoryManager.h>
+
+#include <functional>
 
 namespace DonerECS
 {
@@ -52,8 +56,10 @@ namespace DonerECS
 		const CHandle & operator=(CComponent* rhs);
 		operator CEntity*();
 		operator bool();
+		operator int() const;
 
 		bool operator==(const CHandle& rhs) const;
+		bool operator!=(const CHandle& rhs) const;
 
 		template<typename T>
 		operator T*()
@@ -65,7 +71,7 @@ namespace DonerECS
 
 			if (*this)
 			{
-				return static_cast<T*>(CComponentFactoryManager::Get()->GetComponent(m_componentIdx, m_elementPosition, m_version));
+				return static_cast<T*>(CDonerECSSystems::Get()->GetComponentFactoryManager()->GetComponent(m_componentIdx, m_elementPosition, m_version));
 			}
             else
             {
@@ -74,19 +80,31 @@ namespace DonerECS
 		}
 
 		template<typename T>
-		void SendMessage(const T& message);
+		void SendMessage(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 		template<typename T>
-		void SendMessageRecursive(const T& message);
+		void SendMessageToChildren(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 		template<typename T>
-		void PostMessage(const T& message);
+		void PostMessage(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 		template<typename T>
-		void PostMessageRecursive(const T& message);
+		void PostMessageToChildren(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 
-		bool Destroy();
+		void Destroy();
 
 		unsigned m_elementType : 2; //  4
 		unsigned m_componentIdx : 9; // 512
 		unsigned m_elementPosition : 13; // 8.192
 		unsigned m_version : 8; // 256
+	};
+}
+
+namespace std
+{
+	template <>
+	struct hash<DonerECS::CHandle>
+	{
+		std::size_t operator()(const DonerECS::CHandle& handle) const 
+		{ 
+			return std::hash<int>()(handle);
+		}
 	};
 }

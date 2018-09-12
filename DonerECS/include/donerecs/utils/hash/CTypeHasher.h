@@ -36,11 +36,7 @@ namespace DonerECS
 	public:
 		CTypeHasher() = delete;
 
-#if defined(ENV64BIT)
-		using HashId = long long;
-#elif defined(ENV32BIT)
-		using HashId = long;
-#endif
+		using HashId = intptr_t;
 
 		template<typename T>
 		static HashId Hash()

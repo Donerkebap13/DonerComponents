@@ -26,6 +26,7 @@
 ////////////////////////////////////////////////////////////
 
 #include <donerecs/ErrorMessages.h>
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/entity/CPrefabManager.h>
 #include <donerecs/handle/CHandle.h>
@@ -33,17 +34,14 @@
 namespace DonerECS
 {
 	CPrefabManager::CPrefabManager()
-		: m_entityManager(*CEntityManager::Get())
+		: m_entityManager(*CDonerECSSystems::Get()->GetEntityManager())
 	{}
 
 	CPrefabManager::~CPrefabManager()
 	{
-		if (CEntityManager::Get())
+		for (auto& pair : m_prefabs)
 		{
-			for (auto& pair : m_prefabs)
-			{
-				m_entityManager.DestroyEntity(&pair.second);
-			}
+			pair.second->Destroy();
 		}
 		m_prefabs.clear();
 	}
@@ -61,12 +59,27 @@ namespace DonerECS
 
 	CHandle CPrefabManager::ClonePrefab(CStrID nameId)
 	{
+		return ClonePrefab(nameId, ECloneMode::ActivateAutomaticallyAfterCreation);
+	}
+
+	CHandle CPrefabManager::ClonePrefab(CStrID nameId, ECloneMode cloneMode)
+	{
 		auto prefabIt = m_prefabs.find(nameId);
 		if (prefabIt != m_prefabs.end())
 		{
 			CEntity* prefab = (*prefabIt).second;
 			CEntity* entity = m_entityManager.CreateEntity();
-			entity->CloneFrom(prefab);
+			if (entity)
+			{
+				entity->CloneFrom(prefab);
+
+				if (cloneMode == ECloneMode::ActivateAutomaticallyAfterCreation)
+				{
+					entity->Init();
+					entity->CheckFirstActivation();
+					entity->Activate();
+				}
+			}
 			return entity;
 		}
 		DECS_ERROR_MSG(EErrorCode::PrefabNotRegistered, "Prefab with nameId %u not registered", nameId);

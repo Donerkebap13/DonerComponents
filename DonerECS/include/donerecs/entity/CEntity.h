@@ -27,8 +27,9 @@
 
 #pragma once
 
+#include <donerecs/Defines.h>
 #include <donerecs/ErrorMessages.h>
-#include <donerecs/common/CECSElement.h>
+#include <donerecs/common/CFactory.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/handle/CHandle.h>
 #include <donerecs/messages/CPostMsg.h>
@@ -41,6 +42,7 @@
 namespace DonerECS
 {
 	class CComponentFactoryManager;
+	class CEntityManager;
 
 	class CEntity : public CECSElement
 	{
@@ -199,47 +201,51 @@ namespace DonerECS
 		}
 
 		template<typename T>
-		void SendMessage(const T& message)
+		void SendMessage(const T& message, ESendMessageType type = ESendMessageType::NonRecursive)
 		{
-			for (CComponent* component : m_components)
+			if (IsActive() && !IsDestroyed())
 			{
-				if (component)
+				for (CComponent* component : m_components)
 				{
-					component->SendMessage(message);
+					if (component)
+					{
+						component->SendMessage(message);
+					}
+				}
+
+				if (type == ESendMessageType::Recursive)
+				{
+					for (CEntity* child : m_children)
+					{
+						if (child)
+						{
+							child->SendMessage(message, type);
+						}
+					}
 				}
 			}
 		}
 
 		template<typename T>
-		void SendMessageRecursive(const T& message)
+		void SendMessageToChildren(const T& message, ESendMessageType type = ESendMessageType::NonRecursive)
 		{
-			SendMessage(message);
-
-			for (CEntity* child : m_children)
+			if (IsActive() && !IsDestroyed())
 			{
-				if (child)
+				for (CEntity* child : m_children)
 				{
-					child->SendMessageRecursive(message);
+					if (child)
+					{
+						child->SendMessage(message, type);
+					}
 				}
 			}
 		}
 
 		template<typename T>
-		void PostMessage(const T& message);
+		void PostMessage(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 
 		template<typename T>
-		void PostMessageRecursive(const T& message)
-		{
-			PostMessage(message);
-
-			for (CEntity* child : m_children)
-			{
-				if (child)
-				{
-					child->PostMessageRecursive(message);
-				}
-			}
-		}
+		void PostMessageToChildren(const T& message, ESendMessageType type = ESendMessageType::NonRecursive);
 
 		void Init();
 		void Destroy();
@@ -263,6 +269,8 @@ namespace DonerECS
 	private:
 		CEntity();
 		~CEntity();
+
+		void DestroyInternal();
 
 		void ActivateFromParent();
 		void ActivateInternal();
@@ -306,6 +314,7 @@ namespace DonerECS
 		std::vector<CComponent*> m_components;
 
 		CComponentFactoryManager& m_componentFactoryManager;
+		CEntityManager& m_entityManager;
 		CTagsManager& m_tagsManager;
 
 		TagsMask m_tags;
@@ -322,11 +331,11 @@ namespace DonerECS
 	// -- CEntityManager
 	// -------------------------
 
-	class CEntityManager : public CSingleton<CEntityManager>, public CFactory<CEntity>
+	class CEntityManager : public CFactory<CEntity>
 	{
+		friend class CDonerECSSystems;
 		friend class CEntity;
 	public:
-		CEntityManager();
 		~CEntityManager() override {}
 
 		template<typename T>
@@ -349,19 +358,53 @@ namespace DonerECS
 
 		CEntity* CreateEntity();
 
-		bool DestroyEntity(CEntity** entity);
-		bool DestroyEntity(CHandle handle);
 
 		void SendPostMsgs();
+		void ExecuteScheduledDestroys();
 
 	private:
+		CEntityManager();
+
+		bool DestroyEntity(CHandle handle);
+		void ScheduleDestroy(CHandle handle);
+
 		std::vector<CPostMessageBase*> m_postMsgs;
+		std::vector<CHandle> m_scheduledDestroys;
 	};
 
 	template<typename T>
-	void CEntity::PostMessage(const T& message)
+	void CEntity::PostMessage(const T& message, ESendMessageType type/* = ESendMessageType::NonRecursive*/)
 	{
-		CEntityManager::Get()->PostMessage(this, message);
+		if (IsActive() && !IsDestroyed())
+		{
+			m_entityManager.PostMessage(this, message);
+
+			if (type == ESendMessageType::Recursive)
+			{
+				for (CEntity* child : m_children)
+				{
+					if (child)
+					{
+						child->PostMessage(message, type);
+					}
+				}
+			}
+		}
+	}
+
+	template<typename T>
+	void CEntity::PostMessageToChildren(const T& message, ESendMessageType type/* = ESendMessageType::NonRecursive*/)
+	{
+		if (IsActive() && !IsDestroyed())
+		{
+			for (CEntity* child : m_children)
+			{
+				if (child)
+				{
+					child->PostMessage(message, type);
+				}
+			}
+		}
 	}
 
 	// -------------------------
@@ -369,14 +412,14 @@ namespace DonerECS
 	// -------------------------
 
 	template<typename T>
-	void CHandle::SendMessage(const T& message)
+	void CHandle::SendMessage(const T& message, ESendMessageType type/* = ESendMessageType::NonRecursive*/)
 	{
 		if (m_elementType == CHandle::EElementType::Entity)
 		{
 			CEntity* entity = *this;
 			if (entity)
 			{
-				entity->SendMessage(message);
+				entity->SendMessage(message, type);
 			}
 		}
 		else if (m_elementType == CHandle::EElementType::Component)
@@ -390,40 +433,40 @@ namespace DonerECS
 	}
 
 	template<typename T>
-	void CHandle::SendMessageRecursive(const T& message)
+	void CHandle::SendMessageToChildren(const T& message, ESendMessageType type/* = ESendMessageType::NonRecursive*/)
 	{
 		if (m_elementType == CHandle::EElementType::Entity)
 		{
 			CEntity* entity = *this;
 			if (entity)
 			{
-				entity->SendMessageRecursive(message);
+				entity->SendMessageToChildren(message, type);
 			}
 		}
 	}
 
 	template<typename T>
-	void CHandle::PostMessage(const T& message)
+	void CHandle::PostMessage(const T& message, ESendMessageType type/* = ESendMessageType::NonRecursive*/)
 	{
 		if (m_elementType == CHandle::EElementType::Entity)
 		{
 			CEntity* entity = *this;
 			if (entity)
 			{
-				entity->PostMessage(message);
+				entity->PostMessage(message, type);
 			}
 		}
 	}
 
 	template<typename T>
-	void CHandle::PostMessageRecursive(const T& message)
+	void CHandle::PostMessageToChildren(const T& message, ESendMessageType type/* = ESendMessageType::NonRecursive*/)
 	{
 		if (m_elementType == CHandle::EElementType::Entity)
 		{
 			CEntity* entity = *this;
 			if (entity)
 			{
-				entity->PostMessageRecursive(message);
+				entity->PostMessageToChildren(message, type);
 			}
 		}
 	}

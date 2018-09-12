@@ -33,6 +33,8 @@ namespace DonerECS
 	{
 	public:
 		template<typename C, typename T>
+		void Execute(C* caller, T& param);
+		template<typename C, typename T>
 		void Execute(C* caller, const T& param);
 	};
 
@@ -40,7 +42,24 @@ namespace DonerECS
 	class CMsgHandler : public CMsgHandlerBase
 	{
 	public:
-		CMsgHandler(void(C::*function)(const T&))
+		CMsgHandler(void(C::*function)(T&))
+			: m_function(function)
+		{}
+
+		void ExecuteFunction(C* caller, T& param)
+		{
+			(caller->*m_function)(param);
+		}
+
+	private:
+		void (C::*m_function)(T&);
+	};
+
+	template<typename C, typename T>
+	class CConstMsgHandler : public CMsgHandlerBase
+	{
+	public:
+		CConstMsgHandler(void(C::*function)(const T&))
 			: m_function(function)
 		{}
 
@@ -54,9 +73,16 @@ namespace DonerECS
 	};
 
 	template<typename C, typename T>
-	void CMsgHandlerBase::Execute(C* caller, const T& param)
+	void CMsgHandlerBase::Execute(C* caller, T& param)
 	{
 		CMsgHandler<C, T>* myself = static_cast<CMsgHandler<C, T>*>(this);
+		myself->ExecuteFunction(caller, param);
+	}
+
+	template<typename C, typename T>
+	void CMsgHandlerBase::Execute(C* caller, const T& param)
+	{
+		CConstMsgHandler<C, T>* myself = static_cast<CConstMsgHandler<C, T>*>(this);
 		myself->ExecuteFunction(caller, param);
 	}
 }

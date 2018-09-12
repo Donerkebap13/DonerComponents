@@ -25,11 +25,13 @@
 //
 ////////////////////////////////////////////////////////////
 
+#include <donerecs/CDonerECSSystems.h>
 #include <donerecs/entity/CEntity.h>
 #include <donerecs/handle/CHandle.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 
 #include <gtest/gtest.h>
+#include <unordered_map>
 
 namespace DonerECS
 {
@@ -43,15 +45,17 @@ namespace DonerECS
 	{
 	public:
 		CEntityHandleTest()
-			: m_entityManager(CEntityManager::CreateInstance())
-			, m_componentFactoryManager(CComponentFactoryManager::CreateInstance())
+			: m_entityManager(nullptr)
+			, m_componentFactoryManager(nullptr)
 		{
+			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
+			m_entityManager = systems.GetEntityManager();
+			m_componentFactoryManager = systems.GetComponentFactoryManager();
 		}
 
 		~CEntityHandleTest()
 		{
-			CEntityManager::DestroyInstance();
-			CComponentFactoryManager::DestroyInstance();
+			CDonerECSSystems::DestroyInstance();
 		}
 
 		CEntityManager *m_entityManager;
@@ -113,7 +117,6 @@ namespace DonerECS
 	TEST_F(CEntityHandleTest, cast_entity_to_handle)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 
 		CHandle entityHandle = entity;
 		EXPECT_EQ(CHandle::EElementType::Entity, entityHandle.m_elementType);
@@ -126,11 +129,13 @@ namespace DonerECS
 	TEST_F(CEntityHandleTest, invalidate_handle)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 
 		CHandle entityHandle = entity;
 		EXPECT_TRUE(static_cast<bool>(entityHandle));
-		m_entityManager->DestroyEntity(&entity);
+
+		entity->Destroy();
+		m_entityManager->ExecuteScheduledDestroys();
+
 		EXPECT_FALSE(static_cast<bool>(entityHandle));
 	}
 
@@ -152,14 +157,40 @@ namespace DonerECS
 	TEST_F(CEntityHandleTest, invalid_cast_to_handle_after_destroy)
 	{
 		CEntity* entity = m_entityManager->CreateEntity();
-		EXPECT_NE(nullptr, entity);
 		CHandle handle = entity;
-		EXPECT_TRUE(static_cast<bool>(handle));
 
-		m_entityManager->DestroyEntity(&entity);
+		entity->Destroy();
+		m_entityManager->ExecuteScheduledDestroys();
 
 		EXPECT_FALSE(static_cast<bool>(handle));
 		entity = handle;
 		EXPECT_EQ(nullptr, entity);
+	}
+
+	TEST_F(CEntityHandleTest, destroy_entity_through_handle)
+	{
+		CEntity* entity = m_entityManager->CreateEntity();
+		CHandle handle = entity;
+
+		handle.Destroy();
+		EXPECT_TRUE(entity->IsDestroyed());
+		EXPECT_FALSE(static_cast<bool>(handle));
+	}
+
+	TEST_F(CEntityHandleTest, handle_as_valid_map_index)
+	{
+		static constexpr int testValue = 1337;
+
+		CEntity* entity = m_entityManager->CreateEntity();
+		CHandle handle = entity;
+
+		std::unordered_map<CHandle, int> map;
+		map[handle] = testValue;
+
+		auto it = map.find(handle);
+		ASSERT_TRUE(it != map.end());
+
+		int value = it->second;
+		ASSERT_EQ(testValue, value);
 	}
 }

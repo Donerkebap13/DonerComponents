@@ -33,16 +33,26 @@
 #include <donerecs/messages/CMsgHandler.h>
 #include <donerecs/utils/hash/CTypeHasher.h>
 
+#include <donerserializer/ISerializable.h>
+
+#include <rapidjson/document.h>
+
 #include <unordered_map>
+
+#define DECS_DECLARE_COMPONENT_AS_SERIALIZABLE(class_name)                     \
+  friend struct SDonerReflectionClassProperties<class_name>;                   \
+public:                                                                        \
+  void ParseAtts(const rapidjson::Value &atts) override;
+
+#define DECS_SERIALIZABLE_COMPONENT_IMPL(base_class)                           \
+void base_class::ParseAtts(const rapidjson::Value &atts)					   \
+{                                                                              \
+    DonerSerializer::CJsonDeserializer::Deserialize(*this, atts);			   \
+}
 
 namespace DonerECS
 {
-	namespace Json
-	{
-		class Value;
-	}
-
-	class CComponent : public CECSElement
+	class CComponent : public CECSElement, DonerSerializer::ISerializable
 	{
 		template<class CComponent> friend class CFactory;
 	public:
@@ -54,7 +64,6 @@ namespace DonerECS
 
 		operator CHandle();
 		const CComponent* operator=(const CHandle& rhs);
-        const CComponent& operator=(const CComponent& rhs);
 
 		void SetOwner(CHandle parent) { m_owner = parent; }
 		CHandle GetOwner() const { return m_owner; }
@@ -82,7 +91,7 @@ namespace DonerECS
 		bool IsActive() const { return m_numDeactivations == 0; }
 		bool IsDestroyed() const { return m_destroyed; }
 
-		virtual void ParseAtts(const Json::Value& /*atts*/) {}
+		virtual void ParseAtts(const rapidjson::Value& /*atts*/) {}
 
 		bool GetIsInitiallyActive() const { return m_initiallyActive; }
 		void SetIsInitiallyActive(bool initiallyActive) { m_initiallyActive = initiallyActive; }
@@ -91,6 +100,9 @@ namespace DonerECS
 
 	protected:
 		CComponent();
+		CComponent(CComponent& rhs) = default;
+		CComponent(CComponent&& rhs) = default;
+		const CComponent& operator=(const CComponent& rhs);
 
 		void CheckFirstActivationInternal();
 
@@ -101,12 +113,26 @@ namespace DonerECS
 		virtual void DoDeactivate() {}
 
 		template<typename C, typename T>
-		void RegisterMessage(void(C::*function)(const T& param))
+		void RegisterMessage(void(C::*function)(T& param))
 		{
 			CTypeHasher::HashId id = CTypeHasher::Hash<T>();
 			if (m_messages.find(id) == m_messages.end())
 			{
 				m_messages[id] = new CMsgHandler<C, T>(function);
+			}
+			else
+			{
+				DECS_WARNING_MSG(EErrorCode::MessageAlreadyRegistered, "The message is already registered for this component");
+			}
+		}
+
+		template<typename C, typename T>
+		void RegisterMessage(void(C::*function)(const T& param))
+		{
+			CTypeHasher::HashId id = CTypeHasher::Hash<T>();
+			if (m_messages.find(id) == m_messages.end())
+			{
+				m_messages[id] = new CConstMsgHandler<C, T>(function);
 			}
 			else
 			{
