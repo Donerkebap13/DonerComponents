@@ -349,7 +349,7 @@ Prefab2.json
 {
 	"root": {
 		"name": "Prefab2",
-		"prefab": "Prefab1"
+		"prefab": "Prefab1",
 		"components": [
         	{
 				"name": "sprite",
@@ -364,7 +364,7 @@ Scene.json
 {
 	"root": {
 		"name": "root",
-		"prefab": "Prefab2"
+		"prefab": "Prefab2",
 		"components": [
         	{
 				"name": "comp_location",
