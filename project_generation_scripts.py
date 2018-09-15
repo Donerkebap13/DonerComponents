@@ -132,14 +132,15 @@ def generate_scripts_for_platform(platform, generate_tests, max_entities, max_ta
 def generate_cmake_call(configuration, platform, generate_tests, max_entities, max_tags, xcode):
     tests_flags = ""
     if(generate_tests):
-        tests_flags = "-DDECS_ENABLE_TESTS=1"
+        tests_flags = "-DDC_ENABLE_TESTS=1"
 
+    common_cmake_flags = ""
     common_cmake_flags = ""
     platform_flags = ""
     if platform == "darwin" and xcode:
         platform_flags = "-G Xcode"
 
-    root_cmake_path = path_to_os("{}/DonerECS".format(app_folder))
+    root_cmake_path = path_to_os("{}/DonerComponents".format(app_folder))
 
     return 'cmake "{}" -DCMAKE_CONFIGURATION_TYPES="{}" {} {} {} -DMAX_ENTITIES={} -DMAX_TAGS={}'.format(root_cmake_path, configuration, common_cmake_flags, platform_flags, tests_flags, max_entities, max_tags).replace("  ", " ").replace("  ", " ")
 
