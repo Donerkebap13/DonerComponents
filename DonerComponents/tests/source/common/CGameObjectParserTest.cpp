@@ -43,7 +43,7 @@ namespace GameObjectParserTestInternal
 {
 	class CCompFoo : public DonerComponents::CComponent
 	{
-		DC_DECLARE_COMPONENT_AS_SERIALIZABLE(CCompFoo)
+		DONER_DECLARE_COMPONENT_AS_SERIALIZABLE(CCompFoo)
 	public:
 		CCompFoo() : m_a(-1), m_b(-1) {}
 
@@ -110,7 +110,7 @@ DONER_DEFINE_REFLECTION_DATA(GameObjectParserTestInternal::CCompFoo,
 							DONER_ADD_NAMED_VAR_INFO(m_b, "b")
 )
 
-DC_SERIALIZABLE_COMPONENT_IMPL(::GameObjectParserTestInternal::CCompFoo)
+DONER_SERIALIZABLE_COMPONENT_IMPL(::GameObjectParserTestInternal::CCompFoo)
 
 namespace DonerComponents
 {

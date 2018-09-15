@@ -53,7 +53,7 @@ namespace DeserializationTestInternal
 
 	class CCompFoo : public DonerComponents::CComponent
 	{
-		DC_DECLARE_COMPONENT_AS_SERIALIZABLE(CCompFoo)
+		DONER_DECLARE_COMPONENT_AS_SERIALIZABLE(CCompFoo)
 	public:
 		CCompFoo()
 			: m_int(INT_DEFAULT_VALUE)
@@ -101,7 +101,7 @@ DONER_DEFINE_REFLECTION_DATA(::DeserializationTestInternal::CCompFoo,
 							DONER_ADD_NAMED_VAR_INFO(m_stringVector, "string_vector")
 )
 
-DC_SERIALIZABLE_COMPONENT_IMPL(::DeserializationTestInternal::CCompFoo)
+DONER_SERIALIZABLE_COMPONENT_IMPL(::DeserializationTestInternal::CCompFoo)
 
 namespace DonerComponents
 {
