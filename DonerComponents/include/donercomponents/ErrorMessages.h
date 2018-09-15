@@ -41,7 +41,7 @@ namespace DonerComponents
 		JSONError,
 		JSONBadFormat,
 		InvalidSceneParsingType,
-		NoMoreEntitiesAvailable,
+		NoMoreGameObjectsAvailable,
 		NoMoreComponentsAvailable,
 		PrefabNotRegistered,
 		PrefabAlreadyRegistered,

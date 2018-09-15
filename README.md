@@ -2,23 +2,21 @@
 
 [![Release version](https://img.shields.io/badge/release-v1.0.0-blue.svg)](https://github.com/Donerkebap13/DonerComponents/releases/tag/1.0.0) [![Build Status](https://travis-ci.org/Donerkebap13/DonerComponents.svg?branch=master)](https://travis-ci.org/Donerkebap13/DonerComponents) [![Build status](https://ci.appveyor.com/api/projects/status/3l2174mt6qm7627w/branch/master?svg=true)](https://ci.appveyor.com/project/Donerkebap13/DonerComponents/branch/master) [![Coverage Status](https://coveralls.io/repos/github/Donerkebap13/DonerComponents/badge.svg?branch=master&service=github)](https://coveralls.io/github/Donerkebap13/DonerComponents?branch=master&service=github)
 
-## DonerComponents - A Tweaked GameObject-Component System
+## DonerComponents
 
-DonerComponents is a framework that uses C++14 features to provide a **Unity-like** gameObject-component System.
+DonerComponents is a C++14 Component-Based Game Object Model framework for developing videogames.
+
+If you are not familiar with this concept, I recommend you to have a look to the [Example Project](#example) or the  [Tutorial](#tutorial)  and give it a try!
 
 ## Features
-- Support for **complex gameObject hierarchies**, with parent/children relationships, activation, deactivation etc. 
-- A **Handle System** to determine if any gameObject/component is still valid or has been destroyed already.
-- Easy **component creation/registration** which can be easily added to your entities on the fly.
-- **Messages** between entities, which are forwarded also to their children and their components.
-- **Tags system** to add specific attributes to your entities.
+- Support for **complex GameObject hierarchies**, with parent/children relationships, activation, deactivation etc. 
+- A **Handle System** to determine if any GameObject/component is still valid or has been destroyed already.
+- Easy **component creation/registration** which can be easily added to your GameObjects on the fly.
+- **Messages** between GameObjects, which are forwarded also to their children and their components.
+- **Tags system** to add specific attributes to your GameObjects.
 - **Prefab system** to reuse and compose more complex hierarchies. It supports **Nested Prefabs**.
-- A **JSON parsing system** to load your prefabs/entities/scenes from disk.
+- A **JSON parsing system** to load your prefabs/GameObjects/scenes from disk.
 - **200+ Unit Tests ensures that everything works as expected.**
-
-## Disclaimer
-**DonerComponents doesn't pretend to be a cache friendly GameObject-Component System.** It's not based on Systems either. In DonerComponents each component has it's own `Update()` method, and also others such as `Init()`, `Activate()`, `Deactivate()` and so on. The way of sharing information around is through messages. 
-If you are not familiar with this way of working, I recommend you to have a look to the [Example Project](#example) or the  [Tutorial](#tutorial)  and give it a try!
 
 ## Downloading
 
@@ -29,6 +27,7 @@ Alternatively, you can check out the current development version with:
 ```
 git clone https://github.com/Donerkebap13/DonerComponents.git
 ```
+Remember to run  ``git submodule update --init --recursive`` afterwards.
 
 ## Contact
 
@@ -38,7 +37,7 @@ Also, if you have any suggestion or you find any bug, please don't hesitate to [
 ## Example
 [DonerComponents_Asteroids_Example](https://github.com/Donerkebap13/DonerComponents_Asteroids_Example) is an **example project** I've created in order to show how to use **DonerComponents**. It's a really simple Asteroids-wannabe clone. My intention with that project is to show all the features the framework supports right now, such as:
 - GameObject hierarchy
-- Messaging between entities
+- Messaging between GameObjects
 - Prefab system
 - GameObject parsing from JSON
 - Component creation
@@ -48,7 +47,7 @@ Also, if you have any suggestion or you find any bug, please don't hesitate to [
 Here I'll try to illustrate the basic usage of the main systems of DonerComponents. After reading this you'll have the basic knowledge on how things are organized and how they can be used. For a deeper understanding I recommend you to have a look to the [Example Project.](#example)
 
 ### Initialization
-``CDonerComponentsSystems`` is a **singleton**that initializes and gives access to all **DonerComponents** different systems.
+``CDonerComponentsSystems`` is a **singleton** that initializes and gives access to all **DonerComponents** different systems.
 It should be initialized:
  ```c++
 #include <DonerComponents/CDonerComponentsSystems.h>
@@ -66,7 +65,7 @@ And destroyed:
 DonerComponents::CDonerComponentsSystems::DestroyInstance();
 ```
 
-### Entities
+### GameObjects
 `DonerComponents::CGameObject` is DonerComponents's main actor. This class can contain different `DonerComponents::CComponent` that defines its behavior. It also has information about its parent and its children. It can also receive POD messages and forward them to its components and its children. Last but not least, it can also be tagged.
 
 Creating a new gameObject is as simple as:
@@ -76,7 +75,7 @@ Creating a new gameObject is as simple as:
 DonerComponents::CGameObjectManager* gameObjectManager = DonerComponents::CDonerComponentsSystems::Get()->GetGameObjectManager();
 DonerComponents::CGameObject *gameObject = gameObjectManager->GetNewElement();
 ```
-`GetNewElement();` will return a valid `DonerComponents::CGameObject` as long as it hasn't run out of entities to generate. By default, DonerComponents can have 4096 entities alive at the same time. This value is modifiable through the compiler flag `-DMAX_ENTITIES=4096` with a **maximum of  8.192 entities.**
+`GetNewElement();` will return a valid `DonerComponents::CGameObject` as long as it hasn't run out of GameObjects to generate. By default, DonerComponents can have 4096 GameObjects alive at the same time. This value is modifiable through the compiler flag `-DMAX_GAME_OBJECTS=4096` with a **maximum of  8.192 GameObjects.**
 
 #### Prefabs
 DonerComponents supports the definition of prefabs, so the user can define a specific gameObject hierarchy for reusing it wherever it's needed:
@@ -114,7 +113,7 @@ To register this component in the system, so any gameObject can use it, we need 
 static constexpr int amountOfFooComponentsAvailable = 512;
 ADD_COMPONENT_FACTORY("foo", CCompFoo, amountOfFooComponentsAvailable);
 ```
-After initializing the `DonerComponents::CDonerComponentsSystems` we can start registering our components into the system using the macro `ADD_COMPONENT_FACTORY`. The string it receives is to identify the component while [parsing our entities from a **JSON file**](https://github.com/Donerkebap13/DonerComponents/tree/feature/DonerComponents-asteroids-development#parsing-a-scene-from-a-json-file). The last parameters is how many components will be available. As with the entities, **there's a maximum of  8.192 components** of the same kind alive at the same time.
+After initializing the `DonerComponents::CDonerComponentsSystems` we can start registering our components into the system using the macro `ADD_COMPONENT_FACTORY`. The string it receives is to identify the component while [parsing our GameObjects from a **JSON file**](https://github.com/Donerkebap13/DonerComponents/tree/feature/DonerComponents-asteroids-development#parsing-a-scene-from-a-json-file). The last parameters is how many components will be available. As with the GameObjects, **there's a maximum of  8.192 components** of the same kind alive at the same time.
 
 #### Adding a Component to an GameObject
 Once a componet is registered into the system, it can be added to an gameObject in two different ways:
@@ -173,7 +172,7 @@ After exposing ``m_dummy1`` and ``m_dummy2``, we can define their values in **JS
 For a more in-depth look on how to read from **JSON** check **[this](https://github.com/Donerkebap13/DonerComponents/tree/feature/DonerComponents-asteroids-development#parsing-a-scene-from-a-json-file)**.
 
 ### Messages
-DonerComponents supports a message system to interact between different entities and components. **A message could be any Struct/Class defined by the user.** Usually it'll only contain data, no logic, but there's no limitation to this. 
+DonerComponents supports a message system to interact between different GameObjects and components. **A message could be any Struct/Class defined by the user.** Usually it'll only contain data, no logic, but there's no limitation to this. 
 This is how a `DonerComponents::CComponent` can listen to a specific message:
 ```c++
 // Somewhere in your code
@@ -208,10 +207,10 @@ gameObject->SendMessageToChildren(message, DonerComponents::ESendMessageType::Re
 ```
 ``SendMessage`` sends the message right away, in the same frame. If you want to delay sending the message until the end of the frame, use ``PostMessage`` instead.
 
-Last but not least, if you want to send a message to **ALL** living entities, you can use ``BroadcastMessage``:
+Last but not least, if you want to send a message to **ALL** living GameObjects, you can use ``BroadcastMessage``:
 ```c++
 SDummyMessage message(2, 3);
-// This will propagate the message to all entities alive.
+// This will propagate the message to all GameObjects alive.
 gameObjectManager->BroadcastMessage(message); 
 ```
 
@@ -231,7 +230,7 @@ CHandle gameObjectHandle = m_gameObjectManager->GetNewElement();
 if (gameObjectHandle) {
 	// CGameObjectManager has return a valid CGameObject
 } else {
-	// CGameObjectManager has run out of CEntities
+	// CGameObjectManager has run out of CGameObjects
 }
 CGameObject* gameObject = gameObjectHandle;
 // gameObject will be valid as gameObjectHandle points to an alive gameObject
@@ -248,7 +247,7 @@ handle.SendMessage(message);
 
 ```
 ### Tags
-Tags are a way of adding more information to your entities, so then you can filter them, send messages only to entities with specific tags etc.
+Tags are a way of adding more information to your GameObjects, so then you can filter them, send messages only to GameObjects with specific tags etc.
 There are two ways of adding tags to the system, so you can use them later.
 First one, declaring them directly in code:
 ```c++
@@ -271,7 +270,7 @@ The format of the tags.json file is something similar to this:
 DonerComponents supports loading from disk using JSON thanks to **[DonerSerializer](https://github.com/Donerkebap13/DonerSerializer)**, so there's a way fo creating prefabs or scenes that can be stored as assets instead of building them from scratch in code every time we run our application.
 The basic usage is as follows:
 ```c++
-#include <DonerComponents/entities/CGameObjectParser.h>
+#include <DonerComponents/GameObjects/CGameObjectParser.h>
 
 DonerComponents::CGameObjectParser parser;
 CGameObject* gameObject = parser.ParseSceneFromFile("path/to/your/scene.json");
@@ -310,7 +309,7 @@ The format of a scene.json file is something similar to this:
 #### Parsing a prefab
 If, instead of parsing a scene we want to parse a **prefab** to register it automatically into `DonerComponents::CPrefabManager`, we just need to call ``ParsePrefabFromFile``:
 ```c++
-#include <DonerComponents/entities/CGameObjectParser.h>
+#include <DonerComponents/GameObjects/CGameObjectParser.h>
 
 DonerComponents::CGameObjectParser parser;
 CGameObject* gameObject = parser.ParsePrefabFromFile("path/to/your/prefab.json");

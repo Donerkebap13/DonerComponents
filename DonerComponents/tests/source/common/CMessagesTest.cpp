@@ -373,7 +373,7 @@ namespace DonerComponents
 		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, two_different_entities_receives_same_message_through_BroadcastMessage)
+	TEST_F(CMessagesTest, two_different_game_objects_receives_same_message_through_BroadcastMessage)
 	{
 		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
 		CGameObject* gameObject2 = m_gameObjectManager->CreateGameObject();

@@ -99,7 +99,7 @@ cd %root%
 """
 
 
-def generate_scripts_for_platform(platform, generate_tests, max_entities, max_tags, xcode):
+def generate_scripts_for_platform(platform, generate_tests, max_game_objects, max_tags, xcode):
     script_folder = path_to_os("{}/generate_solution_scripts/{}".format(app_folder, platform))
 
     file_extension = "sh"
@@ -119,8 +119,8 @@ def generate_scripts_for_platform(platform, generate_tests, max_entities, max_ta
 
     create_folder_if_not_exists(script_folder)
 
-    cmake_call_debug = generate_cmake_call("Debug", platform, generate_tests, max_entities, max_tags, xcode)
-    cmake_call_release = generate_cmake_call("Release", platform, generate_tests, max_entities, max_tags, xcode)
+    cmake_call_debug = generate_cmake_call("Debug", platform, generate_tests, max_game_objects, max_tags, xcode)
+    cmake_call_release = generate_cmake_call("Release", platform, generate_tests, max_game_objects, max_tags, xcode)
 
     generate_templated_file(generate_script_file_debug, generate_template, project_folder_path_debug, cmake_call_debug)
     generate_templated_file(generate_script_file_release, generate_template, project_folder_path_release, cmake_call_release)
@@ -129,7 +129,7 @@ def generate_scripts_for_platform(platform, generate_tests, max_entities, max_ta
     generate_templated_file(update_script_file_release, update_template, project_folder_path_release, cmake_call_release)
 
 
-def generate_cmake_call(configuration, platform, generate_tests, max_entities, max_tags, xcode):
+def generate_cmake_call(configuration, platform, generate_tests, max_game_objects, max_tags, xcode):
     tests_flags = ""
     if(generate_tests):
         tests_flags = "-DDC_ENABLE_TESTS=1"
@@ -142,7 +142,7 @@ def generate_cmake_call(configuration, platform, generate_tests, max_entities, m
 
     root_cmake_path = path_to_os("{}/DonerComponents".format(app_folder))
 
-    return 'cmake "{}" -DCMAKE_CONFIGURATION_TYPES="{}" {} {} {} -DMAX_ENTITIES={} -DMAX_TAGS={}'.format(root_cmake_path, configuration, common_cmake_flags, platform_flags, tests_flags, max_entities, max_tags).replace("  ", " ").replace("  ", " ")
+    return 'cmake "{}" -DCMAKE_CONFIGURATION_TYPES="{}" {} {} {} -DMAX_GAME_OBJECTS={} -DMAX_TAGS={}'.format(root_cmake_path, configuration, common_cmake_flags, platform_flags, tests_flags, max_game_objects, max_tags).replace("  ", " ").replace("  ", " ")
 
 
 def generate_templated_file(script_file_path, template, project_folder_path, cmake_call):
@@ -156,26 +156,26 @@ def generate_templated_file(script_file_path, template, project_folder_path, cma
 def read_parameters():
     parser = argparse.ArgumentParser()
     parser.add_argument('--generate-tests', action='store_true', help="Generate Tests project", dest='generate_tests')
-    parser.add_argument('--max-entities', help="Max number of entities. Maximum allowed is 8192. Default is 4096", default="4096", dest='max_entities')
+    parser.add_argument('--max-game-objects', help="Max number of game_objects. Maximum allowed is 8192. Default is 4096", default="4096", dest='max_game_objects')
     parser.add_argument('--max-tags', help="Max number of registrable tags. Rounded to highest power of two. Default is 64", default="64", dest='max_tags')
     parser.add_argument('--all-platforms', action='store_true', help="Generate scripts for all supported platforms", dest='all_platforms')
     parser.add_argument('--xcode', action='store_true', help="Generate OSX projects using XCode", dest='xcode')
 
     args = parser.parse_args()
 
-    return args.generate_tests, args.max_entities, args.max_tags, args.all_platforms, args.xcode
+    return args.generate_tests, args.max_game_objects, args.max_tags, args.all_platforms, args.xcode
 
 
-def generate_scripts(generate_tests, max_entities, max_tags, all_platforms, xcode):
+def generate_scripts(generate_tests, max_game_objects, max_tags, all_platforms, xcode):
     if all_platforms:
         for platform in VALID_PLATFORMS:
-            generate_scripts_for_platform(platform, generate_tests, max_entities, max_tags, xcode)
+            generate_scripts_for_platform(platform, generate_tests, max_game_objects, max_tags, xcode)
     elif sys.platform in VALID_PLATFORMS:
-        generate_scripts_for_platform(sys.platform, generate_tests, max_entities, max_tags, xcode)
+        generate_scripts_for_platform(sys.platform, generate_tests, max_game_objects, max_tags, xcode)
     else:
         message_and_die("You're working under an unsupported OS! Valid OS are {}".format(VALID_PLATFORMS))
 
 
 if __name__ == '__main__':
-    generate_tests, max_entities, max_tags, all_platforms, xcode = read_parameters()
-    generate_scripts(generate_tests, max_entities, max_tags, all_platforms, xcode)
+    generate_tests, max_game_objects, max_tags, all_platforms, xcode = read_parameters()
+    generate_scripts(generate_tests, max_game_objects, max_tags, all_platforms, xcode)

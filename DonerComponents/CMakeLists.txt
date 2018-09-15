@@ -61,10 +61,10 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 set_target_properties ("${project_name}" PROPERTIES FOLDER "${ide_group}")
 
-if(NOT DEFINED MAX_ENTITIES)
-	set(MAX_ENTITIES 4096)
+if(NOT DEFINED MAX_GAME_OBJECTS)
+	set(MAX_GAME_OBJECTS 4096)
 endif()
-target_compile_definitions("${project_name}" PUBLIC -DMAX_ENTITIES=${MAX_ENTITIES})
+target_compile_definitions("${project_name}" PUBLIC -DMAX_GAME_OBJECTS=${MAX_GAME_OBJECTS})
 
 if(NOT DEFINED MAX_TAGS)	
 	set(MAX_TAGS 64)

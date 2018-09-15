@@ -405,7 +405,7 @@ namespace DonerComponents
 					}
 					else
 					{
-						assert(false || "CGameObjectManager doesn't have enough free entities to perform a full copy");
+						assert(false || "CGameObjectManager doesn't have enough free GameObjects to perform a full copy");
 					}
 				}
 			}
@@ -417,7 +417,7 @@ namespace DonerComponents
 	// -------------------------
 
 	CGameObjectManager::CGameObjectManager()
-		: CFactory(MAX_ENTITIES)
+		: CFactory(MAX_GAME_OBJECTS)
 	{}
 
 
@@ -426,7 +426,7 @@ namespace DonerComponents
 		CGameObject* gameObject = GetNewElement();
 		if (!gameObject)
 		{
-			DC_ERROR_MSG(EErrorCode::NoMoreEntitiesAvailable, "No more entities available for creation at this point");
+			DC_ERROR_MSG(EErrorCode::NoMoreGameObjectsAvailable, "No more GameObjects available for creation at this point");
 		}
 		return gameObject;
 	}

@@ -84,7 +84,7 @@ namespace DonerComponents
 		// Updates all registered components
 		m_componentFactoryManager->Update(dt);
 
-		// Destroys pending entities & components
+		// Destroys pending GameObjects & components
 		m_componentFactoryManager->ExecuteScheduledDestroys();
 		m_gameObjectManager->ExecuteScheduledDestroys();
 
