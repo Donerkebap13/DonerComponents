@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// DonerECS - A Tweaked Entity-Component System
+// DonerECS - A Tweaked GameObject-Component System
 // Copyright(c) 2017 Donerkebap13
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -42,21 +42,21 @@ namespace DonerECS
 	class CPostMessage : public CPostMessageBase
 	{
 	public:
-		CPostMessage(CHandle entity, const T& messageData)
-			: m_entity(entity)
+		CPostMessage(CHandle gameObject, const T& messageData)
+			: m_gameObject(gameObject)
 			, m_messageData(messageData)
 		{}
 
 		void SendMessage() override
 		{
-			if (m_entity)
+			if (m_gameObject)
 			{
-				m_entity.SendMessage(m_messageData);
+				m_gameObject.SendMessage(m_messageData);
 			}
 		}
 
 	private:
-		CHandle m_entity;
+		CHandle m_gameObject;
 		T m_messageData;
 	};
 }

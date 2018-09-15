@@ -418,7 +418,7 @@ class ParameterizedTestCaseInfoBase {
 
   // Base part of test case name for display purposes.
   virtual const string& GetTestCaseName() const = 0;
-  // Test case id to verify identity.
+  // Test case id to verify idgameObject.
   virtual TypeId GetTestCaseTypeId() const = 0;
   // UnitTest class invokes this method to register tests in this
   // test case right before running them in RUN_ALL_TESTS macro.
@@ -455,7 +455,7 @@ class ParameterizedTestCaseInfo : public ParameterizedTestCaseInfoBase {
 
   // Test case base name for display purposes.
   virtual const string& GetTestCaseName() const { return test_case_name_; }
-  // Test case id to verify identity.
+  // Test case id to verify idgameObject.
   virtual TypeId GetTestCaseTypeId() const { return GetTypeId<TestCase>(); }
   // TEST_P macro uses AddTestPattern() to record information
   // about a single test in a LocalTestInfo structure.

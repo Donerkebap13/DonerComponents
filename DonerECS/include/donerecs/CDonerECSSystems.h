@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// DonerECS - A Tweaked Entity-Component System
+// DonerECS - A Tweaked GameObject-Component System
 // Copyright(c) 2017 Donerkebap13
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -32,7 +32,7 @@
 namespace DonerECS
 {
 	class CComponentFactoryManager;
-	class CEntityManager;
+	class CGameObjectManager;
 	class CTagsManager;
 	class CPrefabManager;
 
@@ -47,13 +47,13 @@ namespace DonerECS
 		void Update(float dt);
 
 		CComponentFactoryManager* GetComponentFactoryManager();
-		CEntityManager* GetEntityManager();
+		CGameObjectManager* GetGameObjectManager();
 		CTagsManager* GetTagsManager();
 		CPrefabManager* GetPrefabManager();
 
 	private:
 		CComponentFactoryManager* m_componentFactoryManager;
-		CEntityManager* m_entityManager;
+		CGameObjectManager* m_gameObjectManager;
 		CTagsManager* m_tagsManager;
 		CPrefabManager* m_prefabManager;
 

@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// DonerECS - A Tweaked Entity-Component System
+// DonerECS - A Tweaked GameObject-Component System
 // Copyright(c) 2017 Donerkebap13
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,7 +28,7 @@
 #include <donerecs/CDonerECSSystems.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
-#include <donerecs/entity/CEntity.h>
+#include <donerecs/gameObject/CGameObject.h>
 #include <donerecs/handle/CHandle.h>
 
 #include <gtest/gtest.h>
@@ -111,11 +111,11 @@ namespace DonerECS
 	public:
 		CMessagesTest()
 			: m_componentFactoryManager(nullptr)
-			, m_entityManager(nullptr)
+			, m_gameObjectManager(nullptr)
 		{
 			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
 			m_componentFactoryManager = systems.GetComponentFactoryManager();
-			m_entityManager = systems.GetEntityManager();
+			m_gameObjectManager = systems.GetGameObjectManager();
 
 			ADD_COMPONENT_FACTORY("foo", MessagesTestInternal::CCompFoo, 2);
 			ADD_COMPONENT_FACTORY("bar", MessagesTestInternal::CCompBar, 2);
@@ -127,7 +127,7 @@ namespace DonerECS
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;
-		CEntityManager *m_entityManager;
+		CGameObjectManager *m_gameObjectManager;
 	};
 
 	TEST_F(CMessagesTest, component_receives_registered_sendMessage)
@@ -170,526 +170,526 @@ namespace DonerECS
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, entity_with_component_receives_message)
+	TEST_F(CMessagesTest, gameObject_with_component_receives_message)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->SendMessage(message);
+		gameObject->SendMessage(message);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, entity_with_component_receives_message_through_handle)
+	TEST_F(CMessagesTest, gameObject_with_component_receives_message_through_handle)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		CHandle entityHandle = entity;
-		entityHandle.SendMessage(message);
+		CHandle gameObjectHandle = gameObject;
+		gameObjectHandle.SendMessage(message);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, not_initialized_entity_with_component_dont_receives_message)
+	TEST_F(CMessagesTest, not_initialized_gameObject_with_component_dont_receives_message)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->SendMessage(message);
+		gameObject->SendMessage(message);
 		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, not_active_entity_with_component_doesnt_receives_message)
+	TEST_F(CMessagesTest, not_active_gameObject_with_component_doesnt_receives_message)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
+		gameObject->Init();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->SendMessage(message);
+		gameObject->SendMessage(message);
 		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, two_different_components_in_same_entity_receives_same_message)
+	TEST_F(CMessagesTest, two_different_components_in_same_gameObject_receives_same_message)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
-		MessagesTestInternal::CCompBar* compBar = entity->AddComponent<MessagesTestInternal::CCompBar>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
+		MessagesTestInternal::CCompBar* compBar = gameObject->AddComponent<MessagesTestInternal::CCompBar>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		EXPECT_EQ(0, compBar->m_bar);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->SendMessage(message);
+		gameObject->SendMessage(message);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compBar->m_bar);
 	}
 
 	TEST_F(CMessagesTest, component_can_recive_same_message_multiple_times)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompBar* compBar = entity->AddComponent<MessagesTestInternal::CCompBar>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompBar* compBar = gameObject->AddComponent<MessagesTestInternal::CCompBar>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compBar->m_bar);
 		for (int i = 1; i <= MessagesTestInternal::LOOP_COUNT; ++i)
 		{
 			MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-			entity->SendMessage(message);
+			gameObject->SendMessage(message);
 			EXPECT_EQ(MessagesTestInternal::TEST_VALUE * i, compBar->m_bar);
 		}
 	}
 
-	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_SendMessageToChildren)
+	TEST_F(CMessagesTest, child_gameObject_with_component_receives_message_with_SendMessageToChildren)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->SendMessageToChildren(message);
+		gameObject->SendMessageToChildren(message);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, parent_entity_with_component_doesnt_receive_message_with_SendMessageToChildren)
+	TEST_F(CMessagesTest, parent_gameObject_with_component_doesnt_receive_message_with_SendMessageToChildren)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo1 = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo1 = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		EXPECT_EQ(0, compFoo1->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->SendMessageToChildren(message);
+		gameObject->SendMessageToChildren(message);
 		EXPECT_EQ(0, compFoo->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo1->m_foo);
 	}
 
-	TEST_F(CMessagesTest, child_of_child_entity_with_different_components_receives_message_with_SendMessageToChildren_recursive)
+	TEST_F(CMessagesTest, child_of_child_gameObject_with_different_components_receives_message_with_SendMessageToChildren_recursive)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo0 = entity->AddComponent<MessagesTestInternal::CCompFoo>();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
-		CEntity* entity11 = m_entityManager->CreateEntity();
-		entity1->AddChild(entity11);
-		MessagesTestInternal::CCompBar* compBar = entity11->AddComponent<MessagesTestInternal::CCompBar>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo0 = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject11 = m_gameObjectManager->CreateGameObject();
+		gameObject1->AddChild(gameObject11);
+		MessagesTestInternal::CCompBar* compBar = gameObject11->AddComponent<MessagesTestInternal::CCompBar>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(0, compFoo->m_foo);
 		EXPECT_EQ(0, compBar->m_bar);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->SendMessageToChildren(message, ESendMessageType::Recursive);
+		gameObject->SendMessageToChildren(message, ESendMessageType::Recursive);
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compBar->m_bar);
 	}
 
-	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_SendMessage_recursive_through_handle)
+	TEST_F(CMessagesTest, child_gameObject_with_component_receives_message_with_SendMessage_recursive_through_handle)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo0 = entity->AddComponent<MessagesTestInternal::CCompFoo>();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo0 = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		CHandle entityHandle = entity;
-		entityHandle.SendMessage(message, ESendMessageType::Recursive);
+		CHandle gameObjectHandle = gameObject;
+		gameObjectHandle.SendMessage(message, ESendMessageType::Recursive);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo0->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_SendMessageToChildren_recursive_through_handle)
+	TEST_F(CMessagesTest, child_gameObject_with_component_receives_message_with_SendMessageToChildren_recursive_through_handle)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo0 = entity->AddComponent<MessagesTestInternal::CCompFoo>();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo0 = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		CHandle entityHandle = entity;
-		entityHandle.SendMessageToChildren(message, ESendMessageType::Recursive);
+		CHandle gameObjectHandle = gameObject;
+		gameObjectHandle.SendMessageToChildren(message, ESendMessageType::Recursive);
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
 	TEST_F(CMessagesTest, inactive_child_doesnt_receives_message)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
-		entity1->Deactivate();
+		gameObject->Init();
+		gameObject->Activate();
+		gameObject1->Deactivate();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->SendMessage(message, ESendMessageType::Recursive);
+		gameObject->SendMessage(message, ESendMessageType::Recursive);
 		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
 	TEST_F(CMessagesTest, two_different_entities_receives_same_message_through_BroadcastMessage)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		CEntity* entity2 = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
-		MessagesTestInternal::CCompBar* compBar = entity2->AddComponent<MessagesTestInternal::CCompBar>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		CGameObject* gameObject2 = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
+		MessagesTestInternal::CCompBar* compBar = gameObject2->AddComponent<MessagesTestInternal::CCompBar>();
 
-		entity->Init();
-		entity->Activate();
-		entity2->Init();
-		entity2->Activate();
+		gameObject->Init();
+		gameObject->Activate();
+		gameObject2->Init();
+		gameObject2->Activate();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		EXPECT_EQ(0, compBar->m_bar);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		m_entityManager->BroadcastMessage(message);
+		m_gameObjectManager->BroadcastMessage(message);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compBar->m_bar);
 	}
 
-	TEST_F(CMessagesTest, child_entity_receives_message_through_BroadcastMessage_only_once)
+	TEST_F(CMessagesTest, child_gameObject_receives_message_through_BroadcastMessage_only_once)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
-		MessagesTestInternal::CCompBar* compBar = entity1->AddComponent<MessagesTestInternal::CCompBar>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
+		MessagesTestInternal::CCompBar* compBar = gameObject1->AddComponent<MessagesTestInternal::CCompBar>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		EXPECT_EQ(0, compBar->m_bar);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		m_entityManager->BroadcastMessage(message);
+		m_gameObjectManager->BroadcastMessage(message);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compBar->m_bar);
 
-		m_entityManager->BroadcastMessage(message);
+		m_gameObjectManager->BroadcastMessage(message);
 
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE * 2, compBar->m_bar);
 	}
 
-	TEST_F(CMessagesTest, entity_with_component_receives_postMessage)
+	TEST_F(CMessagesTest, gameObject_with_component_receives_postMessage)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->PostMessage(message);
+		gameObject->PostMessage(message);
 		EXPECT_EQ(0, compFoo->m_foo);
 
-		m_entityManager->SendPostMsgs();
+		m_gameObjectManager->SendPostMsgs();
 
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, entity_with_component_receives_postMessage_through_handle)
+	TEST_F(CMessagesTest, gameObject_with_component_receives_postMessage_through_handle)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		CHandle entityHandle = entity;
-		entityHandle.PostMessage(message);
+		CHandle gameObjectHandle = gameObject;
+		gameObjectHandle.PostMessage(message);
 		EXPECT_EQ(0, compFoo->m_foo);
 
-		m_entityManager->SendPostMsgs();
+		m_gameObjectManager->SendPostMsgs();
 
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_PostMessage_recursive)
+	TEST_F(CMessagesTest, child_gameObject_with_component_receives_message_with_PostMessage_recursive)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo0 = entity->AddComponent<MessagesTestInternal::CCompFoo>();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo0 = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->PostMessage(message, ESendMessageType::Recursive);
+		gameObject->PostMessage(message, ESendMessageType::Recursive);
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(0, compFoo->m_foo);
 
-		m_entityManager->SendPostMsgs();
+		m_gameObjectManager->SendPostMsgs();
 
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo0->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_PostMessage_recursive_through_handle)
+	TEST_F(CMessagesTest, child_gameObject_with_component_receives_message_with_PostMessage_recursive_through_handle)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo0 = entity->AddComponent<MessagesTestInternal::CCompFoo>();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo0 = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		CHandle entityHandle = entity;
-		entityHandle.PostMessage(message, ESendMessageType::Recursive);
+		CHandle gameObjectHandle = gameObject;
+		gameObjectHandle.PostMessage(message, ESendMessageType::Recursive);
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(0, compFoo->m_foo);
 
-		m_entityManager->SendPostMsgs();
+		m_gameObjectManager->SendPostMsgs();
 
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo0->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_PostMessageToChildren_recursive)
+	TEST_F(CMessagesTest, child_gameObject_with_component_receives_message_with_PostMessageToChildren_recursive)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo0 = entity->AddComponent<MessagesTestInternal::CCompFoo>();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo0 = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->PostMessageToChildren(message, ESendMessageType::Recursive);
+		gameObject->PostMessageToChildren(message, ESendMessageType::Recursive);
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(0, compFoo->m_foo);
 
-		m_entityManager->SendPostMsgs();
+		m_gameObjectManager->SendPostMsgs();
 
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, child_entity_with_component_receives_message_with_PostMessageToChildren_recursive_through_handle)
+	TEST_F(CMessagesTest, child_gameObject_with_component_receives_message_with_PostMessageToChildren_recursive_through_handle)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo0 = entity->AddComponent<MessagesTestInternal::CCompFoo>();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo0 = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(0, compFoo->m_foo);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		CHandle entityHandle = entity;
-		entityHandle.PostMessageToChildren(message, ESendMessageType::Recursive);
+		CHandle gameObjectHandle = gameObject;
+		gameObjectHandle.PostMessageToChildren(message, ESendMessageType::Recursive);
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(0, compFoo->m_foo);
 
-		m_entityManager->SendPostMsgs();
+		m_gameObjectManager->SendPostMsgs();
 
 		EXPECT_EQ(0, compFoo0->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, child_of_child_entity_with_different_components_receives_message_with_PostMessage_recursive)
+	TEST_F(CMessagesTest, child_of_child_gameObject_with_different_components_receives_message_with_PostMessage_recursive)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
-		CEntity* entity11 = m_entityManager->CreateEntity();
-		entity1->AddChild(entity11);
-		MessagesTestInternal::CCompBar* compBar = entity11->AddComponent<MessagesTestInternal::CCompBar>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject11 = m_gameObjectManager->CreateGameObject();
+		gameObject1->AddChild(gameObject11);
+		MessagesTestInternal::CCompBar* compBar = gameObject11->AddComponent<MessagesTestInternal::CCompBar>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 		EXPECT_EQ(0, compBar->m_bar);
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->PostMessage(message, ESendMessageType::Recursive);
+		gameObject->PostMessage(message, ESendMessageType::Recursive);
 		EXPECT_EQ(0, compFoo->m_foo);
 		EXPECT_EQ(0, compBar->m_bar);
 
-		m_entityManager->SendPostMsgs();
+		m_gameObjectManager->SendPostMsgs();
 
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compFoo->m_foo);
 		EXPECT_EQ(MessagesTestInternal::TEST_VALUE, compBar->m_bar);
 	}
 
-	TEST_F(CMessagesTest, send_postMessage_before_destroying_entity_doesnt_crash)
+	TEST_F(CMessagesTest, send_postMessage_before_destroying_gameObject_doesnt_crash)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
-		entity->PostMessage(message);
+		gameObject->PostMessage(message);
 
-		entity->Destroy();
+		gameObject->Destroy();
 
-		m_entityManager->ExecuteScheduledDestroys();
-		m_entityManager->SendPostMsgs();
+		m_gameObjectManager->ExecuteScheduledDestroys();
+		m_gameObjectManager->SendPostMsgs();
 
 		EXPECT_TRUE(true);
 	}
 
-	TEST_F(CMessagesTest, sendMsg_to_destroyed_entity_not_received)
+	TEST_F(CMessagesTest, sendMsg_to_destroyed_gameObject_not_received)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
 		EXPECT_EQ(0, compFoo->m_foo);
 
-		entity->Destroy();
+		gameObject->Destroy();
 
-		entity->SendMessage(message);
+		gameObject->SendMessage(message);
 
 		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, sendMsg_to_destroyed_entity_with_child_not_received)
+	TEST_F(CMessagesTest, sendMsg_to_destroyed_gameObject_with_child_not_received)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
 		EXPECT_EQ(0, compFoo->m_foo);
 
-		entity->Destroy();
+		gameObject->Destroy();
 
-		entity->SendMessageToChildren(message);
+		gameObject->SendMessageToChildren(message);
 
 		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, postMsg_to_destroyed_entity_not_received)
+	TEST_F(CMessagesTest, postMsg_to_destroyed_gameObject_not_received)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
 		EXPECT_EQ(0, compFoo->m_foo);
 
-		entity->Destroy();
+		gameObject->Destroy();
 
-		entity->PostMessage(message);
-		m_entityManager->SendPostMsgs();
+		gameObject->PostMessage(message);
+		m_gameObjectManager->SendPostMsgs();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
-	TEST_F(CMessagesTest, postMsg_to_destroyed_entity_with_child_not_received)
+	TEST_F(CMessagesTest, postMsg_to_destroyed_gameObject_with_child_not_received)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		CEntity* entity1 = m_entityManager->CreateEntity();
-		entity->AddChild(entity1);
-		MessagesTestInternal::CCompFoo* compFoo = entity1->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		CGameObject* gameObject1 = m_gameObjectManager->CreateGameObject();
+		gameObject->AddChild(gameObject1);
+		MessagesTestInternal::CCompFoo* compFoo = gameObject1->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		MessagesTestInternal::STestMessage message(MessagesTestInternal::TEST_VALUE);
 		EXPECT_EQ(0, compFoo->m_foo);
 
-		entity->Destroy();
+		gameObject->Destroy();
 
-		entity->PostMessageToChildren(message);
-		m_entityManager->SendPostMsgs();
+		gameObject->PostMessageToChildren(message);
+		m_gameObjectManager->SendPostMsgs();
 
 		EXPECT_EQ(0, compFoo->m_foo);
 	}
 
 	TEST_F(CMessagesTest, postMsg_recursive_doesnt_crash)
 	{
-		CEntity* entity = m_entityManager->CreateEntity();
-		MessagesTestInternal::CCompFoo* compFoo = entity->AddComponent<MessagesTestInternal::CCompFoo>();
+		CGameObject* gameObject = m_gameObjectManager->CreateGameObject();
+		MessagesTestInternal::CCompFoo* compFoo = gameObject->AddComponent<MessagesTestInternal::CCompFoo>();
 
-		entity->Init();
-		entity->Activate();
+		gameObject->Init();
+		gameObject->Activate();
 
 		MessagesTestInternal::SPostMessage message;
 		EXPECT_EQ(0, compFoo->m_foo);
 
-		entity->PostMessage(message);
+		gameObject->PostMessage(message);
 
 		for (int i = 1; i < MessagesTestInternal::LOOP_COUNT; ++i)
 		{
-			m_entityManager->SendPostMsgs();
+			m_gameObjectManager->SendPostMsgs();
 			EXPECT_EQ(i, compFoo->m_foo);
 		}
 	}

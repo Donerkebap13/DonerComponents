@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// DonerECS - A Tweaked Entity-Component System
+// DonerECS - A Tweaked GameObject-Component System
 // Copyright(c) 2017 Donerkebap13
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -27,7 +27,7 @@
 
 #include <donerecs/handle/CHandle.h>
 #include <donerecs/CDonerECSSystems.h>
-#include <donerecs/entity/CEntity.h>
+#include <donerecs/gameObject/CGameObject.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 
@@ -41,7 +41,7 @@ namespace DonerECS
         , m_version(0)
         {}
     
-	CHandle::CHandle(CEntity* rhs)
+	CHandle::CHandle(CGameObject* rhs)
 	{
 		*this = rhs ? *rhs : CHandle();
 	}
@@ -52,7 +52,7 @@ namespace DonerECS
 	}
 
 
-	const CHandle& CHandle::operator=(CEntity* rhs)
+	const CHandle& CHandle::operator=(CGameObject* rhs)
 	{
 		*this = rhs ? *rhs : CHandle();
 		return *this;
@@ -64,16 +64,16 @@ namespace DonerECS
 		return *this;
 	}
 
-	CHandle::operator CEntity*()
+	CHandle::operator CGameObject*()
 	{
-		return *this ? CDonerECSSystems::Get()->GetEntityManager()->GetElementByIdxAndVersion(m_elementPosition, m_version) : nullptr;
+		return *this ? CDonerECSSystems::Get()->GetGameObjectManager()->GetElementByIdxAndVersion(m_elementPosition, m_version) : nullptr;
 	}
 
 	CHandle::operator bool()
 	{
-		if (m_elementType == CHandle::EElementType::Entity)
+		if (m_elementType == CHandle::EElementType::GameObject)
 		{
-			return CDonerECSSystems::Get()->GetEntityManager()->GetElementByIdxAndVersion(m_elementPosition, m_version) != nullptr;
+			return CDonerECSSystems::Get()->GetGameObjectManager()->GetElementByIdxAndVersion(m_elementPosition, m_version) != nullptr;
 		}
 		else if (m_elementType == CHandle::EElementType::Component)
 		{
@@ -104,12 +104,12 @@ namespace DonerECS
 
 	void CHandle::Destroy()
 	{
-		if (m_elementType == CHandle::EElementType::Entity)
+		if (m_elementType == CHandle::EElementType::GameObject)
 		{
-			CEntity* entity = *this;
-			if (entity)
+			CGameObject* gameObject = *this;
+			if (gameObject)
 			{
-				entity->Destroy();
+				gameObject->Destroy();
 			}
 		}
 		else if (m_elementType == CHandle::EElementType::Component)

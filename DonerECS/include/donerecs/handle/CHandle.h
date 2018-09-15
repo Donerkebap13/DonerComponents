@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// DonerECS - A Tweaked Entity-Component System
+// DonerECS - A Tweaked GameObject-Component System
 // Copyright(c) 2017 Donerkebap13
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -35,7 +35,7 @@
 
 namespace DonerECS
 {
-	class CEntity;
+	class CGameObject;
 	class CComponent;
 
 	class CHandle
@@ -46,15 +46,15 @@ namespace DonerECS
 		static constexpr int MAX_ELEMENTS = 8192;
 		static constexpr int MAX_VERSIONS = 256;
 
-		enum EElementType : unsigned { None = 0, Entity, Component };
+		enum EElementType : unsigned { None = 0, GameObject, Component };
 
         CHandle();
-		CHandle(CEntity* rhs);
+		CHandle(CGameObject* rhs);
 		CHandle(CComponent* rhs);
 
-		const CHandle & operator=(CEntity* rhs);
+		const CHandle & operator=(CGameObject* rhs);
 		const CHandle & operator=(CComponent* rhs);
-		operator CEntity*();
+		operator CGameObject*();
 		operator bool();
 		operator int() const;
 

@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// DonerECS - A Tweaked Entity-Component System
+// DonerECS - A Tweaked GameObject-Component System
 // Copyright(c) 2017 Donerkebap13
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,7 +28,7 @@
 #include <donerecs/CDonerECSSystems.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
-#include <donerecs/entity/CEntity.h>
+#include <donerecs/gameObject/CGameObject.h>
 
 namespace DonerECS
 {
@@ -108,7 +108,7 @@ namespace DonerECS
 	{
 		if (m_initialized)
 		{
-			CEntity* owner = m_owner;
+			CGameObject* owner = m_owner;
 			if (m_numDeactivations > 0)
 			{
 				if (!owner || owner->IsActive())
@@ -165,7 +165,7 @@ namespace DonerECS
 
 	void CComponent::CheckFirstActivationInternal()
 	{
-		CEntity* owner = m_owner;
+		CGameObject* owner = m_owner;
 		if ((!owner || owner->IsActive()) && m_numDeactivations > 0)
 		{
 			--m_numDeactivations;

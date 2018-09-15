@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// DonerECS - A Tweaked Entity-Component System
+// DonerECS - A Tweaked GameObject-Component System
 // Copyright(c) 2017 Donerkebap13
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,9 +26,9 @@
 ////////////////////////////////////////////////////////////
 
 #include <donerecs/CDonerECSSystems.h>
-#include <donerecs/entity/CEntity.h>
-#include <donerecs/entity/CEntityParser.h>
-#include <donerecs/entity/CPrefabManager.h>
+#include <donerecs/gameObject/CGameObject.h>
+#include <donerecs/gameObject/CGameObjectParser.h>
+#include <donerecs/gameObject/CPrefabManager.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 #include <donerecs/tags/CTagsManager.h>
@@ -76,18 +76,18 @@ namespace DeserializationTestInternal
 		std::vector<std::string> m_stringVector;
 	};
 
-		const char* const FULL_DATA_ENTITY = "{ \"root\": {"
-		"\"type\": \"entity\", \"name\": \"test1\","
+		const char* const FULL_DATA_GAME_OBJECT = "{ \"root\": {"
+		"\"name\": \"test1\","
 		"\"components\": [{ \"name\": \"foo\", \"int\": 1, \"float\": 16.0, \"bool\": true, \"long_long\": 99999, \"double\": 10.0, \"string\": \"std::string\","
 		" \"int_vector\": [1, 20, 300], \"string_vector\": [\"one\", \"two\", \"three\"] }]}}";
 
-	const char* const PARTIALLY_FULL_ENTITY = "{ \"root\": {"
-		"\"type\": \"entity\", \"name\": \"test1\","
+	const char* const PARTIALLY_FULL_GAME_OBJECT = "{ \"root\": {"
+		"\"name\": \"test1\","
 		"\"components\": [{ \"name\": \"foo\", \"bool\": true, \"string\": \"std::string\","
 		" \"string_vector\": [\"one\", \"two\", \"three\"] }]}}";
 
-	const char* const EMPTY_ENTITY = "{ \"root\": {"
-		"\"type\": \"entity\", \"name\": \"test1\","
+	const char* const EMPTY_GAME_OBJECT = "{ \"root\": {"
+		"\"name\": \"test1\","
 		"\"components\": [{ \"name\": \"foo\"}]}}";
 }
 
@@ -111,13 +111,13 @@ namespace DonerECS
 	public:
 		CDeserializationTest()
 			: m_componentFactoryManager(nullptr)
-			, m_entityManager(nullptr)
+			, m_gameObjectManager(nullptr)
 			, m_prefabManager(nullptr)
 			, m_tagManager(nullptr)
 		{
 			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
 			m_componentFactoryManager = systems.GetComponentFactoryManager();
-			m_entityManager = systems.GetEntityManager();
+			m_gameObjectManager = systems.GetGameObjectManager();
 			m_prefabManager = systems.GetPrefabManager();
 			m_tagManager = systems.GetTagsManager();
 
@@ -134,16 +134,16 @@ namespace DonerECS
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;
-		CEntityManager *m_entityManager;
+		CGameObjectManager *m_gameObjectManager;
 		CPrefabManager *m_prefabManager;
 		CTagsManager *m_tagManager;
 	};
 
-	TEST_F(CDeserializationTest, parse_entity_with_full_data)
+	TEST_F(CDeserializationTest, parse_gameObject_with_full_data)
 	{
-		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(::DeserializationTestInternal::FULL_DATA_ENTITY);
-		::DeserializationTestInternal::CCompFoo* component = entity->GetComponent<::DeserializationTestInternal::CCompFoo>();
+		CGameObjectParser parser;
+		CGameObject* gameObject = parser.ParseSceneFromJson(::DeserializationTestInternal::FULL_DATA_GAME_OBJECT);
+		::DeserializationTestInternal::CCompFoo* component = gameObject->GetComponent<::DeserializationTestInternal::CCompFoo>();
 		
 		EXPECT_EQ(1, component->m_int);
 		EXPECT_EQ(16.f, component->m_float);
@@ -165,11 +165,11 @@ namespace DonerECS
 		EXPECT_EQ("three", component->m_stringVector[2]);
 	}
 
-	TEST_F(CDeserializationTest, parse_entity_with_partial_data)
+	TEST_F(CDeserializationTest, parse_gameObject_with_partial_data)
 	{
-		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(::DeserializationTestInternal::PARTIALLY_FULL_ENTITY);
-		::DeserializationTestInternal::CCompFoo* component = entity->GetComponent<::DeserializationTestInternal::CCompFoo>();
+		CGameObjectParser parser;
+		CGameObject* gameObject = parser.ParseSceneFromJson(::DeserializationTestInternal::PARTIALLY_FULL_GAME_OBJECT);
+		::DeserializationTestInternal::CCompFoo* component = gameObject->GetComponent<::DeserializationTestInternal::CCompFoo>();
 		
 		EXPECT_EQ(::DeserializationTestInternal::INT_DEFAULT_VALUE, component->m_int);
 		EXPECT_EQ(::DeserializationTestInternal::FLOAT_DEFAULT_VALUE, component->m_float);
@@ -186,11 +186,11 @@ namespace DonerECS
 		EXPECT_EQ("three", component->m_stringVector[2]);
 	}
 
-	TEST_F(CDeserializationTest, parse_entity_with_no_data)
+	TEST_F(CDeserializationTest, parse_gameObject_with_no_data)
 	{
-		CEntityParser parser;
-		CEntity* entity = parser.ParseSceneFromJson(::DeserializationTestInternal::EMPTY_ENTITY);
-		::DeserializationTestInternal::CCompFoo* component = entity->GetComponent<::DeserializationTestInternal::CCompFoo>();
+		CGameObjectParser parser;
+		CGameObject* gameObject = parser.ParseSceneFromJson(::DeserializationTestInternal::EMPTY_GAME_OBJECT);
+		::DeserializationTestInternal::CCompFoo* component = gameObject->GetComponent<::DeserializationTestInternal::CCompFoo>();
 		
 		EXPECT_EQ(::DeserializationTestInternal::INT_DEFAULT_VALUE, component->m_int);
 		EXPECT_EQ(::DeserializationTestInternal::FLOAT_DEFAULT_VALUE, component->m_float);

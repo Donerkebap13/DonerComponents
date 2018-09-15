@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// DonerECS - A Tweaked Entity-Component System
+// DonerECS - A Tweaked GameObject-Component System
 // Copyright(c) 2017 Donerkebap13
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -51,12 +51,12 @@ namespace DonerECS
 		TagAlreadyExists,
 		TagNotFound,
 		MessageAlreadyRegistered,
-		EntityChildAlreadyExists,
-		EntityChildNotFound,
-		ComponentdNotFoundInEntity,
-		ComponentdAlreadyFoundInEntity,
+		GameObjectChildAlreadyExists,
+		GameObjectChildNotFound,
+		ComponentdNotFoundInGameObject,
+		ComponentdAlreadyFoundInGameObject,
 		ComponentNotRegisteredInFactory,
-		EntityNotRegisteredInFactory
+		GameObjectNotRegisteredInFactory
 	};
 
 #if defined _DEBUG

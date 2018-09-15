@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// DonerECS - A Tweaked Entity-Component System
+// DonerECS - A Tweaked GameObject-Component System
 // Copyright(c) 2017 Donerkebap13
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -28,8 +28,8 @@
 #include <donerecs/CDonerECSSystems.h>
 
 #include <donerecs/component/CComponentFactoryManager.h>
-#include <donerecs/entity/CEntity.h>
-#include <donerecs/entity/CPrefabManager.h>
+#include <donerecs/gameObject/CGameObject.h>
+#include <donerecs/gameObject/CPrefabManager.h>
 #include <donerecs/tags/CTagsManager.h>
 
 #include <cassert>
@@ -38,7 +38,7 @@ namespace DonerECS
 {
 	CDonerECSSystems::CDonerECSSystems()
 		: m_componentFactoryManager(nullptr)
-		, m_entityManager(nullptr)
+		, m_gameObjectManager(nullptr)
 		, m_tagsManager(nullptr)
 		, m_prefabManager(nullptr)
 		, m_initialized(false)
@@ -56,7 +56,7 @@ namespace DonerECS
 		m_initialized = true;
 
 		m_componentFactoryManager = new CComponentFactoryManager();
-		m_entityManager = new CEntityManager();
+		m_gameObjectManager = new CGameObjectManager();
 		m_tagsManager = new CTagsManager();
 		m_prefabManager = new CPrefabManager();
 
@@ -71,9 +71,9 @@ namespace DonerECS
 		DECS_DELETE_POINTER(m_tagsManager);
 
 		m_componentFactoryManager->ExecuteScheduledDestroys();
-		m_entityManager->ExecuteScheduledDestroys();
+		m_gameObjectManager->ExecuteScheduledDestroys();
 
-		DECS_DELETE_POINTER(m_entityManager);
+		DECS_DELETE_POINTER(m_gameObjectManager);
 		DECS_DELETE_POINTER(m_componentFactoryManager);
 
 		m_initialized = false;
@@ -86,10 +86,10 @@ namespace DonerECS
 
 		// Destroys pending entities & components
 		m_componentFactoryManager->ExecuteScheduledDestroys();
-		m_entityManager->ExecuteScheduledDestroys();
+		m_gameObjectManager->ExecuteScheduledDestroys();
 
 		// Sends postMsg
-		m_entityManager->SendPostMsgs();
+		m_gameObjectManager->SendPostMsgs();
 	}
 
 	CComponentFactoryManager* CDonerECSSystems::GetComponentFactoryManager() 
@@ -97,10 +97,10 @@ namespace DonerECS
 		assert(m_initialized);
 		return m_componentFactoryManager; 
 	}
-	CEntityManager* CDonerECSSystems::GetEntityManager() 
+	CGameObjectManager* CDonerECSSystems::GetGameObjectManager() 
 	{
 		assert(m_initialized);
-		return m_entityManager;
+		return m_gameObjectManager;
 	}
 
 	CTagsManager* CDonerECSSystems::GetTagsManager() 

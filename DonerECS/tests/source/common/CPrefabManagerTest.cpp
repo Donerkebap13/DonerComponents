@@ -2,7 +2,7 @@
 //
 // MIT License
 //
-// DonerECS - A Tweaked Entity-Component System
+// DonerECS - A Tweaked GameObject-Component System
 // Copyright(c) 2017 Donerkebap13
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,8 +26,8 @@
 ////////////////////////////////////////////////////////////
 
 #include <donerecs/CDonerECSSystems.h>
-#include <donerecs/entity/CEntity.h>
-#include <donerecs/entity/CPrefabManager.h>
+#include <donerecs/gameObject/CGameObject.h>
+#include <donerecs/gameObject/CPrefabManager.h>
 #include <donerecs/component/CComponent.h>
 #include <donerecs/component/CComponentFactoryManager.h>
 #include <donerecs/handle/CHandle.h>
@@ -56,12 +56,12 @@ namespace DonerECS
 	public:
 		CPrefabManagerTest()
 			: m_componentFactoryManager(nullptr)
-			, m_entityManager(nullptr)
+			, m_gameObjectManager(nullptr)
 			, m_prefabManager(nullptr)
 		{
 			CDonerECSSystems& systems = CDonerECSSystems::CreateInstance()->Init();
 			m_componentFactoryManager = systems.GetComponentFactoryManager();
-			m_entityManager = systems.GetEntityManager();
+			m_gameObjectManager = systems.GetGameObjectManager();
 			m_prefabManager = systems.GetPrefabManager();
 
 			ADD_COMPONENT_FACTORY("foo", PrefabManagerTestInternal::CCompFoo, 10);
@@ -73,13 +73,13 @@ namespace DonerECS
 		}
 
 		CComponentFactoryManager *m_componentFactoryManager;
-		CEntityManager* m_entityManager;
+		CGameObjectManager* m_gameObjectManager;
 		CPrefabManager* m_prefabManager;
 	};
 
-	TEST_F(CPrefabManagerTest, clone_invalid_prefab_return_invalid_entity)
+	TEST_F(CPrefabManagerTest, clone_invalid_prefab_return_invalid_gameObject)
 	{
-		CEntity* cloned = m_prefabManager->ClonePrefab("test");
+		CGameObject* cloned = m_prefabManager->ClonePrefab("test");
 		EXPECT_EQ(nullptr, cloned);
 	}
 }
