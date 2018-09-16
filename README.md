@@ -1,4 +1,4 @@
-![Doner Serializer](https://i.imgur.com/u80uptL.png)
+![Doner Serializer](https://i.imgur.com/XaMwx4V.png)
 
 [![Release version](https://img.shields.io/badge/release-v1.0.0-blue.svg)](https://github.com/Donerkebap13/DonerComponents/releases/tag/1.0.0) [![Build Status](https://travis-ci.org/Donerkebap13/DonerComponents.svg?branch=master)](https://travis-ci.org/Donerkebap13/DonerComponents) [![Build status](https://ci.appveyor.com/api/projects/status/3l2174mt6qm7627w/branch/master?svg=true)](https://ci.appveyor.com/project/Donerkebap13/DonerComponents/branch/master) [![Coverage Status](https://coveralls.io/repos/github/Donerkebap13/DonerComponents/badge.svg?branch=master&service=github)](https://coveralls.io/github/Donerkebap13/DonerComponents?branch=master&service=github)
 
