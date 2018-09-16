@@ -91,8 +91,8 @@ namespace DonerComponents
 			DC_ERROR_MSG(EErrorCode::FileNotFound, "error opening %s", path);
 			return false;
 		}
-
-		return ParseTagsFromJson((const char*)mdp.GetBaseData());
+		std::string zeroTerminatedStr((const char*)mdp.GetBaseData(), mdp.GetSize());
+		return ParseTagsFromJson(zeroTerminatedStr.c_str());
 	}
 
 	bool CTagsManager::ParseTagsFromMemory(const unsigned char* jsonStringBuffer, std::size_t size)
@@ -103,8 +103,8 @@ namespace DonerComponents
 			DC_ERROR_MSG(EErrorCode::ReadFromBufferFailed, "Error reading from Buffer");
 			return false;
 		}
-
-		return ParseTagsFromJson((const char*)mdp.GetBaseData());
+		std::string zeroTerminatedStr((const char*)mdp.GetBaseData(), mdp.GetSize());
+		return ParseTagsFromJson(zeroTerminatedStr.c_str());
 	}
 
 	bool CTagsManager::ParseTagsFromJson(const char* const jsonStr)
