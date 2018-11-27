@@ -38,6 +38,7 @@
 
 #include <vector>
 #include <functional>
+#include <stack>
 
 namespace DonerComponents
 {
@@ -156,15 +157,28 @@ namespace DonerComponents
 		std::vector<CHandle> GetChildrenWithTagsRecursive(Args... args)
 		{
 			std::vector<CHandle> children;
+
+			std::stack<CGameObject*> stack;
 			for (CGameObject* child : m_children)
 			{
-				if (child)
+				stack.push(child);
+			}
+
+			while (!stack.empty())
+			{
+				CGameObject* current = stack.top();
+				stack.pop();
+
+				if (current)
 				{
-					if (child->HasTags(std::forward<Args>(args)...))
+					if (current->HasTags(std::forward<Args>(args)...))
 					{
-						children.emplace_back(child);
+						children.emplace_back(current);
 					}
-					child->GetChildrenWithTagsRecursiveInternal(children, std::forward<Args>(args)...);
+					for (int i = 0; i < current->GetChildrenCount(); ++i)
+					{
+						stack.push(current->GetChildByIndex(i));
+					}
 				}
 			}
 			return children;
@@ -186,15 +200,28 @@ namespace DonerComponents
 		std::vector<CHandle> GetChildrenWithAnyTagRecursive(Args... args)
 		{
 			std::vector<CHandle> children;
+
+			std::stack<CGameObject*> stack;
 			for (CGameObject* child : m_children)
 			{
-				if (child)
+				stack.push(child);
+			}
+
+			while (!stack.empty())
+			{
+				CGameObject* current = stack.top();
+				stack.pop();
+
+				if (current)
 				{
-					if (child->HasAnyTag(std::forward<Args>(args)...))
+					if (current->HasAnyTag(std::forward<Args>(args)...))
 					{
-						children.emplace_back(child);
+						children.emplace_back(current);
 					}
-					child->GetChildrenWithAnyTagRecursiveInternal(children, std::forward<Args>(args)...);
+					for (int i = 0; i < current->GetChildrenCount(); ++i)
+					{
+						stack.push(current->GetChildByIndex(i));
+					}
 				}
 			}
 			return children;
@@ -215,11 +242,20 @@ namespace DonerComponents
 
 				if (type == ESendMessageType::Recursive)
 				{
+					std::stack<CGameObject*> stack;
 					for (CGameObject* child : m_children)
 					{
-						if (child)
+						stack.push(child);
+					}
+
+					while (!stack.empty())
+					{
+						CGameObject* current = stack.top();
+						stack.pop();
+						current->SendMessage(message, type);
+						for (int i = 0; i < current->GetChildrenCount(); ++i)
 						{
-							child->SendMessage(message, type);
+							stack.push(current->GetChildByIndex(i));
 						}
 					}
 				}
@@ -275,38 +311,6 @@ namespace DonerComponents
 		void ActivateFromParent();
 		void ActivateInternal();
 		void CheckFirstActivationInternal();
-
-		template<typename... Args>
-		void GetChildrenWithTagsRecursiveInternal(std::vector<CHandle>& children, Args... args)
-		{
-			for (CGameObject* child : m_children)
-			{
-				if (child)
-				{
-					if (child->HasTags(std::forward<Args>(args)...))
-					{
-						children.emplace_back(child);
-					}
-					child->GetChildrenWithTagsRecursiveInternal(children, std::forward<Args>(args)...);
-				}
-			}
-		}
-
-		template<typename... Args>
-		void GetChildrenWithAnyTagRecursiveInternal(std::vector<CHandle>& children, Args... args)
-		{
-			for (CGameObject* child : m_children)
-			{
-				if (child)
-				{
-					if (child->HasAnyTag(std::forward<Args>(args)...))
-					{
-						children.emplace_back(child);
-					}
-					child->GetChildrenWithAnyTagRecursiveInternal(children, std::forward<Args>(args)...);
-				}
-			}
-		}
 
 		CHandle m_parent;
 		std::vector<CHandle> m_children;
@@ -381,11 +385,23 @@ namespace DonerComponents
 
 			if (type == ESendMessageType::Recursive)
 			{
+				std::stack<CGameObject*> stack;
 				for (CGameObject* child : m_children)
 				{
-					if (child)
+					stack.push(child);
+				}
+				while (!stack.empty())
+				{
+					CGameObject* current = stack.top();
+					stack.pop();
+					if (current && current->IsActive() && !current->IsDestroyed())
 					{
-						child->PostMessage(message, type);
+						m_gameObjectManager.PostMessage(current, message);
+
+						for (int i = 0; i < current->GetChildrenCount(); ++i)
+						{
+							stack.push(current->GetChildByIndex(i));
+						}
 					}
 				}
 			}
